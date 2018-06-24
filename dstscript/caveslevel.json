@@ -1,0 +1,931 @@
+{
+  "version": "2.0.0",
+  "environment": [
+    {
+      "name": "boons",
+      "value": "default",
+      "cn_str": "前辈遗迹",
+      "options": [
+        {
+          "value": "never",
+          "cn_str": "无"
+        },
+        {
+          "value": "rare",
+          "cn_str": "较少"
+        },
+        {
+          "value": "default",
+          "cn_str": "默认"
+        },
+        {
+          "value": "often",
+          "cn_str": "较多"
+        },
+        {
+          "value": "always",
+          "cn_str": "大量"
+        }
+      ]
+    },
+    {
+      "name": "branching",
+      "value": "default",
+      "cn_str": "岔路地形",
+      "options": [
+        {
+          "value": "never",
+          "cn_str": "无"
+        },
+        {
+          "value": "rare",
+          "cn_str": "较少"
+        },
+        {
+          "value": "default",
+          "cn_str": "默认"
+        },
+        {
+          "value": "often",
+          "cn_str": "较多"
+        },
+        {
+          "value": "always",
+          "cn_str": "大量"
+        }
+      ]
+    },
+    {
+      "name": "disease_delay",
+      "value": "default",
+      "cn_str": "作物患病",
+      "options": [
+        {
+          "value": "default",
+          "cn_str": "默认"
+        },
+        {
+          "value": "none",
+          "cn_str": "无"
+        },
+        {
+          "value": "random",
+          "cn_str": "随机"
+        },
+        {
+          "value": "long",
+          "cn_str": "慢"
+        },
+        {
+          "value": "short",
+          "cn_str": "快"
+        }
+      ]
+    },
+    {
+      "name": "loop",
+      "value": "default",
+      "cn_str": "环状地形",
+      "options": [
+        {
+          "value": "never",
+          "cn_str": "无"
+        },
+        {
+          "value": "rare",
+          "cn_str": "较少"
+        },
+        {
+          "value": "default",
+          "cn_str": "默认"
+        },
+        {
+          "value": "often",
+          "cn_str": "较多"
+        },
+        {
+          "value": "always",
+          "cn_str": "大量"
+        }
+      ]
+    },
+    {
+      "name": "petrification",
+      "value": "default",
+      "cn_str": "石化速率",
+      "options": [
+        {
+          "value": "default",
+          "cn_str": "默认"
+        },
+        {
+          "value": "none",
+          "cn_str": "无"
+        },
+        {
+          "value": "few",
+          "cn_str": "慢"
+        },
+        {
+          "value": "many",
+          "cn_str": "快"
+        },
+        {
+          "value": "max",
+          "cn_str": "极快"
+        }
+      ]
+    },
+    {
+      "name": "regrowth",
+      "value": "default",
+      "cn_str": "资源再生",
+      "options": [
+        {
+          "value": "veryslow",
+          "cn_str": "极慢"
+        },
+        {
+          "value": "slow",
+          "cn_str": "慢"
+        },
+        {
+          "value": "default",
+          "cn_str": "默认"
+        },
+        {
+          "value": "fast",
+          "cn_str": "快"
+        },
+        {
+          "value": "veryfast",
+          "cn_str": "极快"
+        }
+      ]
+    },
+    {
+      "name": "start_location",
+      "value": "default",
+      "cn_str": "初始环境",
+      "options": [
+        {
+          "num": 3
+        },
+        {
+          "value": "default",
+          "cn_str": "默认"
+        },
+        {
+          "value": "plus",
+          "cn_str": "三箱"
+        },
+        {
+          "value": "darkness",
+          "cn_str": "永夜"
+        }
+      ]
+    },
+    {
+      "name": "touchstone",
+      "value": "default",
+      "cn_str": "猪头祭坛",
+      "options": [
+        {
+          "value": "never",
+          "cn_str": "无"
+        },
+        {
+          "value": "rare",
+          "cn_str": "较少"
+        },
+        {
+          "value": "default",
+          "cn_str": "默认"
+        },
+        {
+          "value": "often",
+          "cn_str": "较多"
+        },
+        {
+          "value": "always",
+          "cn_str": "大量"
+        }
+      ]
+    },
+    {
+      "name": "weather",
+      "value": "default",
+      "cn_str": "雨",
+      "options": [
+        {
+          "value": "never",
+          "cn_str": "无"
+        },
+        {
+          "value": "rare",
+          "cn_str": "较少"
+        },
+        {
+          "value": "default",
+          "cn_str": "默认"
+        },
+        {
+          "value": "often",
+          "cn_str": "较多"
+        },
+        {
+          "value": "always",
+          "cn_str": "大量"
+        }
+      ]
+    },
+    {
+      "name": "world_size",
+      "value": "default",
+      "cn_str": "地图大小",
+      "world_size_options": [
+        {
+          "num": 4
+        },
+        {
+          "value": "small",
+          "cn_str": "小型"
+        },
+        {
+          "value": "medium",
+          "cn_str": "中等"
+        },
+        {
+          "value": "default",
+          "cn_str": "大型"
+        },
+        {
+          "value": "huge",
+          "cn_str": "巨型"
+        }
+      ]
+    },
+    {
+      "name": "prefabswaps_start",
+      "value": "default",
+      "cn_str": "初始多样性",
+      "prefabswaps_start": [
+        {
+          "num": 3
+        },
+        {
+          "value": "classic",
+          "cn_str": "经典"
+        },
+        {
+          "value": "highlyrandom",
+          "cn_str": "高度随机"
+        },
+        {
+          "value": "default",
+          "cn_str": "默认"
+        }
+      ]
+    },
+    {
+      "name": "roads",
+      "value": "default",
+      "cn_str": "道路",
+      "options": [
+        {
+          "num": 2
+        },
+        {
+          "value": "never",
+          "cn_str": "无"
+        },
+        {
+          "value": "default",
+          "cn_str": "有"
+        }
+      ]
+    },
+    {
+      "name": "task_set",
+      "value": "default",
+      "cn_str": "生物群落",
+      "task_set_option": [
+        {
+          "num": 3
+        },
+        {
+          "value": "classic",
+          "cn_str": "没有巨人"
+        },
+        {
+          "value": "default",
+          "cn_str": "联机"
+        },
+        {
+          "value": "cave",
+          "cn_str": "洞穴选这个"
+        }
+      ]
+    },
+    {
+      "name": "cavelight",
+      "value": "default",
+      "cn_str": "洞穴光照",
+      "cavelight_options": [
+        {
+          "value": "veryslow",
+          "cn_str": "极慢"
+        },
+        {
+          "value": "slow",
+          "cn_str": "慢"
+        },
+        {
+          "value": "default",
+          "cn_str": "默认"
+        },
+        {
+          "value": "fast",
+          "cn_str": "快"
+        },
+        {
+          "value": "veryfast",
+          "cn_str": "极快"
+        }
+      ]
+    },
+    {
+      "name": "earthquakes",
+      "value": "default",
+      "cn_str": "地震频率",
+      "options": [
+        {
+          "value": "never",
+          "cn_str": "无"
+        },
+        {
+          "value": "rare",
+          "cn_str": "较少"
+        },
+        {
+          "value": "default",
+          "cn_str": "默认"
+        },
+        {
+          "value": "often",
+          "cn_str": "较多"
+        },
+        {
+          "value": "always",
+          "cn_str": "大量"
+        }
+      ]
+    },
+    {
+      "name": "wormlights",
+      "value": "default",
+      "cn_str": "发光浆果",
+      "options": [
+        {
+          "value": "never",
+          "cn_str": "无"
+        },
+        {
+          "value": "rare",
+          "cn_str": "较少"
+        },
+        {
+          "value": "default",
+          "cn_str": "默认"
+        },
+        {
+          "value": "often",
+          "cn_str": "较多"
+        },
+        {
+          "value": "always",
+          "cn_str": "大量"
+        }
+      ]
+    }
+  ],
+  "food": [
+    {
+      "name": "berrybush",
+      "value": "default",
+      "cn_str": "浆果丛",
+      "options": [
+        {
+          "value": "never",
+          "cn_str": "无"
+        },
+        {
+          "value": "rare",
+          "cn_str": "较少"
+        },
+        {
+          "value": "default",
+          "cn_str": "默认"
+        },
+        {
+          "value": "often",
+          "cn_str": "较多"
+        },
+        {
+          "value": "always",
+          "cn_str": "大量"
+        }
+      ]
+    },
+    {
+      "name": "carrot",
+      "value": "default",
+      "cn_str": "胡萝卜",
+      "options": [
+        {
+          "value": "never",
+          "cn_str": "无"
+        },
+        {
+          "value": "rare",
+          "cn_str": "较少"
+        },
+        {
+          "value": "default",
+          "cn_str": "默认"
+        },
+        {
+          "value": "often",
+          "cn_str": "较多"
+        },
+        {
+          "value": "always",
+          "cn_str": "大量"
+        }
+      ]
+    },
+    {
+      "name": "mushroom",
+      "value": "default",
+      "cn_str": "蘑菇",
+      "options": [
+        {
+          "value": "never",
+          "cn_str": "无"
+        },
+        {
+          "value": "rare",
+          "cn_str": "较少"
+        },
+        {
+          "value": "default",
+          "cn_str": "默认"
+        },
+        {
+          "value": "often",
+          "cn_str": "较多"
+        },
+        {
+          "value": "always",
+          "cn_str": "大量"
+        }
+      ]
+    },
+    {
+      "name": "banana",
+      "value": "default",
+      "cn_str": "香蕉",
+      "options": [
+        {
+          "value": "never",
+          "cn_str": "无"
+        },
+        {
+          "value": "rare",
+          "cn_str": "较少"
+        },
+        {
+          "value": "default",
+          "cn_str": "默认"
+        },
+        {
+          "value": "often",
+          "cn_str": "较多"
+        },
+        {
+          "value": "always",
+          "cn_str": "大量"
+        }
+      ]
+    },
+    {
+      "name": "lichen",
+      "value": "default",
+      "cn_str": "苔藓",
+      "options": [
+        {
+          "value": "never",
+          "cn_str": "无"
+        },
+        {
+          "value": "rare",
+          "cn_str": "较少"
+        },
+        {
+          "value": "default",
+          "cn_str": "默认"
+        },
+        {
+          "value": "often",
+          "cn_str": "较多"
+        },
+        {
+          "value": "always",
+          "cn_str": "大量"
+        }
+      ]
+    }
+  ],
+  "animal": [
+    {
+      "name": "bunnymen",
+      "value": "default",
+      "cn_str": "兔人",
+      "options": [
+        {
+          "value": "never",
+          "cn_str": "无"
+        },
+        {
+          "value": "rare",
+          "cn_str": "较少"
+        },
+        {
+          "value": "default",
+          "cn_str": "默认"
+        },
+        {
+          "value": "often",
+          "cn_str": "较多"
+        },
+        {
+          "value": "always",
+          "cn_str": "大量"
+        }
+      ]
+    },
+    {
+      "name": "cave_ponds",
+      "value": "default",
+      "cn_str": "洞穴池塘",
+      "options": [
+        {
+          "value": "never",
+          "cn_str": "无"
+        },
+        {
+          "value": "rare",
+          "cn_str": "较少"
+        },
+        {
+          "value": "default",
+          "cn_str": "默认"
+        },
+        {
+          "value": "often",
+          "cn_str": "较多"
+        },
+        {
+          "value": "always",
+          "cn_str": "大量"
+        }
+      ]
+    },
+    {
+      "name": "monkey",
+      "value": "default",
+      "cn_str": "猴子",
+      "options": [
+        {
+          "value": "never",
+          "cn_str": "无"
+        },
+        {
+          "value": "rare",
+          "cn_str": "较少"
+        },
+        {
+          "value": "default",
+          "cn_str": "默认"
+        },
+        {
+          "value": "often",
+          "cn_str": "较多"
+        },
+        {
+          "value": "always",
+          "cn_str": "大量"
+        }
+      ]
+    },
+    {
+      "name": "rocky",
+      "value": "default",
+      "cn_str": "石虾",
+      "options": [
+        {
+          "value": "never",
+          "cn_str": "无"
+        },
+        {
+          "value": "rare",
+          "cn_str": "较少"
+        },
+        {
+          "value": "default",
+          "cn_str": "默认"
+        },
+        {
+          "value": "often",
+          "cn_str": "较多"
+        },
+        {
+          "value": "always",
+          "cn_str": "大量"
+        }
+      ]
+    },
+    {
+      "name": "slurper",
+      "value": "default",
+      "cn_str": "啜食者",
+      "options": [
+        {
+          "value": "never",
+          "cn_str": "无"
+        },
+        {
+          "value": "rare",
+          "cn_str": "较少"
+        },
+        {
+          "value": "default",
+          "cn_str": "默认"
+        },
+        {
+          "value": "often",
+          "cn_str": "较多"
+        },
+        {
+          "value": "always",
+          "cn_str": "大量"
+        }
+      ]
+    },
+    {
+      "name": "slurtles",
+      "value": "default",
+      "cn_str": "蜗牛",
+      "options": [
+        {
+          "value": "never",
+          "cn_str": "无"
+        },
+        {
+          "value": "rare",
+          "cn_str": "较少"
+        },
+        {
+          "value": "default",
+          "cn_str": "默认"
+        },
+        {
+          "value": "often",
+          "cn_str": "较多"
+        },
+        {
+          "value": "always",
+          "cn_str": "大量"
+        }
+      ]
+    }
+  ],
+  "monster": [
+    {
+      "name": "chess",
+      "value": "default",
+      "cn_str": "齿轮怪",
+      "options": [
+        {
+          "value": "never",
+          "cn_str": "无"
+        },
+        {
+          "value": "rare",
+          "cn_str": "较少"
+        },
+        {
+          "value": "default",
+          "cn_str": "默认"
+        },
+        {
+          "value": "often",
+          "cn_str": "较多"
+        },
+        {
+          "value": "always",
+          "cn_str": "大量"
+        }
+      ]
+    },
+    {
+      "name": "liefs",
+      "value": "default",
+      "cn_str": "树精",
+      "options": [
+        {
+          "value": "never",
+          "cn_str": "无"
+        },
+        {
+          "value": "rare",
+          "cn_str": "较少"
+        },
+        {
+          "value": "default",
+          "cn_str": "默认"
+        },
+        {
+          "value": "often",
+          "cn_str": "较多"
+        },
+        {
+          "value": "always",
+          "cn_str": "大量"
+        }
+      ]
+    },
+    {
+      "name": "tentacles",
+      "value": "default",
+      "cn_str": "触手怪",
+      "options": [
+        {
+          "value": "never",
+          "cn_str": "无"
+        },
+        {
+          "value": "rare",
+          "cn_str": "较少"
+        },
+        {
+          "value": "default",
+          "cn_str": "默认"
+        },
+        {
+          "value": "often",
+          "cn_str": "较多"
+        },
+        {
+          "value": "always",
+          "cn_str": "大量"
+        }
+      ]
+    },
+    {
+      "name": "bats",
+      "value": "default",
+      "cn_str": "蝙蝠",
+      "options": [
+        {
+          "value": "never",
+          "cn_str": "无"
+        },
+        {
+          "value": "rare",
+          "cn_str": "较少"
+        },
+        {
+          "value": "default",
+          "cn_str": "默认"
+        },
+        {
+          "value": "often",
+          "cn_str": "较多"
+        },
+        {
+          "value": "always",
+          "cn_str": "大量"
+        }
+      ]
+    },
+    {
+      "name": "cave_spiders",
+      "value": "default",
+      "cn_str": "洞穴蜘蛛",
+      "options": [
+        {
+          "value": "never",
+          "cn_str": "无"
+        },
+        {
+          "value": "rare",
+          "cn_str": "较少"
+        },
+        {
+          "value": "default",
+          "cn_str": "默认"
+        },
+        {
+          "value": "often",
+          "cn_str": "较多"
+        },
+        {
+          "value": "always",
+          "cn_str": "大量"
+        }
+      ]
+    },
+    {
+      "name": "fissure",
+      "value": "default",
+      "cn_str": "影怪裂缝",
+      "options": [
+        {
+          "value": "never",
+          "cn_str": "无"
+        },
+        {
+          "value": "rare",
+          "cn_str": "较少"
+        },
+        {
+          "value": "default",
+          "cn_str": "默认"
+        },
+        {
+          "value": "often",
+          "cn_str": "较多"
+        },
+        {
+          "value": "always",
+          "cn_str": "大量"
+        }
+      ]
+    },
+    {
+      "name": "wormattacks",
+      "value": "default",
+      "cn_str": "蠕虫袭击",
+      "options": [
+        {
+          "value": "never",
+          "cn_str": "无"
+        },
+        {
+          "value": "rare",
+          "cn_str": "较少"
+        },
+        {
+          "value": "default",
+          "cn_str": "默认"
+        },
+        {
+          "value": "often",
+          "cn_str": "较多"
+        },
+        {
+          "value": "always",
+          "cn_str": "大量"
+        }
+      ]
+    },
+    {
+      "name": "worms",
+      "value": "default",
+      "cn_str": "蠕虫",
+      "options": [
+        {
+          "value": "never",
+          "cn_str": "无"
+        },
+        {
+          "value": "rare",
+          "cn_str": "较少"
+        },
+        {
+          "value": "default",
+          "cn_str": "默认"
+        },
+        {
+          "value": "often",
+          "cn_str": "较多"
+        },
+        {
+          "value": "always",
+          "cn_str": "大量"
+        }
+      ]
+    }
+  ]
+}
