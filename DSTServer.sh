@@ -80,20 +80,20 @@ Install_Dependency(){
 # Install steamcmd
 Install_Steamcmd(){
     wget "http://media.steampowered.com/client/steamcmd_linux.tar.gz" 
-    tar -xzvf steamcmd_linux.tar.gz -C steamcmd
-    chmod +x steamcmd/steamcmd.sh
+    tar -xzvf steamcmd_linux.tar.gz -C $HOME/steamcmd
+    chmod +x $HOME/steamcmd/steamcmd.sh
     rm steamcmd_linux.tar.gz
 }
 # Install DST Dedicated Server
 Install_Game(){
-    cd steamcmd || exit 1
+    cd $HOME/steamcmd || exit 1
     ./steamcmd.sh +login "anonymous" +force_install_dir "$HOME/DSTServer" +app_update "343050" validate +quit
 }
 # 修复SteamCMD [S_API FAIL] SteamAPI_Init() failed;
 fix_steamcmd(){
     info "修复Steamcmd可能存在的依赖问题 ..."
     mkdir -pv "${HOME}/.steam/sdk32"
-    cp -v steamcmd/linux32/steamclient.so "${HOME}/.steam/sdk32/steamclient.so"
+    cp -v $HOME/steamcmd/linux32/steamclient.so "${HOME}/.steam/sdk32/steamclient.so"
 }
 first_run_check
 ##########################################################################
@@ -101,13 +101,13 @@ first_run_check
 Update_DST(){
     appmanifestfile=$(find "$HOME/DSTServer" -type f -name "appmanifest_343050.acf")
     currentbuild=$(grep buildid "${appmanifestfile}" | tr '[:blank:]"' ' ' | tr -s ' ' | cut -d\  -f3)
-    cd steamcmd || exit
+    cd $HOME/steamcmd || exit
     availablebuild=$(./steamcmd.sh +login "anonymous" +app_info_update 1 +app_info_print 343050 +app_info_print 343050 +quit | sed -n '/branch/,$p' | grep -m 1 buildid | tr -cd '[:digit:]')
     if [ "${currentbuild}" != "${availablebuild}" ]; then
         info "更新可用(${currentbuild}===>${availablebuild}！即将执行更新..."
         Install_Game
     else
-        tip "无可用更新！"
+        tip "无可用更新！当前Steam构建版本（$currentbuild）"
     fi
 }
 
