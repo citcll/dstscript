@@ -136,9 +136,12 @@ function closeserver()
 	    if tmux has-session -t DST_Caves > /dev/null 2>&1; then
             tmux send-keys -t DST_Caves "c_shutdown(true)" C-m
 	    fi
+		sleep 1
+		echo -e "\e[92m服务器已关闭！\e[0m"
+	else
+		sleep 1
+		echo -e "\e[92m服务器为开启！\e[0m"
 	fi
-	sleep 1
-	echo -e "\e[92m服务器已关闭！\e[0m"
 }
 function settoken()
 {
