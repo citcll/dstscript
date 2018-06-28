@@ -528,6 +528,8 @@ sleep 10" > $HOME/rebootserver.sh
 }
 function startcheck()
 {
+	masterserverlog_path="${DST_conf_basedir}/${DST_conf_dirname}/${cluster_name}/Master/server_log.txt"
+	cavesserverlog_path="${DST_conf_basedir}/${DST_conf_dirname}/${cluster_name}/Caves/server_log.txt"
 	while :
     do
         if tmux has-session -t DST_Master > /dev/null 2>&1 && tmux has-session -t DST_Caves > /dev/null 2>&1; then
