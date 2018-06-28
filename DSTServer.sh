@@ -1,48 +1,114 @@
 #!/bin/bash
 #-------------------------------------------------------------------------------------------
-#作者：Kurumi 2017.01.20
-#Bug反馈：QQ1113787381
+#作者：Ariwori 2018-06-29 00:10:49
 #需配合putty和winscp或者Xshell使用
 #首次使用上传脚本至用户根目录并给予执行权限
-#云服务器系统为linux发行版本Ubuntu                                                                        
+#云服务器系统为linux发行版本Ubuntu
+#旧饭新炒，有很多不完善和不合理的地方，我就懒得改了                                                                        
 #-------------------------------------------------------------------------------------------
 
 DST_conf_dirname="DoNotStarveTogether"   
 DST_conf_basedir="$HOME/.klei" 
 DST_bin_cmd="./dontstarve_dedicated_server_nullrenderer"   
 
-function PreLib()
-{
-	sudo apt-get -y update
-	sudo apt-get -y install lib32gcc1
-    sudo apt-get -y install lib32stdc++6 
-	sudo apt-get -y install libcurl4-gnutls-dev:i386
-	sudo apt-get -y install screen
-	sudo apt-get -y install htop
-	sudo apt-get -y install diffutils 
-	sudo apt-get -y install grep
-}
-
-function update_game()
-{
-    if [ ! -d "./steamcmd" ];then
-	    PreLib
-	    mkdir ./steamcmd
-        cd ./steamcmd
-        wget https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz
-        tar -xvzf steamcmd_linux.tar.gz
-        rm -f steamcmd_linux.tar.gz
-		cd $HOME
-	fi
-	cd ./steamcmd
-    if [[ ${DST_game_beta} != "Public" ]]; then
-	    echo "游戏服务端版本为测试版！"
-	    ./steamcmd.sh +@ShutdownOnFailedCommand 1 +@NoPromptForPassword 1 +login anonymous +force_install_dir "$HOME/Steam/steamapps/common/DST_ANewReignBeta" +app_update 343050 -beta anewreignbeta validate +quit
-	else
-        echo "游戏服务端版本为正式版！"	
-	    ./steamcmd.sh +@ShutdownOnFailedCommand 1 +@NoPromptForPassword 1 +login anonymous +force_install_dir "$HOME/Steam/steamapps/common/DST_Public" +app_update 343050 validate +quit 
+# 屏幕输出
+Green_font_prefix="\033[32m"
+Red_font_prefix="\033[31m"
+Yellow_font_prefix="\033[33m"
+Font_color_suffix="\033[0m"
+Info="${Green_font_prefix}[信息]${Font_color_suffix}"
+Error="${Red_font_prefix}[错误]${Font_color_suffix}"
+Tip="${Yellow_font_prefix}[注意]${Font_color_suffix}"
+info(){ echo -e "${Info} $1"|tee -a run.log; }
+tip(){ echo -e "${Tip} $1"|tee -a run.log; }
+error(){ echo -e "${Error} $1"|tee -a run.log; }
+# 第一次运行
+first_run_check(){
+    if [ ! -f $HOME/DSTServer/version.txt  ]; then
+        info "检测到你是首次运行脚本，需要进行必要的配置，大概一个小时 ..."
+        check_sys
+        mkdstdir
+        Install_Dependency
+        Install_Steamcmd
+        info "安装游戏服务端 ..."
+        Install_Game
+        fix_steamcmd
+        info "首次运行配置完毕，如果无任何异常，你就可以创建新的世界了。"
     fi
-	cd $HOME
+}
+# 创建文件夹
+mkdstdir(){
+    mkdir -pv $HOME/steamcmd
+	mkdir -pv $HOME/DSTServer
+	mkdir -pv $DST_conf_basedir/$DST_conf_dirname
+}
+# 检查当前系统信息
+check_sys(){
+    if [[ -f /etc/redhat-release ]]; then
+        release="centos"
+    elif cat /etc/issue | grep -q -E -i "debian"; then
+        release="debian"
+    elif cat /etc/issue | grep -q -E -i "ubuntu"; then
+        release="ubuntu"
+    elif cat /etc/issue | grep -q -E -i "centos|red hat|redhat"; then
+        release="centos"
+    elif cat /proc/version | grep -q -E -i "debian"; then
+        release="debian"
+    elif cat /proc/version | grep -q -E -i "ubuntu"; then
+        release="ubuntu"
+    elif cat /proc/version | grep -q -E -i "centos|red hat|redhat"; then
+        release="centos"
+    fi
+    if [[ $release != "ubuntu" && $release != "debian" ]]; then
+        error "很遗憾！本脚本暂时只支持Debian7+和Ubuntu12+的系统！" && exit 1
+    fi
+    bit=`uname -m`
+}
+# 安装依赖库和必要软件
+Install_Dependency(){
+    info "安装DST所需依赖库 ..."
+    if [[ ${bit} = "x86_64" ]]; then
+		sudo dpkg --add-architecture i386;
+        sudo apt update;
+        sudo apt install -y lib32gcc1 libstdc++6 libstdc++6:i386 libcurl4-gnutls-dev:i386
+	else
+	    sudo apt install -y libstdc++6 libcurl4-gnutls-dev
+	fi
+    info "安装脚本所需软件 ..."
+    sudo apt install -y tmux
+}
+# Install steamcmd
+Install_Steamcmd(){
+    wget "http://media.steampowered.com/client/steamcmd_linux.tar.gz" 
+    tar -xzvf steamcmd_linux.tar.gz -C steamcmd
+    chmod +x steamcmd/steamcmd.sh
+    rm steamcmd_linux.tar.gz
+}
+# Install DST Dedicated Server
+Install_Game(){
+    cd steamcmd || exit 1
+    ./steamcmd.sh +login "anonymous" +force_install_dir "$HOME/DSTServer" +app_update "343050" validate +quit
+}
+# 修复SteamCMD [S_API FAIL] SteamAPI_Init() failed;
+fix_steamcmd(){
+    info "修复Steamcmd可能存在的依赖问题 ..."
+    mkdir -pv "${HOME}/.steam/sdk32"
+    cp -v steamcmd/linux32/steamclient.so "${HOME}/.steam/sdk32/steamclient.so"
+}
+first_run_check
+##########################################################################
+# 更新游戏服务端
+Update_DST(){
+    appmanifestfile=$(find "$HOME/DSTServer" -type f -name "appmanifest_343050.acf")
+    currentbuild=$(grep buildid "${appmanifestfile}" | tr '[:blank:]"' ' ' | tr -s ' ' | cut -d\  -f3)
+    cd steamcmd || exit
+    availablebuild=$(./steamcmd.sh +login "anonymous" +app_info_update 1 +app_info_print 343050 +app_info_print 343050 +quit | sed -n '/branch/,$p' | grep -m 1 buildid | tr -cd '[:digit:]')
+    if [ "${currentbuild}" != "${availablebuild}" ]; then
+        info "更新可用(${currentbuild}===>${availablebuild}！即将执行更新..."
+        Install_Game
+    else
+        tip "无可用更新！"
+    fi
 }
 
 function setupmod()
@@ -51,7 +117,7 @@ function setupmod()
 ServerModSetup(\"367546858\")
 ServerModSetup(\"889953787\")
 " >> "${DST_conf_basedir}/${DST_conf_dirname}/mods_setup.lua"
-    dir=$(ls -l "$HOME/Steam/steamapps/common/DST_${DST_game_beta}/mods" |awk '/^d/ {print $NF}'|grep "workshop"|cut -f2 -d"-")
+    dir=$(ls -l "$HOME/DSTServer/mods" |awk '/^d/ {print $NF}'|grep "workshop"|cut -f2 -d"-")
     for modid in $dir
     do
 	    if [[ $(grep "$modid" -c "${DST_conf_basedir}/${DST_conf_dirname}/mods_setup.lua") > 0 ]] ;then 
@@ -64,59 +130,19 @@ ServerModSetup(\"889953787\")
 
 function closeserver()
 {
-    if [[ $(screen -ls | grep -c "DST_Master") > 0 || $(screen -ls | grep -c "DST_Caves") > 0 ]]; then
-	    if [[ $(screen -ls | grep -c "DST_Master") > 0 ]]; then
-            screen -S "DST_Master" -p 0 -X stuff "c_shutdown(true)$(printf \\r)"
+    if tmux has-session -s DST_Master || tmux has-session -s DST_Caves; then
+	    if tmux has-session -s DST_Master; then
+            tmux send-keys -t DST_Master "c_shutdown(true)" C-m
 	    fi
-	    if [[ $(screen -ls | grep -c "DST_Caves") > 0 ]]; then
-            screen -S "DST_Caves" -p 0 -X stuff "c_shutdown(true)$(printf \\r)"
+		sleep 10
+	    if tmux has-session -s DST_Caves; then
+            tmux send-keys -t DST_Caves "c_shutdown(true)" C-m
 	    fi
-		if [[ $(screen -ls | grep -c "DST_autoupdate") > 0 ]]; then
-            screen -X -S "DST_autoupdate" quit
-	    fi
+		tmux kill-session -a
 	fi
 	sleep 3
 	echo -e "\e[92m服务器已关闭！\e[0m"
 }
-
-
-function savelog()
-{
-    if [ ! -d "${DST_conf_basedir}/backup" ]
-	    then 
-		    mkdir -p ${DST_conf_basedir}/backup
-	fi
-	if [ ! -d "${DST_conf_basedir}/backup/log_archive" ]
-	    then 
-		    mkdir -p ${DST_conf_basedir}/backup/log_archive
-	fi
-	if [ -f "${DST_conf_basedir}/${DST_conf_dirname}/${cluster_name}/Master/server_chat_log.txt" ]; then
-	    DST_now=$(date +"%D %T")
-		echo "${DST_now}: 保存服务器聊天日志。。。"
-		cat "${DST_conf_basedir}/${DST_conf_dirname}/${cluster_name}/Master/server_chat_log.txt" >> "${DST_conf_basedir}/backup/log_archive/server_chat_log.save.txt"
-		DST_now=$(date +"%D %T")
-		echo "${DST_now}" >> "${DST_conf_basedir}/backup/log_archive/server_chat_log.save.txt"
-	fi		
-	if [ -f "${DST_conf_basedir}/${DST_conf_dirname}/${cluster_name}/Master/server_log.txt" ]; then
-	    DST_now=$(date +"%D %T")
-	    echo -e "${DST_now}: 保存地上服务器日志。。。"
-		DST_timestamp=$(date +"%s")
-		cat "${DST_conf_basedir}/${DST_conf_dirname}/${cluster_name}/Master/server_log.txt" > "${DST_conf_basedir}/backup/log_archive/server_log.${DST_timestamp}.txt"
-	    DST_now=$(date +"%D %T")
-		echo "${DST_now}" >> "${DST_conf_basedir}/backup/log_archive/server_log.${DST_timestamp}.txt"
-	fi
-	sleep 5
-	if [ -f "${DST_conf_basedir}/${DST_conf_dirname}/${cluster_name}/Caves/server_log.txt" ]; then
-	    DST_now=$(date +"%D %T")
-	    echo -e "${DST_now}: 保存洞穴服务器日志。。。"
-		DST_timestamp=$(date +"%s")
-		cat "${DST_conf_basedir}/${DST_conf_dirname}/${cluster_name}/Caves/server_log.txt" > "${DST_conf_basedir}/backup/log_archive/server_log.${DST_timestamp}.txt"
-	    DST_now=$(date +"%D %T")
-		echo "${DST_now}" >> "${DST_conf_basedir}/backup/log_archive/server_log.${DST_timestamp}.txt"
-	fi
-}
-
-
 function settoken()
 {
     echo -e "\e[92m是否使用预设服务器令牌：1.是 2.否 \e[0m"
@@ -303,21 +329,6 @@ authentication_port = 8768" > "${DST_conf_basedir}/${DST_conf_dirname}/${cluster
 	fi
 }
 
-function movemod()
-{	
-
-	if [ ! -d "$HOME/Steam/steamapps/common/DST_Public/mods" ]
-	then 
-		mkdir -p $HOME/Steam/steamapps/common/DST_Public/mods
-	fi
-	if [ ! -d "$HOME/Steam/steamapps/common/DST_ANewReignBeta/mods" ]
-	then 
-		mkdir -p $HOME/Steam/steamapps/common/DST_ANewReignBeta/mods
-	fi
-	cp -r "$HOME/Steam/steamapps/common/DST_ANewReignBeta/mods" "$HOME/Steam/steamapps/common/DST_Public"
-	cp -r "$HOME/Steam/steamapps/common/DST_Public/mods" "$HOME/Steam/steamapps/common/DST_ANewReignBeta"
-}
-
 function startserver()
 {
     if [ ! -d "${DST_conf_basedir}/${DST_conf_dirname}" ]
@@ -356,45 +367,33 @@ function startserver()
 		cluster_name=$clustername		
 		;;
 	esac
-	savelog
-	echo -e "\e[92m请选择游戏版本：1.正式版  2.ANR测试版\e[0m"
-	read isbeta
-	case $isbeta in
-	    1)
-		DST_game_beta="Public" ;;
-		2)
-		DST_game_beta="ANewReignBeta" ;;
-	esac	
 	echo -e "\e[92m启动前更新。。。请稍候。。。\e[0m"
-	update_game
-	movemod
 	setupmod
 	if [[ ! -f ${DST_conf_basedir}/${DST_conf_dirname}/$cluster_name/Master/modoverrides.lua ]]; then
 		modadd
 	    listallmod
         addmod
     fi
-    cp "${DST_conf_basedir}/${DST_conf_dirname}/mods_setup.lua" "$HOME/Steam/steamapps/common/DST_${DST_game_beta}/mods/dedicated_server_mods_setup.lua"	
-	cd "$HOME/Steam/steamapps/common/DST_${DST_game_beta}/bin"
+    cp "${DST_conf_basedir}/${DST_conf_dirname}/mods_setup.lua" "$HOME/DSTServer/mods/dedicated_server_mods_setup.lua"	
+	cd "$HOME/DSTServer/bin"
 	echo -e "\e[92m请选择要启动的世界：1.仅地上  2.仅洞穴  3.地上 + 洞穴\e[0m"
 	read shard 
 	case $shard in
 		1)		
-		screen -dmS "DST_Master" /bin/sh -c "$DST_bin_cmd -console -conf_dir $DST_conf_dirname -cluster $cluster_name -shard Master"
+		tmux new-session -s DST_Master -d "$DST_bin_cmd -console -conf_dir $DST_conf_dirname -cluster $cluster_name -shard Master"
 		echo "#!/bin/bash
 masterserverlog_path=\"${DST_conf_basedir}/${DST_conf_dirname}/${cluster_name}/Master/server_log.txt\"
 cavesserverlog_path=\"${DST_conf_basedir}/${DST_conf_dirname}/${cluster_name}/Caves/server_log.txt\"			
-echo \"\" > \"$HOME/Steam/steamapps/common/DST_${DST_game_beta}/mods/dedicated_server_mods_setup.lua\"	
-cp \"${DST_conf_basedir}/${DST_conf_dirname}/mods_setup.lua\" \"$HOME/Steam/steamapps/common/DST_${DST_game_beta}/mods/dedicated_server_mods_setup.lua\"
-cd $HOME/Steam/steamapps/common/DST_${DST_game_beta}/bin
-screen -dmS \"DST_Master\" /bin/sh -c \"$DST_bin_cmd -console -conf_dir $DST_conf_dirname -cluster $cluster_name -shard Master\"
+echo \"\" > \"$HOME/DSTServer/mods/dedicated_server_mods_setup.lua\"	
+cp \"${DST_conf_basedir}/${DST_conf_dirname}/mods_setup.lua\" \"$HOME/DSTServer/mods/dedicated_server_mods_setup.lua\"
+cd $HOME/DSTServer/bin
+tmux new-session -s DST_Master -d \"$DST_bin_cmd -console -conf_dir $DST_conf_dirname -cluster $cluster_name -shard Master\"
 sleep 5
-screen -dmS \"DST_autoupdate\" /bin/sh -c \"./auto_update.sh\"
 echo -e \"\e[92m正在重启服务器。。。请稍后。。。\e[0m\"
 sleep 10" > $HOME/rebootserver.sh
         echo 'while :
     do
-        if [[ $(screen -ls | grep -c "DST_Master") > 0 && $(screen -ls | grep -c "DST_Caves") > 0 ]]; then
+        if tmux has-session -s DST_Master && tmux has-session -s DST_Caves; then
             if [[ $(grep "Sim paused" -c "$masterserverlog_path") > 0 ]]; then
 		        echo "服务器开启成功，和小伙伴尽情玩耍吧！"
 			    break
@@ -404,7 +403,7 @@ sleep 10" > $HOME/rebootserver.sh
 			    break
 		    fi
 		fi
-	    if [[ $(screen -ls | grep -c "DST_Master") > 0 && $(screen -ls | grep -c "DST_Caves") = 0 ]]; then
+	    if tmux has-session -s DST_Master && ! tmux has-session -s DST_Caves; then
             if [[ $(grep "Sim paused" -c "$masterserverlog_path") > 0 ]]; then
 		        echo "服务器开启成功，和小伙伴尽情玩耍吧！"
 			    break
@@ -414,7 +413,7 @@ sleep 10" > $HOME/rebootserver.sh
 			    break
 		    fi
         fi	
-	    if [[ $(screen -ls | grep -c "DST_Master") = 0 && $(screen -ls | grep -c "DST_Caves") > 0 ]]; then
+	    if ! tmux has-session -s DST_Master && tmux has-session -s DST_Caves; then
             if [[ $(grep "Sim paused" -c "$cavesserverlog_path") > 0 ]]; then
 		        echo "服务器开启成功，和小伙伴尽情玩耍吧！"
 			    break
@@ -428,21 +427,20 @@ sleep 10" > $HOME/rebootserver.sh
     done' >> $HOME/rebootserver.sh
 		;;
 		2)
-		screen -dmS "DST_Caves" /bin/sh -c "$DST_bin_cmd -console -conf_dir $DST_conf_dirname -cluster $cluster_name -shard Caves"
+		tmux new-session -s DST_Caves -d "$DST_bin_cmd -console -conf_dir $DST_conf_dirname -cluster $cluster_name -shard Caves"
 		echo "#!/bin/bash
 masterserverlog_path=\"${DST_conf_basedir}/${DST_conf_dirname}/${cluster_name}/Master/server_log.txt\"
 cavesserverlog_path=\"${DST_conf_basedir}/${DST_conf_dirname}/${cluster_name}/Caves/server_log.txt\"
-echo \"\" > \"$HOME/Steam/steamapps/common/DST_${DST_game_beta}/mods/dedicated_server_mods_setup.lua\"		
-cp \"${DST_conf_basedir}/${DST_conf_dirname}/mods_setup.lua\" \"$HOME/Steam/steamapps/common/DST_${DST_game_beta}/mods/dedicated_server_mods_setup.lua\"
-cd $HOME/Steam/steamapps/common/DST_${DST_game_beta}/bin
-screen -dmS \"DST_Caves\" /bin/sh -c \"$DST_bin_cmd -console -conf_dir $DST_conf_dirname -cluster $cluster_name -shard Caves\"
+echo \"\" > \"$HOME/DSTServer/mods/dedicated_server_mods_setup.lua\"		
+cp \"${DST_conf_basedir}/${DST_conf_dirname}/mods_setup.lua\" \"$HOME/DSTServer/mods/dedicated_server_mods_setup.lua\"
+cd $HOME/DSTServer/bin
+tmux new-session -s DST_Caves -d \"$DST_bin_cmd -console -conf_dir $DST_conf_dirname -cluster $cluster_name -shard Caves\"
 sleep 5
-screen -dmS \"DST_autoupdate\" /bin/sh -c \"./auto_update.sh\"
 echo -e \"\e[92m正在重启服务器。。。请稍后。。。\e[0m\"
 sleep 10" > $HOME/rebootserver.sh
         echo 'while :
-    do
-        if [[ $(screen -ls | grep -c "DST_Master") > 0 && $(screen -ls | grep -c "DST_Caves") > 0 ]]; then
+        do
+        if tmux has-session -s DST_Master && tmux has-session -s DST_Caves; then
             if [[ $(grep "Sim paused" -c "$masterserverlog_path") > 0 ]]; then
 		        echo "服务器开启成功，和小伙伴尽情玩耍吧！"
 			    break
@@ -452,7 +450,7 @@ sleep 10" > $HOME/rebootserver.sh
 			    break
 		    fi
 		fi
-	    if [[ $(screen -ls | grep -c "DST_Master") > 0 && $(screen -ls | grep -c "DST_Caves") = 0 ]]; then
+	    if tmux has-session -s DST_Master && ! tmux has-session -s DST_Caves; then
             if [[ $(grep "Sim paused" -c "$masterserverlog_path") > 0 ]]; then
 		        echo "服务器开启成功，和小伙伴尽情玩耍吧！"
 			    break
@@ -462,7 +460,7 @@ sleep 10" > $HOME/rebootserver.sh
 			    break
 		    fi
         fi	
-	    if [[ $(screen -ls | grep -c "DST_Master") = 0 && $(screen -ls | grep -c "DST_Caves") > 0 ]]; then
+	    if ! tmux has-session -s DST_Master && tmux has-session -s DST_Caves; then
             if [[ $(grep "Sim paused" -c "$cavesserverlog_path") > 0 ]]; then
 		        echo "服务器开启成功，和小伙伴尽情玩耍吧！"
 			    break
@@ -476,23 +474,22 @@ sleep 10" > $HOME/rebootserver.sh
     done' >> $HOME/rebootserver.sh
 		;;
 		3)
-		screen -dmS "DST_Master" /bin/sh -c "$DST_bin_cmd -console -conf_dir $DST_conf_dirname -cluster $cluster_name -shard Master"
-		screen -dmS "DST_Caves" /bin/sh -c "$DST_bin_cmd -console -conf_dir $DST_conf_dirname -cluster $cluster_name -shard Caves"
+		tmux new-session -s DST_Master -d "$DST_bin_cmd -console -conf_dir $DST_conf_dirname -cluster $cluster_name -shard Master"
+		tmux new-session -s DST_Caves -d "$DST_bin_cmd -console -conf_dir $DST_conf_dirname -cluster $cluster_name -shard Caves"
 		echo "#!/bin/bash
 masterserverlog_path=\"${DST_conf_basedir}/${DST_conf_dirname}/${cluster_name}/Master/server_log.txt\"
 cavesserverlog_path=\"${DST_conf_basedir}/${DST_conf_dirname}/${cluster_name}/Caves/server_log.txt\"
-echo \"\" > \"$HOME/Steam/steamapps/common/DST_${DST_game_beta}/mods/dedicated_server_mods_setup.lua\"		
-cp \"${DST_conf_basedir}/${DST_conf_dirname}/mods_setup.lua\" \"$HOME/Steam/steamapps/common/DST_${DST_game_beta}/mods/dedicated_server_mods_setup.lua\"
-cd $HOME/Steam/steamapps/common/DST_${DST_game_beta}/bin
-screen -dmS \"DST_Master\" /bin/sh -c \"$DST_bin_cmd -console -conf_dir $DST_conf_dirname -cluster $cluster_name -shard Master\"
-screen -dmS \"DST_Caves\" /bin/sh -c \"$DST_bin_cmd -console -conf_dir $DST_conf_dirname -cluster $cluster_name -shard Caves\"
+echo \"\" > \"$HOME/DSTServer/mods/dedicated_server_mods_setup.lua\"		
+cp \"${DST_conf_basedir}/${DST_conf_dirname}/mods_setup.lua\" \"$HOME/DSTServer/mods/dedicated_server_mods_setup.lua\"
+cd $HOME/DSTServer/bin
+tmux new-session -s DST_Master -d \"$DST_bin_cmd -console -conf_dir $DST_conf_dirname -cluster $cluster_name -shard Master\"
+tmux new-session -s DST_Caves -d \"$DST_bin_cmd -console -conf_dir $DST_conf_dirname -cluster $cluster_name -shard Caves\"
 sleep 5
-screen -dmS \"DST_autoupdate\" /bin/sh -c \"./auto_update.sh\"
 echo -e \"\e[92m正在重启服务器。。。请稍后。。。\e[0m\"
 sleep 10" > $HOME/rebootserver.sh
         echo 'while :
-    do
-        if [[ $(screen -ls | grep -c "DST_Master") > 0 && $(screen -ls | grep -c "DST_Caves") > 0 ]]; then
+        do
+        if tmux has-session -s DST_Master && tmux has-session -s DST_Caves; then
             if [[ $(grep "Sim paused" -c "$masterserverlog_path") > 0 ]]; then
 		        echo "服务器开启成功，和小伙伴尽情玩耍吧！"
 			    break
@@ -502,7 +499,7 @@ sleep 10" > $HOME/rebootserver.sh
 			    break
 		    fi
 		fi
-	    if [[ $(screen -ls | grep -c "DST_Master") > 0 && $(screen -ls | grep -c "DST_Caves") = 0 ]]; then
+	    if tmux has-session -s DST_Master && ! tmux has-session -s DST_Caves; then
             if [[ $(grep "Sim paused" -c "$masterserverlog_path") > 0 ]]; then
 		        echo "服务器开启成功，和小伙伴尽情玩耍吧！"
 			    break
@@ -512,7 +509,7 @@ sleep 10" > $HOME/rebootserver.sh
 			    break
 		    fi
         fi	
-	    if [[ $(screen -ls | grep -c "DST_Master") = 0 && $(screen -ls | grep -c "DST_Caves") > 0 ]]; then
+	    if ! tmux has-session -s DST_Master && tmux has-session -s DST_Caves; then
             if [[ $(grep "Sim paused" -c "$cavesserverlog_path") > 0 ]]; then
 		        echo "服务器开启成功，和小伙伴尽情玩耍吧！"
 			    break
@@ -528,190 +525,40 @@ sleep 10" > $HOME/rebootserver.sh
 	esac
 	chmod u+x $HOME/rebootserver.sh
 	echo -e "\e[92m服务器开启中。。。请稍候。。。\e[0m"
-    auto_update_process
 	sleep 10
 	startcheck
 	menu
 }
-
-function auto_update_process()
-{
-    cd $HOME
-	echo "#!/bin/bash
-	 
-DST_game_beta=\"$DST_game_beta\"
-cluster_name=\"$cluster_name\"
-DST_conf_dirname=\"$DST_conf_dirname\"  
-DST_temp_path=\"$HOME/Dstupdatecheck\"
-DST_conf_basedir=\"$DST_conf_basedir\"" > $HOME/auto_update.sh
-
-    echo 'function update_temp_game()
-{
-    DST_now=$(date +"%D %T")
-    echo "${DST_now}：同步服务端更新进程正在运行。。。"
-    cd ./steamcmd
-    if [[ ${DST_game_beta} != "Public" ]]; then
-	    echo "正在同步测试版游戏服务端。"	
-	    ./steamcmd.sh +@ShutdownOnFailedCommand 1 +@NoPromptForPassword 1 +login anonymous +force_install_dir "$HOME/Dstupdatecheck/branch_ANewReignBeta" +app_update 343050 -beta anewreignbeta validate +quit
-		cp "$HOME/Dstupdatecheck/branch_ANewReignBeta/version.txt" "$HOME/Dstupdatecheck/branch_ANewReignBeta/version4updater.txt"	
-	else
-        echo "正在同步正式版游戏服务端。"		
-	    ./steamcmd.sh +@ShutdownOnFailedCommand 1 +@NoPromptForPassword 1 +login anonymous +force_install_dir "$HOME/Dstupdatecheck/branch_Public" +app_update 343050 validate +quit 
-	    cp "$HOME/Dstupdatecheck/branch_Public/version.txt" "$HOME/Dstupdatecheck/branch_Public/version4updater.txt"
-    fi
-	
-    echo "${DST_now}：服务端已完成同步。"	
-    cd $HOME	
-}
-
-function update_shutdown()
-{   DST_now=$(date +"%D %T")
-    echo -e "\e[36m\e[1m${DST_now}：准备关服，\e[0m \e[36m正在发送更新公告。。。\e[0m"
-	sleep 10
-	if [[ $(screen -ls | grep -c "DST_Master") > 0 ]]; then									        
-	    screen -S "DST_Master" -p 0 -X stuff "c_announce(\"感谢你在本服务器玩耍，服务器将于一分钟后关闭进行更新，预计耗时三分钟！\")$(printf \\r)"	
-	fi
-	if [[ $(screen -ls | grep -c "DST_Caves") > 0 ]]; then
-	    screen -S "DST_Caves" -p 0 -X stuff "c_announce(\"感谢你在本服务器玩耍，服务器将于一分钟后关闭进行更新，预计耗时三分钟！\")$(printf \\r)"
-	fi
-    sleep 30	
-    if [[ $(screen -ls | grep -c "DST_Master") > 0 ]]; then
-	    screen -S "DST_Master" -p 0 -X stuff "c_shutdown(true)$(printf \\r)"
-	fi
-	if [[ $(screen -ls | grep -c "DST_Caves") > 0 ]]; then
-	    screen -S "DST_Caves" -p 0 -X stuff "c_shutdown(true)$(printf \\r)"
-	fi
-	sleep 20
-	if [[ $(screen -ls | grep -c "DST_Master") = 0 && $(screen -ls | grep -c "DST_Caves") = 0 ]]; then
-	    DST_now=$(date +"%D %T")
-	    echo "${DST_now}：服务器已关闭。"
-		update_game
-	fi
-}
-
-function auto_update()
-{	
-	DST_now=$(date +"%D %T")
-    echo "${DST_now}：服务器自动更新检查进程正在运行。。。"
-	if [[ $(screen -ls | grep -c "DST_Master") > 0 ]]; then
-	    if [[ $(grep "is out of date and needs to be updated for new users to be able to join the server" -c "${DST_conf_basedir}/${DST_conf_dirname}/${cluster_name}/Master/server_chat_log.txt") > 0 ]]; then
-		    DST_has_mods_update=true
-		    DST_now=$(date +"%D %T")
-		    echo -e "\e[93m${DST_now}: Mod 有更新！\e[0m"
-			echo "${DST_now}: Mod 有更新！" >> ${DST_conf_basedir}/backup/log-updater.txt
-	    else
-		    DST_has_mods_update=false
-		    echo -e "\e[92m${DST_now}: Mod 没有更新!\e[0m"
-		fi
-	fi
-    if [[ $(screen -ls | grep -c "DST_Caves") > 0 ]]; then
-	    if [[ $(grep "is out of date and needs to be updated for new users to be able to join the server" -c "${DST_conf_basedir}/${DST_conf_dirname}/${cluster_name}/Caves/server_chat_log.txt") > 0 ]]; then
-		    DST_has_mods_update=true
-		    DST_now=$(date +"%D %T")
-		    echo -e "\e[93m${DST_now}: Mod 有更新！\e[0m"
-			echo "${DST_now}: Mod 有更新！" >> ${DST_conf_basedir}/backup/log-updater.txt
-	    else
-		    DST_has_mods_update=false
-		    echo -e "\e[92m${DST_now}: Mod 没有更新!\e[0m"
-		fi
-	fi
-	if [[ -f "${DST_temp_path}/branch_${DST_game_beta}/version4updater.txt" ]]; then
-		if flock "${DST_temp_path}/branch_${DST_game_beta}/version4updater.txt" -c "! diff -q "${DST_temp_path}/branch_${DST_game_beta}/version4updater.txt" "$HOME/Steam/steamapps/common/DST_${DST_game_beta}/version.txt" > /dev/null" ; then
-		    DST_now=$(date +"%D %T")
-		    DST_has_game_update=true
-		    echo -e "\e[93m${DST_now}：游戏服务端有更新!\e[0m"
-            echo "${DST_now}：游戏服务端有更新!" >> ${DST_conf_basedir}/backup/log-updater.txt		
-		else
-		    DST_has_game_update=false
-			echo -e "\e[92m${DST_now}：游戏服务端没有更新!\e[0m"
-		fi
-	else
-		echo -e "\e[31m\e[1m警告: 没有找到文件 ${DST_temp_path}/branch_${DST_game_beta}/version4updater.txt\e[0m"
-		echo -e "\e[31m等待下一次循环检查！\e[0m"		
-		sleep 5
-	fi	
-	if [[ "$DST_has_mods_update" == true || "$DST_has_game_update" == true ]]; then 
-	    update_shutdown
-	fi
-}
-
-function update_game()
-{
-    echo "更新游戏服务端!"
-	cd ./steamcmd
-    if [[ ${DST_game_beta} != "Public" ]]; then
-	    echo "游戏服务端版本为测试版！"
-	    ./steamcmd.sh +@ShutdownOnFailedCommand 1 +@NoPromptForPassword 1 +login anonymous +force_install_dir "$HOME/Steam/steamapps/common/DST_ANewReignBeta" +app_update 343050 -beta anewreignbeta validate +quit
-	else
-        echo "游戏服务端版本为正式版！"	
-	    ./steamcmd.sh +@ShutdownOnFailedCommand 1 +@NoPromptForPassword 1 +login anonymous +force_install_dir "$HOME/Steam/steamapps/common/DST_Public" +app_update 343050 validate +quit 
-    fi
-	cd $HOME
-	echo "更新完成!"
-}
-
-function processkeep()
-{
-    DST_now=$(date +"%D %T")
-    echo "${DST_now}：服务器进程保持开启检查正在运行。。。"
-    if [[ $(screen -ls | grep -c "DST_Caves") > 0 || $(screen -ls | grep -c "DST_Master") > 0 ]]; then
-	    DST_now=$(date +"%D %T")
-		echo "${DST_now}: 服务器已开启!"
-	else
-	    DST_now=$(date +"%D %T")
-		echo "${DST_now}: 服务器未开启!"
-	    cd $HOME
-	    ./rebootserver.sh
-		echo "${DST_now}: 服务器已重启。"
-	fi			
-}
-while :
-do
-    clear
-    echo -e "\e[33m欢迎使用饥荒联机版独立服务器脚本[Linux-Steam]\e[0m"
-    update_temp_game
-	sleep 60
-    auto_update
-    sleep 60
-    processkeep
-	DST_now=$(date +"%D %T")
-	echo -e "\e[31m${DST_now}: 半小时后进行下一次循环检查！\e[0m"
-	sleep 1800
-done' >> $HOME/auto_update.sh
-	chmod u+x $HOME/auto_update.sh
-	screen -dmS "DST_autoupdate" /bin/sh -c "./auto_update.sh"
-}
-
 function startcheck()
 {
 	while :
     do
-        if [[ $(screen -ls | grep -c "DST_Master") > 0 && $(screen -ls | grep -c "DST_Caves") > 0 ]]; then
-            if [[ $(grep "Sim paused" -c "${DST_conf_basedir}/${DST_conf_dirname}/${cluster_name}/Master/server_log.txt") > 0 ]]; then
+        if tmux has-session -s DST_Master && tmux has-session -s DST_Caves; then
+            if [[ $(grep "Sim paused" -c "$masterserverlog_path") > 0 ]]; then
 		        echo "服务器开启成功，和小伙伴尽情玩耍吧！"
 			    break
 		    fi
-		    if [[ $(grep "Your Server Will Not Start" -c "${DST_conf_basedir}/${DST_conf_dirname}/${cluster_name}/Master/server_log.txt") > 0 ]]; then
+		    if [[ $(grep "Your Server Will Not Start" -c "$masterserverlog_path") > 0 ]]; then
 		        echo "服务器开启未成功，请执行关闭服务器命令后再次尝试，并注意令牌是否成功设置且有效。"
 			    break
 		    fi
 		fi
-	    if [[ $(screen -ls | grep -c "DST_Master") > 0 && $(screen -ls | grep -c "DST_Caves") = 0 ]]; then
-            if [[ $(grep "Sim paused" -c "${DST_conf_basedir}/${DST_conf_dirname}/${cluster_name}/Master/server_log.txt") > 0 ]]; then
+	    if tmux has-session -s DST_Master && ! tmux has-session -s DST_Caves; then
+            if [[ $(grep "Sim paused" -c "$masterserverlog_path") > 0 ]]; then
 		        echo "服务器开启成功，和小伙伴尽情玩耍吧！"
 			    break
 		    fi
-		    if [[ $(grep "Your Server Will Not Start" -c "${DST_conf_basedir}/${DST_conf_dirname}/${cluster_name}/Master/server_log.txt") > 0 ]]; then
+		    if [[ $(grep "Your Server Will Not Start" -c "$masterserverlog_path") > 0 ]]; then
 		        echo "服务器开启未成功，请执行关闭服务器命令后再次尝试，并注意令牌是否成功设置且有效。"
 			    break
 		    fi
         fi	
-	    if [[ $(screen -ls | grep -c "DST_Master") = 0 && $(screen -ls | grep -c "DST_Caves") > 0 ]]; then
-            if [[ $(grep "Sim paused" -c "${DST_conf_basedir}/${DST_conf_dirname}/${cluster_name}/Caves/server_log.txt") > 0 ]]; then
+	    if ! tmux has-session -s DST_Master && tmux has-session -s DST_Caves; then
+            if [[ $(grep "Sim paused" -c "$cavesserverlog_path") > 0 ]]; then
 		        echo "服务器开启成功，和小伙伴尽情玩耍吧！"
 			    break
 		    fi
-		    if [[ $(grep "Your Server Will Not Start" -c "${DST_conf_basedir}/${DST_conf_dirname}/${cluster_name}/Caves/server_log.txt") > 0 ]]; then
+		    if [[ $(grep "Your Server Will Not Start" -c "$cavesserverlog_path") > 0 ]]; then
 		        echo "服务器开启未成功，请执行关闭服务器命令后再次尝试，并注意令牌是否成功设置且有效。"
 			    break
 		    fi
@@ -723,16 +570,13 @@ function startcheck()
 
 function checkserver()
 {    
-	if [[ $(screen -ls | grep -c "DST_Master") > 0 || $(screen -ls | grep -c "DST_Caves") > 0 ]]; then
-	    echo -e "\e[92m即将跳转游戏服务器窗口，要退回本界面，在游戏服务器窗口按 ctrl+a+d 再执行脚本即可。\e[0m"
+	if tmux has-session -s DST_Master || tmux has-session -s DST_Caves; then
+	    echo -e "\e[92m即将跳转游戏服务器窗口，要退回本界面，在游戏服务器窗口按 ctrl+B　松开马上再按下　D　再执行脚本即可。\e[0m"
 		sleep 3
-	    if [[ $(screen -ls | grep -c "DST_Master") > 0 && $(screen -ls | grep -c "DST_Caves") > 0 ]]; then
-	        screen -r DST_Master
+	    if tmux has-session -s DST_Master; then
+	        tmux attach-session -t DST_Master
 	    fi
-	    if [[ $(screen -ls | grep -c "DST_Master") > 0 && $(screen -ls | grep -c "DST_Caves") = 0 ]]; then
-	        screen -r DST_Master
-	    fi
-	    if [[ $(screen -ls | grep -c "DST_Master") = 0 && $(screen -ls | grep -c "DST_Caves") > 0 ]]; then
+	    if ! tmux has-session -s DST_Master && tmux has-session -s DST_Caves;; then
 	        screen -r DST_Caves
 	    fi
 	else
@@ -2273,17 +2117,17 @@ function listusedmod()
 	
     for i in $(grep "workshop" "${DST_conf_basedir}/${DST_conf_dirname}/$cluster_name/Master/modoverrides.lua" | cut -d '"' -f 2 | cut -d '-' -f 2)
     do
-	    name=$(grep "$HOME/Steam/steamapps/common/DST_${DST_game_beta}/mods/workshop-$i/modinfo.lua" -e "name =" | cut -d '"' -f 2 | head -1)	
+	    name=$(grep "$HOME/DSTServer/mods/workshop-$i/modinfo.lua" -e "name =" | cut -d '"' -f 2 | head -1)	
 	    echo -e "\e[92m$i\e[0m-----------\e[33m$name\e[0m" 
     done
 }
 
 function listallmod()
 {
-    for i in $(ls -l "$HOME/Steam/steamapps/common/DST_${DST_game_beta}/mods" |awk '/^d/ {print $NF}' | cut -d '-' -f 2)
+    for i in $(ls -l "$HOME/DSTServer/mods" |awk '/^d/ {print $NF}' | cut -d '-' -f 2)
     do
-        if [[ -f "$HOME/Steam/steamapps/common/DST_${DST_game_beta}/mods/workshop-$i/modinfo.lua" ]]; then
-	        name=$(grep "$HOME/Steam/steamapps/common/DST_${DST_game_beta}/mods/workshop-$i/modinfo.lua" -e "name =" | cut -d '"' -f 2 | head -1)	
+        if [[ -f "$HOME/DSTServer/mods/workshop-$i/modinfo.lua" ]]; then
+	        name=$(grep "$HOME/DSTServer/mods/workshop-$i/modinfo.lua" -e "name =" | cut -d '"' -f 2 | head -1)	
 	        echo -e "\e[92m$i\e[0m----\e[33m$name\e[0m" 
 	    fi
     done
@@ -2370,7 +2214,7 @@ function modadd()
 
 function console()
 {
-    if [[ $(screen -ls | grep -c "DST_Master") == 0 ]]; then 
+    if tmux has-session -t DST_Master; then 
 	    echo "当前世界不是主世界，请在主世界所在服务器操作"
 		menu
 	fi
@@ -2398,31 +2242,31 @@ function console()
 				listallplayer
 				echo "请输入你要踢出的玩家的KLEIID"
 				read kleiid1
-				screen -S "DST_Master" -p 0 -X stuff "TheNet:Kick(%kleiid1)$(printf \\r)"
+				tmux send-keys -t DST_Master "TheNet:Kick(%kleiid1)" C-m
 				echo "玩家 $kleiid1 已被踢出游戏"
 			    ;;	
                 3)
 				listallplayer
 				echo "请输入你要禁止的玩家的KLEIID"
-				read kleiid2
-				screen -S "DST_Master" -p 0 -X stuff "TheNet:Kick(%kleiid1)$(printf \\r)"
+				read kleiid1
+				tmux send-keys -t DST_Master "TheNet:Kick(%kleiid1)" C-m
 				echo "玩家 $kleiid1 已被禁止加入游戏"
 			    ;;	
                 4)
-				screen -S "DST_Master" -p 0 -X stuff "TheNet:SetAllowIncomingConnections(false)$(printf \\r)"
+				tmux send-keys -t DST_Master "TheNet:SetAllowIncomingConnections(false)" C-m
 			    ;;
                 5)
-				screen -S "DST_Master" -p 0 -X stuff "TheNet:SetAllowIncomingConnections(true)$(printf \\r)"
+				tmux send-keys -t DST_Master "TheNet:SetAllowIncomingConnections(true)" C-m
 			    ;;
                 6)
 				menu
 				break
 			    ;;	
                 7)
-				screen -S "DST_Master" -p 0 -X stuff "c_resetruins()$(printf \\r)"
+				tmux send-keys -t DST_Master "c_resetruins()" C-m
 			    ;;
-                7)
-				screen -S "DST_Master" -p 0 -X stuff "c_stopvote$(printf \\r)"
+                8)
+				tmux send-keys -t DST_Master "c_stopvote" C-m
 			    ;;				
 		    esac
     done
@@ -2430,11 +2274,11 @@ function console()
 
 function rebootannounce()
 {
-    if [[ $(screen -ls | grep -c "DST_Master") > 0 ]]; then   									        
-	    screen -S "DST_Master" -p 0 -X stuff "c_announce(\"服务器设置因做了改动需要重启，预计耗时三分钟，给你带来的不便还请谅解！\")$(printf \\r)"	
+    if tmux has-session -t DST_Master; then   									        
+	    tmux send-keys -t DST_Master "c_announce(\"服务器设置因做了改动需要重启，预计耗时三分钟，给你带来的不便还请谅解！\")" C-m
 	fi
-	if [[ $(screen -ls | grep -c "DST_Caves") > 0 ]]; then						        
-		screen -S "DST_Caves" -p 0 -X stuff "c_announce(\"服务器设置因做了改动需要重启，预计耗时三分钟，给你带来的不便还请谅解！\")$(printf \\r)"
+	if tmux has-session -t DST_Caves; then						        
+		tmux send-keys -t DST_Caves "c_announce(\"服务器设置因做了改动需要重启，预计耗时三分钟，给你带来的不便还请谅解！\")" C-m
 	fi
 }
 
@@ -2451,11 +2295,11 @@ function deldir()
 function listallplayer()
 {	
     playernumber=$( date +%s%3N )
-	screen -S "DST_Master" -p 0 -X stuff "c_printplayersnumber($playernumber)$(printf \\r)"
+	tmux send-keys -t DST_Master "c_printplayersnumber($playernumber)" C-m
 	if [[ $( grep "${DST_conf_basedir}/${DST_conf_dirname}/$clustername/Master/server_log.txt" -e "$playernumber" | cut -d ':' -f 6 ) > 0 ]]; then
 	    sleep 3
 		playerlist=$( date +%s%3N )
-	    screen -S "DST_Master" -p 0 -X stuff "c_printplayerlist($playerlist)$(printf \\r)"
+	   tmux send-keys -t DST_Master "c_printplayerlist($playerlist)" C-m
 	    echo -e "\e[92m============================================================\e[0m"
         grep "${DST_conf_basedir}/${DST_conf_dirname}/$clustername/Master/server_log.txt" -e "$playerlist" | cut -d ' ' -f 2-6 | tail -n +2
 	    echo -e "\e[92m============================================================\e[0m"
@@ -2481,17 +2325,17 @@ function menu()
     do
 	    echo -e "\e[33m================欢迎使用饥荒联机版独立服务器脚本[Linux-Steam]==================\e[0m"
         echo
-		echo -e "\e[33m作者：Ariwori        Bug反馈：QQ1113787381\e[0m"
+		echo -e "\e[33m作者：Ariwori        Bug反馈：https://blog.wqlin.com/dstscript.html\e[0m"
 		echo -e "\e[33m本脚本一切权利归作者所有。未经许可禁止使用本脚本进行任何的商业活动！\e[0m"
 		echo
 		echo -e "\e[31m首次使用请将本地电脑上的MOD上传到\e[0m"
-		echo -e "\e[31m云服务器$HOME/Steam/steamapps/common/DST_*/mods目录下\e[0m"
+		echo -e "\e[31m云服务器$HOME/DSTServer/mods目录下\e[0m"
 		echo
         echo -e "\e[92m[1]启动服务器           [2]关闭服务器         [3]重启服务器\e[0m"  
         echo -e "\e[92m[4]查看游戏服务器状态   [5]添加或移除MOD      [6]设置管理员和黑名单\e[0m"
 		echo -e "\e[92m[7]控制台               [8]查看自动更新进程   [9]退出本脚本\e[0m"
 		echo -e "\e[92m[10]删除存档            [11]开启虚拟内存（单服务器开洞穴使用）\e[0m"
-		echo
+		echo -e "\e[92m[1２]更新游戏服务端(MOD更新一般重启即可)\e[0m"
 		echo -e "\e[92m注：开启虚拟内存只需执行一次\e[0m"
         echo
         echo -e "\e[33m================================================================================\e[0m"
@@ -2518,14 +2362,6 @@ function menu()
 	            echo -e "\e[92m请输入要设置的存档：\e[0m"
 	            read clustername
 	            cluster_name=$clustername
-				echo -e "\e[92m请选择游戏版本：1.正式版  2.ANR测试版\e[0m"
-	            read isbeta
-	            case $isbeta in
-	                1)
-		            DST_game_beta="Public" ;;
-		            2)
-		            DST_game_beta="ANewReignBeta" ;;
-	            esac	
 				echo -e "\e[92m你要：1.添加Mod  2.移除Mod\e[0m"
                 read modad
 	            case $modad in
@@ -2546,11 +2382,7 @@ function menu()
 				console
 			    break;;	
                 8)
-				if [[ $(screen -ls | grep -c "DST_autoupdate") > 0 ]]; then
-				    screen -r "DST_autoupdate"
-				else 
-				    echo "自动更新进程未正常开启，请在空闲时重启服务器！"
-				fi
+				echo "该功能已移除，请使用更新命令！"
 			    break;;	
 				9)
 				exitshell
@@ -2562,7 +2394,11 @@ function menu()
                 11)
 				openswap
 				menu
-			    break;;					
+			    break;;
+				12)
+				closeserver
+				Update_DST
+				break;;				
 		    esac
     done
 }
