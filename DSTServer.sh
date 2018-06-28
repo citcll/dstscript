@@ -132,11 +132,10 @@ function closeserver()
 	    if tmux has-session -t DST_Master > /dev/null 2>&1; then
             tmux send-keys -t DST_Master "c_shutdown(true)" C-m
 	    fi
-		sleep 10
+		sleep 3
 	    if tmux has-session -t DST_Caves > /dev/null 2>&1; then
             tmux send-keys -t DST_Caves "c_shutdown(true)" C-m
 	    fi
-		tmux kill-session -a
 	fi
 	sleep 1
 	echo -e "\e[92m服务器已关闭！\e[0m"
@@ -576,7 +575,7 @@ function checkserver()
 	        tmux attach-session -t DST_Master
 	    fi
 	    if ! tmux has-session -t DST_Master > /dev/null 2>&1 && tmux has-session -t DST_Caves > /dev/null 2>&1; then
-	        screen -r DST_Caves
+	        tmux attach-session -t DST_Caves
 	    fi
 	else
 	    echo "游戏服务器未开启！"
