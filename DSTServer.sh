@@ -130,12 +130,12 @@ ServerModSetup(\"889953787\")
 
 function closeserver()
 {
-    if tmux has-session -s DST_Master || tmux has-session -s DST_Caves; then
-	    if tmux has-session -s DST_Master; then
+    if tmux has-session -t DST_Master || tmux has-session -t DST_Caves; then
+	    if tmux has-session -t DST_Master; then
             tmux send-keys -t DST_Master "c_shutdown(true)" C-m
 	    fi
 		sleep 10
-	    if tmux has-session -s DST_Caves; then
+	    if tmux has-session -t DST_Caves; then
             tmux send-keys -t DST_Caves "c_shutdown(true)" C-m
 	    fi
 		tmux kill-session -a
@@ -393,7 +393,7 @@ echo -e \"\e[92m正在重启服务器。。。请稍后。。。\e[0m\"
 sleep 10" > $HOME/rebootserver.sh
         echo 'while :
     do
-        if tmux has-session -s DST_Master && tmux has-session -s DST_Caves; then
+        if tmux has-session -t DST_Master && tmux has-session -t DST_Caves; then
             if [[ $(grep "Sim paused" -c "$masterserverlog_path") > 0 ]]; then
 		        echo "服务器开启成功，和小伙伴尽情玩耍吧！"
 			    break
@@ -403,7 +403,7 @@ sleep 10" > $HOME/rebootserver.sh
 			    break
 		    fi
 		fi
-	    if tmux has-session -s DST_Master && ! tmux has-session -s DST_Caves; then
+	    if tmux has-session -t DST_Master && ! tmux has-session -t DST_Caves; then
             if [[ $(grep "Sim paused" -c "$masterserverlog_path") > 0 ]]; then
 		        echo "服务器开启成功，和小伙伴尽情玩耍吧！"
 			    break
@@ -413,7 +413,7 @@ sleep 10" > $HOME/rebootserver.sh
 			    break
 		    fi
         fi	
-	    if ! tmux has-session -s DST_Master && tmux has-session -s DST_Caves; then
+	    if ! tmux has-session -t DST_Master && tmux has-session -t DST_Caves; then
             if [[ $(grep "Sim paused" -c "$cavesserverlog_path") > 0 ]]; then
 		        echo "服务器开启成功，和小伙伴尽情玩耍吧！"
 			    break
@@ -440,7 +440,7 @@ echo -e \"\e[92m正在重启服务器。。。请稍后。。。\e[0m\"
 sleep 10" > $HOME/rebootserver.sh
         echo 'while :
         do
-        if tmux has-session -s DST_Master && tmux has-session -s DST_Caves; then
+        if tmux has-session -t DST_Master && tmux has-session -t DST_Caves; then
             if [[ $(grep "Sim paused" -c "$masterserverlog_path") > 0 ]]; then
 		        echo "服务器开启成功，和小伙伴尽情玩耍吧！"
 			    break
@@ -450,7 +450,7 @@ sleep 10" > $HOME/rebootserver.sh
 			    break
 		    fi
 		fi
-	    if tmux has-session -s DST_Master && ! tmux has-session -s DST_Caves; then
+	    if tmux has-session -t DST_Master && ! tmux has-session -t DST_Caves; then
             if [[ $(grep "Sim paused" -c "$masterserverlog_path") > 0 ]]; then
 		        echo "服务器开启成功，和小伙伴尽情玩耍吧！"
 			    break
@@ -460,7 +460,7 @@ sleep 10" > $HOME/rebootserver.sh
 			    break
 		    fi
         fi	
-	    if ! tmux has-session -s DST_Master && tmux has-session -s DST_Caves; then
+	    if ! tmux has-session -t DST_Master && tmux has-session -t DST_Caves; then
             if [[ $(grep "Sim paused" -c "$cavesserverlog_path") > 0 ]]; then
 		        echo "服务器开启成功，和小伙伴尽情玩耍吧！"
 			    break
@@ -489,7 +489,7 @@ echo -e \"\e[92m正在重启服务器。。。请稍后。。。\e[0m\"
 sleep 10" > $HOME/rebootserver.sh
         echo 'while :
         do
-        if tmux has-session -s DST_Master && tmux has-session -s DST_Caves; then
+        if tmux has-session -t DST_Master && tmux has-session -t DST_Caves; then
             if [[ $(grep "Sim paused" -c "$masterserverlog_path") > 0 ]]; then
 		        echo "服务器开启成功，和小伙伴尽情玩耍吧！"
 			    break
@@ -499,7 +499,7 @@ sleep 10" > $HOME/rebootserver.sh
 			    break
 		    fi
 		fi
-	    if tmux has-session -s DST_Master && ! tmux has-session -s DST_Caves; then
+	    if tmux has-session -t DST_Master && ! tmux has-session -t DST_Caves; then
             if [[ $(grep "Sim paused" -c "$masterserverlog_path") > 0 ]]; then
 		        echo "服务器开启成功，和小伙伴尽情玩耍吧！"
 			    break
@@ -509,7 +509,7 @@ sleep 10" > $HOME/rebootserver.sh
 			    break
 		    fi
         fi	
-	    if ! tmux has-session -s DST_Master && tmux has-session -s DST_Caves; then
+	    if ! tmux has-session -t DST_Master && tmux has-session -t DST_Caves; then
             if [[ $(grep "Sim paused" -c "$cavesserverlog_path") > 0 ]]; then
 		        echo "服务器开启成功，和小伙伴尽情玩耍吧！"
 			    break
@@ -533,7 +533,7 @@ function startcheck()
 {
 	while :
     do
-        if tmux has-session -s DST_Master && tmux has-session -s DST_Caves; then
+        if tmux has-session -t DST_Master && tmux has-session -t DST_Caves; then
             if [[ $(grep "Sim paused" -c "$masterserverlog_path") > 0 ]]; then
 		        echo "服务器开启成功，和小伙伴尽情玩耍吧！"
 			    break
@@ -543,7 +543,7 @@ function startcheck()
 			    break
 		    fi
 		fi
-	    if tmux has-session -s DST_Master && ! tmux has-session -s DST_Caves; then
+	    if tmux has-session -t DST_Master && ! tmux has-session -t DST_Caves; then
             if [[ $(grep "Sim paused" -c "$masterserverlog_path") > 0 ]]; then
 		        echo "服务器开启成功，和小伙伴尽情玩耍吧！"
 			    break
@@ -553,7 +553,7 @@ function startcheck()
 			    break
 		    fi
         fi	
-	    if ! tmux has-session -s DST_Master && tmux has-session -s DST_Caves; then
+	    if ! tmux has-session -t DST_Master && tmux has-session -t DST_Caves; then
             if [[ $(grep "Sim paused" -c "$cavesserverlog_path") > 0 ]]; then
 		        echo "服务器开启成功，和小伙伴尽情玩耍吧！"
 			    break
@@ -570,13 +570,13 @@ function startcheck()
 
 function checkserver()
 {    
-	if tmux has-session -s DST_Master || tmux has-session -s DST_Caves; then
+	if tmux has-session -t DST_Master || tmux has-session -t DST_Caves; then
 	    echo -e "\e[92m即将跳转游戏服务器窗口，要退回本界面，在游戏服务器窗口按 ctrl+B　松开马上再按下　D　再执行脚本即可。\e[0m"
 		sleep 3
-	    if tmux has-session -s DST_Master; then
+	    if tmux has-session -t DST_Master; then
 	        tmux attach-session -t DST_Master
 	    fi
-	    if ! tmux has-session -s DST_Master && tmux has-session -s DST_Caves;; then
+	    if ! tmux has-session -t DST_Master && tmux has-session -t DST_Caves; then
 	        screen -r DST_Caves
 	    fi
 	else
