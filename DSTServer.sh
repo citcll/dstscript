@@ -113,9 +113,7 @@ Update_DST(){
 
 function setupmod()
 {
-    echo "ServerModSetup(\"572538624\")
-ServerModSetup(\"367546858\")
-ServerModSetup(\"889953787\")
+    echo "ServerModSetup(\"1301033176\")
 " >> "${DST_conf_basedir}/${DST_conf_dirname}/mods_setup.lua"
     dir=$(ls -l "$HOME/DSTServer/mods" |awk '/^d/ {print $NF}'|grep "workshop"|cut -f2 -d"-")
     for modid in $dir
@@ -367,7 +365,6 @@ function startserver()
 		cluster_name=$clustername		
 		;;
 	esac
-	echo -e "\e[92m启动前更新。。。请稍候。。。\e[0m"
 	setupmod
 	if [[ ! -f ${DST_conf_basedir}/${DST_conf_dirname}/$cluster_name/Master/modoverrides.lua ]]; then
 		modadd
@@ -2137,7 +2134,7 @@ function addmod()
 {
 	echo "请从以上列表选择你要启用的MODID，不存在直接输入9位数modid"
 	echo -e "\e[31m只支持启用MOD，要具体配置在客机配置好上传配置文件即可\e[0m"
-	echo "添加完毕请输入 0 ！(默认安装中文模组和脚本配套模组)"
+	echo "添加完毕请输入 0 ！"
 	while :
 	do
     read modid
@@ -2201,14 +2198,10 @@ function delmod()
 function modadd()
 {    
     echo "return {
-[\"workshop-367546858\"]={ configuration_options={  }, enabled=true },
-[\"workshop-572538624\"]={ configuration_options={  }, enabled=true },
-[\"workshop-889953787\"]={ configuration_options={  }, enabled=true }
+[\"workshop-1301033176\"]={ configuration_options={  }, enabled=true }
 }" > ${DST_conf_basedir}/${DST_conf_dirname}/$cluster_name/Master/modoverrides.lua
 	echo "return {
-[\"workshop-367546858\"]={ configuration_options={  }, enabled=true },
-[\"workshop-572538624\"]={ configuration_options={  }, enabled=true },
-[\"workshop-889953787\"]={ configuration_options={  }, enabled=true }
+[\"workshop-1301033176\"]={ configuration_options={  }, enabled=true }
 }" > ${DST_conf_basedir}/${DST_conf_dirname}/$cluster_name/Caves/modoverrides.lua	
 }
 
