@@ -365,7 +365,7 @@ function startserver()
 		cluster_name=$clustername		
 		;;
 	esac
-	echo "cluster=$cluster_name" > dst.conf
+	echo "clustername=$cluster_name" > $HOME/dst.conf
 	setupmod
 	if [[ ! -f ${DST_conf_basedir}/${DST_conf_dirname}/$cluster_name/Master/modoverrides.lua ]]; then
 		modadd
@@ -387,9 +387,8 @@ function startserver()
 		shard="Master Caves"
 		;;
 	esac
-	echo "shard=\"$shard\"" > $HOME/dst.conf
+	echo "shard=$shard" >> $HOME/dst.conf
 	startshard
-	startcheck
 	echo -e "\e[92m服务器开启中。。。请稍候。。。\e[0m"
 	sleep 10
 	startcheck
@@ -397,7 +396,7 @@ function startserver()
 }
 function startshard(){
 	for s in $shard; do
-		tmux new-session -s DST_$shard -d "$DST_bin_cmd -cluster $cluster_name -shard $shard"
+		tmux new-session -s DST_$s -d "$DST_bin_cmd -cluster $cluster_name -shard $s"
 	done
 }
 function startcheck()
@@ -1943,11 +1942,7 @@ function dellist()
 
 function listmanager()
 {
-    echo -e "\e[92m已有存档：\e[0m"
-	ls -l ${DST_conf_basedir}/${DST_conf_dirname} | awk '/^d/ {print $NF}'
-	echo -e "\e[92m请输入要设置的存档：\e[0m"
-	read clustername
-	cluster_name=$clustername
+	[[ -z $cluster_name ]] && echo -e "\e[92m已有存档：\e[0m" && ls -l ${DST_conf_basedir}/${DST_conf_dirname} | awk '/^d/ {print $NF}' && echo -e "\e[92m请输入要设置的存档：\e[0m" && read clustername && cluster_name=$clustername
     echo -e "\e[92m你要设置：1.管理员  2.黑名单  3.白名单\e[0m"
     read list
 	case $list in
@@ -2191,6 +2186,7 @@ function openswap()
 }
 
 function rebootserver(){
+	info "服务器重启中。。。请稍候。。。"
 	cluster_name=$(cat $HOME/dst.conf|grep clustername|cut -d "=" -f2)
 	shard=$(cat $HOME/dst.conf|grep shard|cut -d "=" -f2)
 	startshard
