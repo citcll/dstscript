@@ -3,7 +3,7 @@
 #作者：Ariwori 2018-06-29 00:10:49
 #旧饭新炒，有很多不完善和不合理的地方，我就懒得改了                                                                        
 #-------------------------------------------------------------------------------------------
-shell_ver="1.1.3"
+shell_ver="1.1.4"
 DST_conf_dirname="DoNotStarveTogether"   
 DST_conf_basedir="$HOME/.klei" 
 DST_bin_cmd="./dontstarve_dedicated_server_nullrenderer"
@@ -404,6 +404,8 @@ function startcheck()
 {
 	masterserverlog_path="${DST_conf_basedir}/${DST_conf_dirname}/${cluster_name}/Master/server_log.txt"
 	cavesserverlog_path="${DST_conf_basedir}/${DST_conf_dirname}/${cluster_name}/Caves/server_log.txt"
+	echo "" > masterserverlog_path
+	echo "" > cavesserverlog_path
 	while :
     do
         if tmux has-session -t DST_Master > /dev/null 2>&1 && tmux has-session -t DST_Caves > /dev/null 2>&1; then
@@ -2213,7 +2215,7 @@ function menu()
 {    
     while :
     do
-	    echo -e "\e[33m================欢迎使用饥荒联机版独立服务器脚本[Linux-Steam]($shell_ver)==============\e[0m"
+	    echo -e "\e[33m==============欢迎使用饥荒联机版独立服务器脚本[Linux-Steam]($shell_ver)==============\e[0m"
         echo
 		echo -e "\e[33m作者：Ariwori        Bug反馈：https://blog.wqlin.com/dstscript.html\e[0m"
 		echo -e "\e[33m本脚本一切权利归作者所有。未经许可禁止使用本脚本进行任何的商业活动！\e[0m"
