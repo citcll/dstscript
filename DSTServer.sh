@@ -3,7 +3,7 @@
 #作者：Ariwori 2018-06-29 00:10:49
 #旧饭新炒，有很多不完善和不合理的地方，我就懒得改了                                                                        
 #-------------------------------------------------------------------------------------------
-shell_ver="1.1.1"
+shell_ver="1.1.2"
 DST_conf_dirname="DoNotStarveTogether"   
 DST_conf_basedir="$HOME/.klei" 
 DST_bin_cmd="./dontstarve_dedicated_server_nullrenderer"
@@ -397,7 +397,7 @@ function startserver()
 }
 function startshard(){
 	for s in $shard; do
-		tmux new-session -s DST_Caves -d "$DST_bin_cmd -cluster $cluster_name -shard $shard"
+		tmux new-session -s DST_$shard -d "$DST_bin_cmd -cluster $cluster_name -shard $shard"
 	done
 }
 function startcheck()
