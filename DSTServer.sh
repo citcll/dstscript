@@ -3,7 +3,7 @@
 #作者：Ariwori 2018-06-29 00:10:49
 #旧饭新炒，有很多不完善和不合理的地方，我就懒得改了                                                                        
 #-------------------------------------------------------------------------------------------
-shell_ver="1.1.4"
+shell_ver="1.1.5"
 DST_conf_dirname="DoNotStarveTogether"   
 DST_conf_basedir="$HOME/.klei" 
 DST_bin_cmd="./dontstarve_dedicated_server_nullrenderer"
@@ -103,7 +103,9 @@ Update_DST(){
     availablebuild=$(./steamcmd.sh +login "anonymous" +app_info_update 1 +app_info_print 343050 +app_info_print 343050 +quit | sed -n '/branch/,$p' | grep -m 1 buildid | tr -cd '[:digit:]')
     if [ "${currentbuild}" != "${availablebuild}" ]; then
         info "更新可用(${currentbuild}===>${availablebuild}！即将执行更新..."
-        Install_Game
+		closeserver
+		Install_Game
+		rebootserver
     else
         tip "无可用更新！当前Steam构建版本（$currentbuild）"
     fi
@@ -2269,8 +2271,15 @@ function menu()
 				console
 			    break;;	
                 8)
-				echo "该功能已移除，请使用手动更新命令！"
-			    break;;	
+				if tmux has-session -t Auto_update > /dev/null 2>&1; then
+					info "自动更新进程已在运行，即将跳转。。。退出请按Ctrl + B松开再按D"
+					sleep 3
+					tmux attach-session -t Auto_update
+				else
+					tmux new-session -s Auto_update -d "./DSTServer.sh au"
+					info "自动更新已开启！"
+				fi
+			    break;;
 				9)
 				exitshell
 			    break;;	
@@ -2292,5 +2301,11 @@ function menu()
 		    esac
     done
 }
-
+if [[ $1 == "au" ]]; then
+	while(true); do
+		Update_DST
+		info "每十分鐘進行一次更新檢測。。。"
+		sleep 600
+	done
+fi
 menu
