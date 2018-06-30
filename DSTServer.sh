@@ -2201,7 +2201,7 @@ function rebootserver(){
 Update_shell(){
 	cur_ver=$shell_ver
     info "当前版本为 [ ${cur_ver} ]，开始检测最新版本..."
-    new_ver=$(wget --no-check-certificate -qO- https://raw.githubusercontent.com/ariwori/dstscript/master/DSTServer.sh|grep "^shell_ver=" |cut -d '=' -f2)
+    new_ver=$(wget --no-check-certificate -qO- https://raw.githubusercontent.com/ariwori/dstscript/master/DSTServer.sh|grep "^shell_ver=" |cut -d '"' -f2)
     [[ -z ${new_ver} ]] && tip "检测最新版本失败 !" && new_ver=$cur_ver
     if [[ ${new_ver} != ${cur_ver} ]]; then
         info "发现新版本[ ${new_ver} ]，更新中..."
