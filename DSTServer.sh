@@ -6,10 +6,11 @@
 #云服务器系统为linux发行版本Ubuntu
 #旧饭新炒，有很多不完善和不合理的地方，我就懒得改了                                                                        
 #-------------------------------------------------------------------------------------------
-
+shell_ver="1.1.0"
 DST_conf_dirname="DoNotStarveTogether"   
 DST_conf_basedir="$HOME/.klei" 
-DST_bin_cmd="./dontstarve_dedicated_server_nullrenderer"   
+DST_bin_cmd="./dontstarve_dedicated_server_nullrenderer"
+
 
 # 屏幕输出
 Green_font_prefix="\033[32m"
@@ -140,7 +141,7 @@ function closeserver()
 		echo -e "\e[92m服务器已关闭！\e[0m"
 	else
 		sleep 1
-		echo -e "\e[92m服务器为开启！\e[0m"
+		echo -e "\e[92m服务器为未开启！\e[0m"
 	fi
 }
 function settoken()
@@ -367,6 +368,7 @@ function startserver()
 		cluster_name=$clustername		
 		;;
 	esac
+	echo "cluster=$cluster_name" > dst.conf
 	setupmod
 	if [[ ! -f ${DST_conf_basedir}/${DST_conf_dirname}/$cluster_name/Master/modoverrides.lua ]]; then
 		modadd
@@ -379,154 +381,27 @@ function startserver()
 	read shard 
 	case $shard in
 		1)		
-		tmux new-session -s DST_Master -d "$DST_bin_cmd -console -conf_dir $DST_conf_dirname -cluster $cluster_name -shard Master"
-		echo "#!/bin/bash
-masterserverlog_path=\"${DST_conf_basedir}/${DST_conf_dirname}/${cluster_name}/Master/server_log.txt\"
-cavesserverlog_path=\"${DST_conf_basedir}/${DST_conf_dirname}/${cluster_name}/Caves/server_log.txt\"			
-echo \"\" > \"$HOME/DSTServer/mods/dedicated_server_mods_setup.lua\"	
-cp \"${DST_conf_basedir}/${DST_conf_dirname}/mods_setup.lua\" \"$HOME/DSTServer/mods/dedicated_server_mods_setup.lua\"
-cd $HOME/DSTServer/bin
-tmux new-session -s DST_Master -d \"$DST_bin_cmd -console -conf_dir $DST_conf_dirname -cluster $cluster_name -shard Master\"
-sleep 5
-echo -e \"\e[92m正在重启服务器。。。请稍后。。。\e[0m\"
-sleep 10" > $HOME/rebootserver.sh
-        echo 'while :
-    do
-        if tmux has-session -t DST_Master > /dev/null 2>&1 > /dev/null 2>&1 && tmux has-session -t DST_Caves > /dev/null 2>&1; then
-            if [[ $(grep "Sim paused" -c "$masterserverlog_path") > 0 ]]; then
-		        echo "服务器开启成功，和小伙伴尽情玩耍吧！"
-			    break
-		    fi
-		    if [[ $(grep "Your Server Will Not Start" -c "$masterserverlog_path") > 0 ]]; then
-		        echo "服务器开启未成功，请执行关闭服务器命令后再次尝试，并注意令牌是否成功设置且有效。"
-			    break
-		    fi
-		fi
-	    if tmux has-session -t DST_Master > /dev/null 2>&1 && ! tmux has-session -t DST_Caves > /dev/null 2>&1; then
-            if [[ $(grep "Sim paused" -c "$masterserverlog_path") > 0 ]]; then
-		        echo "服务器开启成功，和小伙伴尽情玩耍吧！"
-			    break
-		    fi
-		    if [[ $(grep "Your Server Will Not Start" -c "$masterserverlog_path") > 0 ]]; then
-		        echo "服务器开启未成功，请执行关闭服务器命令后再次尝试，并注意令牌是否成功设置且有效。"
-			    break
-		    fi
-        fi	
-	    if ! tmux has-session -t DST_Master > /dev/null 2>&1 && tmux has-session -t DST_Caves > /dev/null 2>&1; then
-            if [[ $(grep "Sim paused" -c "$cavesserverlog_path") > 0 ]]; then
-		        echo "服务器开启成功，和小伙伴尽情玩耍吧！"
-			    break
-		    fi
-		    if [[ $(grep "Your Server Will Not Start" -c "$cavesserverlog_path") > 0 ]]; then
-		        echo "服务器开启未成功，请执行关闭服务器命令后再次尝试，并注意令牌是否成功设置且有效。"
-			    break
-		    fi
-	    fi
-		
-    done' >> $HOME/rebootserver.sh
+		shard="Master"
 		;;
 		2)
-		tmux new-session -s DST_Caves -d "$DST_bin_cmd -console -conf_dir $DST_conf_dirname -cluster $cluster_name -shard Caves"
-		echo "#!/bin/bash
-masterserverlog_path=\"${DST_conf_basedir}/${DST_conf_dirname}/${cluster_name}/Master/server_log.txt\"
-cavesserverlog_path=\"${DST_conf_basedir}/${DST_conf_dirname}/${cluster_name}/Caves/server_log.txt\"
-echo \"\" > \"$HOME/DSTServer/mods/dedicated_server_mods_setup.lua\"		
-cp \"${DST_conf_basedir}/${DST_conf_dirname}/mods_setup.lua\" \"$HOME/DSTServer/mods/dedicated_server_mods_setup.lua\"
-cd $HOME/DSTServer/bin
-tmux new-session -s DST_Caves -d \"$DST_bin_cmd -console -conf_dir $DST_conf_dirname -cluster $cluster_name -shard Caves\"
-sleep 5
-echo -e \"\e[92m正在重启服务器。。。请稍后。。。\e[0m\"
-sleep 10" > $HOME/rebootserver.sh
-        echo 'while :
-        do
-        if tmux has-session -t DST_Master > /dev/null 2>&1 && tmux has-session -t DST_Caves > /dev/null 2>&1; then
-            if [[ $(grep "Sim paused" -c "$masterserverlog_path") > 0 ]]; then
-		        echo "服务器开启成功，和小伙伴尽情玩耍吧！"
-			    break
-		    fi
-		    if [[ $(grep "Your Server Will Not Start" -c "$masterserverlog_path") > 0 ]]; then
-		        echo "服务器开启未成功，请执行关闭服务器命令后再次尝试，并注意令牌是否成功设置且有效。"
-			    break
-		    fi
-		fi
-	    if tmux has-session -t DST_Master > /dev/null 2>&1 && ! tmux has-session -t DST_Caves > /dev/null 2>&1; then
-            if [[ $(grep "Sim paused" -c "$masterserverlog_path") > 0 ]]; then
-		        echo "服务器开启成功，和小伙伴尽情玩耍吧！"
-			    break
-		    fi
-		    if [[ $(grep "Your Server Will Not Start" -c "$masterserverlog_path") > 0 ]]; then
-		        echo "服务器开启未成功，请执行关闭服务器命令后再次尝试，并注意令牌是否成功设置且有效。"
-			    break
-		    fi
-        fi	
-	    if ! tmux has-session -t DST_Master > /dev/null 2>&1 && tmux has-session -t DST_Caves > /dev/null 2>&1; then
-            if [[ $(grep "Sim paused" -c "$cavesserverlog_path") > 0 ]]; then
-		        echo "服务器开启成功，和小伙伴尽情玩耍吧！"
-			    break
-		    fi
-		    if [[ $(grep "Your Server Will Not Start" -c "$cavesserverlog_path") > 0 ]]; then
-		        echo "服务器开启未成功，请执行关闭服务器命令后再次尝试，并注意令牌是否成功设置且有效。"
-			    break
-		    fi
-	    fi
-		
-    done' >> $HOME/rebootserver.sh
+		shard="Caves"
 		;;
 		3)
-		tmux new-session -s DST_Master -d "$DST_bin_cmd -console -conf_dir $DST_conf_dirname -cluster $cluster_name -shard Master"
-		tmux new-session -s DST_Caves -d "$DST_bin_cmd -console -conf_dir $DST_conf_dirname -cluster $cluster_name -shard Caves"
-		echo "#!/bin/bash
-masterserverlog_path=\"${DST_conf_basedir}/${DST_conf_dirname}/${cluster_name}/Master/server_log.txt\"
-cavesserverlog_path=\"${DST_conf_basedir}/${DST_conf_dirname}/${cluster_name}/Caves/server_log.txt\"
-echo \"\" > \"$HOME/DSTServer/mods/dedicated_server_mods_setup.lua\"		
-cp \"${DST_conf_basedir}/${DST_conf_dirname}/mods_setup.lua\" \"$HOME/DSTServer/mods/dedicated_server_mods_setup.lua\"
-cd $HOME/DSTServer/bin
-tmux new-session -s DST_Master -d \"$DST_bin_cmd -console -conf_dir $DST_conf_dirname -cluster $cluster_name -shard Master\"
-tmux new-session -s DST_Caves -d \"$DST_bin_cmd -console -conf_dir $DST_conf_dirname -cluster $cluster_name -shard Caves\"
-sleep 5
-echo -e \"\e[92m正在重启服务器。。。请稍后。。。\e[0m\"
-sleep 10" > $HOME/rebootserver.sh
-        echo 'while :
-        do
-        if tmux has-session -t DST_Master > /dev/null 2>&1 && tmux has-session -t DST_Caves > /dev/null 2>&1; then
-            if [[ $(grep "Sim paused" -c "$masterserverlog_path") > 0 ]]; then
-		        echo "服务器开启成功，和小伙伴尽情玩耍吧！"
-			    break
-		    fi
-		    if [[ $(grep "Your Server Will Not Start" -c "$masterserverlog_path") > 0 ]]; then
-		        echo "服务器开启未成功，请执行关闭服务器命令后再次尝试，并注意令牌是否成功设置且有效。"
-			    break
-		    fi
-		fi
-	    if tmux has-session -t DST_Master > /dev/null 2>&1 && ! tmux has-session -t DST_Caves > /dev/null 2>&1; then
-            if [[ $(grep "Sim paused" -c "$masterserverlog_path") > 0 ]]; then
-		        echo "服务器开启成功，和小伙伴尽情玩耍吧！"
-			    break
-		    fi
-		    if [[ $(grep "Your Server Will Not Start" -c "$masterserverlog_path") > 0 ]]; then
-		        echo "服务器开启未成功，请执行关闭服务器命令后再次尝试，并注意令牌是否成功设置且有效。"
-			    break
-		    fi
-        fi	
-	    if ! tmux has-session -t DST_Master > /dev/null 2>&1 && tmux has-session -t DST_Caves > /dev/null 2>&1; then
-            if [[ $(grep "Sim paused" -c "$cavesserverlog_path") > 0 ]]; then
-		        echo "服务器开启成功，和小伙伴尽情玩耍吧！"
-			    break
-		    fi
-		    if [[ $(grep "Your Server Will Not Start" -c "$cavesserverlog_path") > 0 ]]; then
-		        echo "服务器开启未成功，请执行关闭服务器命令后再次尝试，并注意令牌是否成功设置且有效。"
-			    break
-		    fi
-	    fi
-		
-    done' >> $HOME/rebootserver.sh
+		shard="Master Caves"
 		;;
 	esac
-	chmod u+x $HOME/rebootserver.sh
+	echo "shard=\"$shard\"" > $HOME/dst.conf
+	startshard
+	startcheck
 	echo -e "\e[92m服务器开启中。。。请稍候。。。\e[0m"
 	sleep 10
 	startcheck
 	menu
+}
+function startshard(){
+	for s in $shard; do
+		tmux new-session -s DST_Caves -d "$DST_bin_cmd -cluster $cluster_name -shard $shard"
+	done
 }
 function startcheck()
 {
@@ -2316,6 +2191,27 @@ function openswap()
     echo -e "\e[92m虚拟内存已开启！\e[0m"
 }
 
+function rebootserver(){
+	cluster_name=$(cat $HOME/dst.conf|grep clustername|cut -d "=" -f2)
+	shard=$(cat $HOME/dst.conf|grep shard|cut -d "=" -f2)
+	startshard
+	startcheck
+}
+# 脚本更新
+Update_shell(){
+	cur_ver=$shell_ver
+    info "当前版本为 [ ${cur_ver} ]，开始检测最新版本..."
+    new_ver=$(wget --no-check-certificate -qO- https://raw.githubusercontent.com/ariwori/dstscript/master/DSTServer.sh|grep "^shell_ver=" |cut -d '=' -f2)
+    [[ -z ${new_ver} ]] && tip "检测最新版本失败 !" && new_ver=$cur_ver
+    if [[ ${new_ver} != ${cur_ver} ]]; then
+        info "发现新版本[ ${new_ver} ]，更新中..."
+        wget https://raw.githubusercontent.com/ariwori/dstscript/master/DSTServer.sh -O $HOME/DSTServer.sh
+    	chmod +x $HOME/DSTServer.sh
+        info "已更新为最新版本[ ${new_ver} ] !"
+    else
+        info "当前已是最新版本[ ${new_ver} ] !"
+    fi
+}
 function menu()
 {    
     while :
@@ -2330,7 +2226,7 @@ function menu()
 		echo
         echo -e "\e[92m[1]启动服务器           [2]关闭服务器         [3]重启服务器\e[0m"  
         echo -e "\e[92m[4]查看游戏服务器状态   [5]添加或移除MOD      [6]设置管理员和黑名单\e[0m"
-		echo -e "\e[92m[7]控制台               [8]查看自动更新进程   [9]退出本脚本\e[0m"
+		echo -e "\e[92m[7]控制台               [8]自动更新   [9]退出本脚本\e[0m"
 		echo -e "\e[92m[10]删除存档            [11]开启虚拟内存（单服务器开洞穴使用）\e[0m"
 		echo -e "\e[92m[1２]更新游戏服务端(MOD更新一般重启即可)\e[0m"
 		echo -e "\e[92m注：开启虚拟内存只需执行一次\e[0m"
@@ -2346,9 +2242,8 @@ function menu()
                 break;;
 				3)rebootannounce
 				sleep 10
-				closeserver
-                savelog				
-				./rebootserver.sh
+				closeserver				
+				rebootserver
 				menu
 				break;;
 			    4)checkserver
@@ -2379,7 +2274,7 @@ function menu()
 				console
 			    break;;	
                 8)
-				echo "该功能已移除，请使用更新命令！"
+				echo "该功能已移除，请使用手动更新命令！"
 			    break;;	
 				9)
 				exitshell
