@@ -2314,6 +2314,7 @@ function menu()
 				break;;
 				13)
 				Update_shell
+				menu
 				break;;			
 		    esac
     done
