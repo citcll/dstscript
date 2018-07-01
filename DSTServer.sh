@@ -2295,6 +2295,7 @@ function menu()
 					tmux new-session -s Auto_update -d "./DSTServer.sh au"
 					info "自动更新已开启！"
 				fi
+				menu
 			    break;;
 				9)
 				exitshell
