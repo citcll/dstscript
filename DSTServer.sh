@@ -1,9 +1,8 @@
 #!/bin/bash
 #-------------------------------------------------------------------------------------------
-#作者：Ariwori 2018-06-29 00:10:49
-#旧饭新炒，有很多不完善和不合理的地方，我就懒得改了                                                                        
+# Author：Ariwori 2018-06-29 00:10:49
 #-------------------------------------------------------------------------------------------
-shell_ver="1.1.5"
+shell_ver="1.1.7"
 DST_conf_dirname="DoNotStarveTogether"   
 DST_conf_basedir="$HOME/.klei" 
 DST_bin_cmd="./dontstarve_dedicated_server_nullrenderer"
@@ -31,7 +30,10 @@ first_run_check(){
         info "安装游戏服务端 ..."
         Install_Game
         fix_steamcmd
-        info "首次运行配置完毕，如果无任何异常，你就可以创建新的世界了。"
+		if [ ! -f $HOME/DSTServer/version.txt ]; then
+			error "安装失败，请重试！多次重试仍无效请反馈!" && exit 1
+		fi
+        info "首次运行配置完毕，你可以创建新的世界了。"
     fi
 }
 # 创建文件夹
@@ -57,23 +59,30 @@ check_sys(){
     elif cat /proc/version | grep -q -E -i "centos|red hat|redhat"; then
         release="centos"
     fi
-    if [[ $release != "ubuntu" && $release != "debian" ]]; then
-        error "很遗憾！本脚本暂时只支持Debian7+和Ubuntu12+的系统！" && exit 1
+    if [[ $release != "ubuntu" && $release != "debian" && $release != "centos" ]]; then
+        error "很遗憾！本脚本暂时只支持Debian7+和Ubuntu12+和CentOS7+的系统！" && exit 1
     fi
     bit=`uname -m`
 }
 # 安装依赖库和必要软件
 Install_Dependency(){
-    info "安装DST所需依赖库 ..."
-    if [[ ${bit} = "x86_64" ]]; then
-		sudo dpkg --add-architecture i386;
-        sudo apt update;
-        sudo apt install -y lib32gcc1 libstdc++6 libstdc++6:i386 libcurl4-gnutls-dev:i386
+    info "安装DST所需依赖库及软件 ..."
+	if [[ $release != "centos" ]]; then
+		if [[ ${bit} = "x86_64" ]]; then
+			sudo dpkg --add-architecture i386
+ 	       	sudo apt update
+ 	       	sudo apt install -y lib32gcc1 libstdc++6 libstdc++6:i386 libcurl4-gnutls-dev:i386 tmux wget
+		else
+		 	sudo apt update   
+			sudo apt install -y libstdc++6 libcurl4-gnutls-dev tmux wget
+		fi
 	else
-	    sudo apt install -y libstdc++6 libcurl4-gnutls-dev
-	fi
-    info "安装脚本所需软件 ..."
-    sudo apt install -y tmux
+		if [[ ${bit} = "x86_64" ]]; then
+			sudo yum install -y tmux glibc.i686 libstdc++ libstdc++.i686 libcurl.i686 wget
+		else
+			sudo yum install -y wget tmux libstdc++ libcurl
+		fi
+ 	fi
 }
 # Install steamcmd
 Install_Steamcmd(){
@@ -92,25 +101,32 @@ fix_steamcmd(){
     info "修复Steamcmd可能存在的依赖问题 ..."
     mkdir -pv "${HOME}/.steam/sdk32"
     cp -v $HOME/steamcmd/linux32/steamclient.so "${HOME}/.steam/sdk32/steamclient.so"
+	# fix lib for centos
+	if [[ $release == "centos" ]] && [ ! -f "$HOME/DSTServer/bin/lib32/libcurl-gnutls.so.4" ]; then
+		info "libcurl-gnutls.so.4 missing...create a lib link."
+		ln -s "/usr/lib/libcurl.so.4" "$HOME/DSTServer/bin/lib32/libcurl-gnutls.so.4"
+	fi
 }
 first_run_check
 ##########################################################################
 # 更新游戏服务端
-Update_DST(){
+Update_DST_Check(){
     appmanifestfile=$(find "$HOME/DSTServer" -type f -name "appmanifest_343050.acf")
     currentbuild=$(grep buildid "${appmanifestfile}" | tr '[:blank:]"' ' ' | tr -s ' ' | cut -d\  -f3)
     cd $HOME/steamcmd || exit
     availablebuild=$(./steamcmd.sh +login "anonymous" +app_info_update 1 +app_info_print 343050 +app_info_print 343050 +quit | sed -n '/branch/,$p' | grep -m 1 buildid | tr -cd '[:digit:]')
     if [ "${currentbuild}" != "${availablebuild}" ]; then
         info "更新可用(${currentbuild}===>${availablebuild}！即将执行更新..."
-		closeserver
-		Install_Game
-		rebootserver
+		dst_need_update=true
     else
         tip "无可用更新！当前Steam构建版本（$currentbuild）"
+		dst_need_update=false
     fi
 }
-
+Update_DST(){
+	Update_DST_Check
+	if [[ $dst_need_update == "true" ]]; then Install_Game; fi
+}
 function setupmod()
 {
     echo "ServerModSetup(\"1301033176\")
@@ -2225,7 +2241,7 @@ function menu()
         echo -e "\e[92m[4]查看游戏服务器状态   [5]添加或移除MOD      [6]设置管理员和黑名单\e[0m"
 		echo -e "\e[92m[7]控制台               [8]自动更新           [9]退出本脚本\e[0m"
 		echo -e "\e[92m[10]删除存档            [11]开启虚拟内存（单服务器开洞穴使用）\e[0m"
-		echo -e "\e[92m[1２]更新游戏服务端(MOD更新一般重启即可)      [13]更新脚本\e[0m"
+		echo -e "\e[92m[12]更新游戏服务端(MOD更新一般重启即可)       [13]更新脚本\e[0m"
 		echo -e "\e[92m注：开启虚拟内存只需执行一次\e[0m"
         echo
         echo -e "\e[33m================================================================================\e[0m"
@@ -2303,7 +2319,12 @@ function menu()
 }
 if [[ $1 == "au" ]]; then
 	while(true); do
-		Update_DST
+		Update_DST_Check
+		if [[ $dst_need_update == "true" ]]; then
+			closeserver
+			Install_Game
+			rebootserver
+		fi
 		info "每十分鐘進行一次更新檢測。。。"
 		sleep 600
 	done
