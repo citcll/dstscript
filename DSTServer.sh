@@ -2,7 +2,7 @@
 #-------------------------------------------------------------------------------------------
 # Author：Ariwori 2018-06-29 00:10:49
 #-------------------------------------------------------------------------------------------
-shell_ver="1.1.7"
+shell_ver="1.1.8"
 DST_conf_dirname="DoNotStarveTogether"   
 DST_conf_basedir="$HOME/.klei" 
 DST_bin_cmd="./dontstarve_dedicated_server_nullrenderer"
@@ -2220,7 +2220,7 @@ Update_shell(){
         info "发现新版本[ ${new_ver} ]，更新中..."
         wget https://raw.githubusercontent.com/ariwori/dstscript/master/DSTServer.sh -O $HOME/DSTServer.sh
     	chmod +x $HOME/DSTServer.sh
-        info "已更新为最新版本[ ${new_ver} ] !"
+        info "已更新为最新版本[ ${new_ver} ] !" && exit 0
     else
         info "当前已是最新版本[ ${new_ver} ] !"
     fi
