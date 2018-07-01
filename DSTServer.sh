@@ -118,14 +118,21 @@ Update_DST_Check(){
     if [ "${currentbuild}" != "${availablebuild}" ]; then
         info "更新可用(${currentbuild}===>${availablebuild}！即将执行更新..."
 		dst_need_update=true
+		closeserver
+		Install_Game
     else
         tip "无可用更新！当前Steam构建版本（$currentbuild）"
 		dst_need_update=false
     fi
 }
 Update_DST(){
+	if tmux has-session -t DST_Master > /dev/null 2>&1 || tmux has-session -t DST_Caves > /dev/null 2>&1; then
+		serveropen=true
+	fi
 	Update_DST_Check
-	if [[ $dst_need_update == "true" ]]; then Install_Game; fi
+	if [[ $serveropen == "true" && dst_need_update == "true" ]]; then
+		rebootserver
+	fi
 }
 function setupmod()
 {
@@ -2159,10 +2166,10 @@ function console()
 function rebootannounce()
 {
     if tmux has-session -t DST_Master > /dev/null 2>&1; then   									        
-	    tmux send-keys -t DST_Master "c_announce(\"服务器设置因做了改动需要重启，预计耗时三分钟，给你带来的不便还请谅解！\")" C-m
+	    tmux send-keys -t DST_Master "c_announce(\"服务器因改动或更新需要重启，预计耗时三分钟，给你带来的不便还请谅解！\")" C-m
 	fi
 	if tmux has-session -t DST_Caves > /dev/null 2>&1; then						        
-		tmux send-keys -t DST_Caves "c_announce(\"服务器设置因做了改动需要重启，预计耗时三分钟，给你带来的不便还请谅解！\")" C-m
+		tmux send-keys -t DST_Caves "c_announce(\"服务器设因改动或更新需要重启，预计耗时三分钟，给你带来的不便还请谅解！\")" C-m
 	fi
 }
 
@@ -2220,7 +2227,10 @@ Update_shell(){
         info "发现新版本[ ${new_ver} ]，更新中..."
         wget https://raw.githubusercontent.com/ariwori/dstscript/master/DSTServer.sh -O $HOME/DSTServer.sh
     	chmod +x $HOME/DSTServer.sh
-        info "已更新为最新版本[ ${new_ver} ] !" && exit 0
+        info "已更新为最新版本[ ${new_ver} ] !"
+		tmux kill-session -t Auto_update
+		tip "自动更新进程已退出，如需要请重新开启！"
+		exit 0
     else
         info "当前已是最新版本[ ${new_ver} ] !"
     fi
@@ -2309,8 +2319,8 @@ function menu()
 				menu
 			    break;;
 				12)
-				closeserver
 				Update_DST
+				menu
 				break;;
 				13)
 				Update_shell
@@ -2321,12 +2331,7 @@ function menu()
 }
 if [[ $1 == "au" ]]; then
 	while(true); do
-		Update_DST_Check
-		if [[ $dst_need_update == "true" ]]; then
-			closeserver
-			Install_Game
-			rebootserver
-		fi
+		Update_DST
 		info "每十分鐘進行一次更新檢測。。。"
 		sleep 600
 	done
