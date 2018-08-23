@@ -787,7 +787,7 @@ Update_script(){
         if [[ ${new_ver} != ${cur_ver} ]]; then
             info "$file 发现新版本[ ${new_ver} ]，更新中..."
             wget https://raw.githubusercontent.com/ariwori/dstscript/master/$file -O $HOME/$file
-            chmod +x $HOME/DSTServer.sh
+            chmod +x $HOME/dstserver.sh
             info "$file 已更新为最新版本[ ${new_ver} ] !"
             if [[ "$file" == "dstserver.sh" ]]; then need_exit="true"; fi
             need_update="true"
