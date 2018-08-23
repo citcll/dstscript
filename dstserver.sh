@@ -34,7 +34,7 @@ Menu(){
         echo -e "\e[33m作者：Ariwori        Bug反馈：https://wqlin.com/blog/dstscript.html\e[0m"
         echo -e "\e[33m本脚本一切权利归作者所有。未经许可禁止使用本脚本进行任何的商业活动！\e[0m"
         echo
-        echo -e "\e[31m游戏服务端安装目录：$dst_server_dir (Version: $game_ver)\e[0m"
+        echo -e "\e[31m游戏服务端安装目录：$dst_server_dir (Version: $(cat dst_server_dir/version.txt))\e[0m"
         echo
         echo -e "\e[92m[1]启动服务器           [2]关闭服务器         [3]重启服务器\e[0m"  
         echo -e "\e[92m[4]查看服务器状态       [5]添加或移除MOD      [6]设置管理员和黑名单\e[0m"
