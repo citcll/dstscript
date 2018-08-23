@@ -1,3 +1,4 @@
+-- script_ver="1.1.9"
 return {
   desc="The standard Don't Starve experience.",
   hideminimap=false,

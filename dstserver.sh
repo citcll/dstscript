@@ -70,6 +70,79 @@ Menu(){
 		esac
     done
 }
+###################################################################
+Not_work_now(){
+	info "功能尚未完成，请等待作者更新！"
+}
+###################################################################
+Server_detail(){
+	Not_work_now
+}
+Server_console(){
+	Not_work_now
+}
+Cluster_manager(){
+	Not_work_now
+}
+Auto_update(){
+	if tmux has-session -t Auto_update > /dev/null 2>&1; then
+		info "自动更新进程已在运行，即将跳转。。。退出请按Ctrl + B松开再按D"
+		sleep 3
+		tmux attach-session -t Auto_update
+	else
+		tmux new-session -s Auto_update -d "./dstserver.sh au"
+		info "自动更新已开启！"
+	fi
+}
+Update_DST_Check(){
+    appmanifestfile=$(find "$dst_server_dir" -type f -name "appmanifest_343050.acf")
+    currentbuild=$(grep buildid "${appmanifestfile}" | tr '[:blank:]"' ' ' | tr -s ' ' | cut -d\  -f3)
+    cd $HOME/steamcmd || exit
+    availablebuild=$(./steamcmd.sh +login "anonymous" +app_info_update 1 +app_info_print 343050 +app_info_print 343050 +quit | sed -n '/branch/,$p' | grep -m 1 buildid | tr -cd '[:digit:]')
+    if [ "${currentbuild}" != "${availablebuild}" ]; then
+        info "更新可用(${currentbuild}===>${availablebuild}！即将执行更新..."
+		dst_need_update=true
+		Reboot_announce
+		Close_server
+		Install_Game
+    else
+        tip "无可用更新！当前Steam构建版本（$currentbuild）"
+		dst_need_update=false
+    fi
+}
+Update_DST(){
+	if tmux has-session -t DST_Master > /dev/null 2>&1 || tmux has-session -t DST_Caves > /dev/null 2>&1; then
+		serveropen=true
+	fi
+	Update_DST_Check
+	if [[ $serveropen == "true" && dst_need_update == "true" ]]; then
+		Run_server
+	fi
+}
+###################################################################
+Reboot_server(){
+	info "服务器重启中。。。请稍候。。。"
+	Reboot_announce
+	Close_server
+	Run_server
+}
+Run_server(){
+	cluster_name=$(cat $server_conf_file | grep "^cluster" | cut -d "=" -f2)
+	shard=$(cat $server_conf_file | grep "^shard" | cut -d "=" -f2)
+	Start_shard
+	info "服务器开启中。。。请稍候。。。"
+	sleep 10
+	Start_check
+}
+Reboot_announce(){
+	if tmux has-session -t DST_Master > /dev/null 2>&1; then   									        
+	    tmux send-keys -t DST_Master "c_announce(\"服务器因改动或更新需要重启，预计耗时三分钟，给你带来的不便还请谅解！\")" C-m
+	fi
+	if tmux has-session -t DST_Caves > /dev/null 2>&1; then						        
+		tmux send-keys -t DST_Caves "c_announce(\"服务器设因改动或更新需要重启，预计耗时三分钟，给你带来的不便还请谅解！\")" C-m
+	fi
+	sleep 5
+}
 Start_server(){
     info "本操作将会关闭已开启的服务器 ... Ctrl+C 中断操作 ..."
     sleep 3
@@ -106,8 +179,7 @@ Start_server(){
 	if ! find $dst_base_dir/$cluster -name modoverrides.lua > /dev/null 2>&1; then
         Default_mod
     fi
-    Setup_mod
-    cp "$data_dir/mods_setup.lua" "$dst_server_dir/mods/dedicated_server_mods_setup.lua"	
+    Setup_mod	
 	cd "$dst_server_dir/bin"
 	echo -e "\e[92m请选择要启动的世界：1.仅地上  2.仅洞穴  3.地上 + 洞穴 ?\e[0m\c"
 	read shard 
@@ -120,10 +192,7 @@ Start_server(){
 		shard="Master Caves";;
 	esac
 	echo "shard=$shard" >> $server_conf_file
-	Start_shard
-	info "服务器开启中。。。请稍候。。。"
-	sleep 10
-	Start_check
+	Run_server
 }
 Close_server(){
     if tmux has-session -t DST_Master > /dev/null 2>&1 || tmux has-session -t DST_Caves > /dev/null 2>&1; then
@@ -338,10 +407,30 @@ Write_in(){
 	cat "$data_dir/masterend.lua" >> $data_file
 }
 Default_mod(){
-
+	echo "return {
+	-- 汉化增强 Chinese++ (含中文高清字体)
+	[\"workshop-1418746242\"]={ configuration_options={  }, enabled=true },
+	-- 中文语言包
+	[\"workshop-1301033176\"]={ configuration_options={  }, enabled=true }
+	}" > $dst_base_dir/$cluster/Master/modoverrides.lua
+	echo "return {
+	-- 汉化增强 Chinese++ (含中文高清字体)
+	[\"workshop-1418746242\"]={ configuration_options={  }, enabled=true },
+	-- 中文语言包
+	[\"workshop-1301033176\"]={ configuration_options={  }, enabled=true }
+	}" > $dst_base_dir/$cluster/Caves/modoverrides.lua	
 }
 Setup_mod(){
-
+	echo "ServerModSetup(\"1301033176\")" >> "$dst_base_dir/mods_setup.lua"
+    dir=$(ls -l "$dst_server_dir/mods" |awk '/^d/ {print $NF}'|grep "workshop"|cut -f2 -d"-")
+    for modid in $dir; do
+	    if [[ $(grep "$modid" -c "$dst_base_dir/mods_setup.lua") > 0 ]] ;then 
+		    echo "" >> "$dst_base_dir/mods_setup.lua"
+		else	
+            echo "ServerModSetup(\"$modid\")" >> "$dst_base_dir/mods_setup.lua"
+		fi
+    done
+    cp "$data_dir/mods_setup.lua" "$dst_server_dir/mods/dedicated_server_mods_setup.lua"
 }
 Start_shard(){
     for s in $shard; do
@@ -391,6 +480,7 @@ First_run_check(){
 if [ ! -f $dst_server_dir/version.txt ]; then
         info "检测到你是首次运行脚本，需要进行必要的配置，大概一个小时 ..."
         Check_sys
+		Open_swap
         Mkdstdir
         Install_Dependency
         Install_Steamcmd
@@ -402,6 +492,18 @@ if [ ! -f $dst_server_dir/version.txt ]; then
 		fi
         info "首次运行配置完毕，你可以创建新的世界了。"
     fi
+}
+# open swap
+Open_swap(){
+    info "创建并开启虚拟内存 ..."
+	sudo dd if=/dev/zero of=/swapfile bs=1M count=2048
+    sudo mkswap /swapfile
+    sudo swapon /swapfile
+	sudo chmod 0600 /swapfile
+	sudo chmod 0666 /etc/fstab
+    echo "/swapfile swap swap defaults 0 0" >> /etc/fstab
+	sudo chmod 0644 /etc/fstab
+	info "虚拟内存已开启！"
 }
 # 创建文件夹
 Mkdstdir(){
@@ -513,6 +615,13 @@ Update_script(){
     done
 }
 ####################################################################################
+if [[ $1 == "au" ]]; then
+	while(true); do
+		Update_DST
+		info "每十分钟进行一次更新检测。。。"
+		sleep 600
+	done
+fi
 # Run from here
 First_run_check
 Update_script
