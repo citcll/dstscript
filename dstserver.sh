@@ -15,6 +15,7 @@ dst_bin_cmd="./dontstarve_dedicated_server_nullrenderer"
 data_dir="$HOME/dstscript"
 dst_token_file="$data_dir/clustertoken.txt"
 server_conf_file="$data_dir/server.conf"
+dst_cluster_file="$data_dir/clusterdata.txt"
 # 屏幕输出
 Green_font_prefix="\033[32m"
 Red_font_prefix="\033[31m"
@@ -33,14 +34,12 @@ Menu(){
         echo
         echo -e "\e[33m作者：Ariwori        Bug反馈：https://wqlin.com/blog/dstscript.html\e[0m"
         echo -e "\e[33m本脚本一切权利归作者所有。未经许可禁止使用本脚本进行任何的商业活动！\e[0m"
-        echo
-        echo -e "\e[31m游戏服务端安装目录：$dst_server_dir (Version: $(cat dst_server_dir/version.txt))\e[0m"
+        echo -e "\e[31m游戏服务端安装目录：$dst_server_dir (Version: $(cat $dst_server_dir/version.txt))\e[0m"
         echo
         echo -e "\e[92m[1]启动服务器           [2]关闭服务器         [3]重启服务器\e[0m"  
         echo -e "\e[92m[4]查看服务器状态       [5]添加或移除MOD      [6]设置管理员和黑名单\e[0m"
         echo -e "\e[92m[7]控制台               [8]自动更新           [9]退出本脚本\e[0m"
         echo -e "\e[92m[10]删除存档            [11]更新游戏服务端/MOD\e[0m"
-        echo
         echo -e "\e[33m================================================================================\e[0m"
         echo -e "\e[92m请输入命令代号：\e[0m\c"
         read cmd  
@@ -82,6 +81,7 @@ Server_console(){
     Not_work_now
 }
 MOD_manager(){
+    [ -z $cluster ] && cluster=$(cat $server_conf_file | grep "^cluster" | cut -d "=" -f2)
     read -p "你要 1.添加mod  2.删除mod :" mc
     case $mc in
         1)
@@ -110,7 +110,7 @@ Listallmod(){
     if [ ! -f $data_dir/mod_setup.lua ]; then
         echo "---MOD自动更新列表：" > $data_dir/mods_setup.lua
     fi
-    echo "" > $data_dir/modconflist.lua
+    rm -f $data_dir/modconflist.lua
     for moddir in $(ls -F "$dst_server_dir/mods" | grep "/$" | cut -d '/' -f1); do
         if [[ "$moddir" != "" ]]; then
             fuc="list"
@@ -120,10 +120,10 @@ Listallmod(){
     grep -n "^" $data_dir/modconflist.lua
 }
 Listusedmod(){
-    echo "" > $data_dir/modconflist.lua
-    for moddir in $(grep "^[" "$dst_base_dir/$cluster/Master/modoverrides.lua" | cut -d '' -f2| cut -d "-" -f2); do
+    rm -f $data_dir/modconflist.lua
+    for moddir in $(grep "^\[" "$dst_base_dir/$cluster/Master/modoverrides.lua" | cut -d '"' -f2); do
         if [[ "$moddir" != "" ]]; then
-            fuc = "list"
+            fuc="list"
             MOD_conf
         fi
     done
@@ -162,7 +162,7 @@ Addmodtoshard(){
 }
 Truemodid(){
     if [ $modid -lt 1000 ]; then
-        moddir=$(sed -n ${modid}p $data_dir/modconfwrite.lua | cut -d ':' -f1)
+        moddir=$(sed -n ${modid}p $data_dir/modconflist.lua | cut -d ':' -f1)
     else
         moddir="workshop-$modid"
     fi
@@ -178,8 +178,8 @@ Addmodfunc(){
     fi
 }
 Delmodfromshard(){
-    if [[ $(grep "$moddir" "$dst_base_dir/$cluster/$shard/modoverrides.lua") > 0 ]]; then
-        grep "workshop" -n "$dst_base_dir/$cluster/$shard/modoverrides.lua" > $data_dir/modidlist.txt
+    if [[ $(grep "$moddir" -c "$dst_base_dir/$cluster/$shard/modoverrides.lua") > 0 ]]; then
+        grep -n "^\[" "$dst_base_dir/$cluster/$shard/modoverrides.lua" > $data_dir/modidlist.txt
         up=$(grep "$moddir" "$data_dir/modidlist.txt" | cut -d ":" -f1)
         down=$(grep -A 1 "$moddir" "$data_dir/modidlist.txt" | tail -1 |cut -d ":" -f1)
         upnum=$(($up - 1))
@@ -326,8 +326,7 @@ Reboot_announce(){
     sleep 5
 }
 Start_server(){
-    info "本操作将会关闭已开启的服务器 ... Ctrl+C 中断操作 ..."
-    sleep 3
+    info "本操作将会关闭已开启的服务器 ..."
     Close_server
     echo -e "\e[92m是否新建存档: [y|n] (默认: y): \e[0m\c"
     read yn
@@ -336,7 +335,9 @@ Start_server(){
         echo -e "\e[92m请输入新建存档名称：（不要包含中文、符号和空格）\e[0m"
         read cluster
         if [ ! -d "$dst_base_dir/$cluster" ]; then 
-            mkdir -pv $dst_base_dir/$cluster
+            mkdir -p $dst_base_dir/$cluster
+            mkdir -p $dst_base_dir/$cluster/Master
+            mkdir -p $dst_base_dir/$cluster/Caves
         fi
         Set_cluster
         Set_token
@@ -347,14 +348,11 @@ Start_server(){
         Choose_exit_cluster
     fi
     echo "cluster=$cluster" > $server_conf_file
-    mkdir -pv $dst_base_dir/$cluster/Master
-    mkdir -pv $dst_base_dir/$cluster/Caves
-    if ! find $dst_base_dir/$cluster -name modoverrides.lua > /dev/null 2>&1; then
+    if [ ! -f $dst_base_dir/$cluster/Master/modoverrides.lua ]; then
         Default_mod
     fi
     Setup_mod
     Set_list
-    cd "$dst_server_dir/bin"
     echo -e "\e[92m请选择要启动的世界：1.仅地上  2.仅洞穴  3.地上 + 洞穴 ?\e[0m\c"
     read shard 
     case $shard in
@@ -405,6 +403,7 @@ Exit_auto_update(){
 }
 Set_cluster(){
     while (true); do
+        clear
         echo -e "\e[92m=============【存档槽：$cluster】===============\e[0m"
         index=1
         cat $dst_cluster_file | grep -v "script_ver" | while read line; do
@@ -503,7 +502,7 @@ Set_world(){
     if [ $wc -eq 1 ]; then
         configure_file="$data_dir/masterleveldata.txt"
         data_file="$dst_base_dir/$cluster/Master/leveldataoverride.lua"
-        Set_world_cofig
+        Set_world_config
         Write_in
     fi
     info "是否修改洞穴世界配置？：1.是 2.否（同上）"
@@ -594,17 +593,17 @@ Write_in(){
 }
 Default_mod(){
     echo 'return {
-    -- 汉化增强 Chinese++ (含中文高清字体)
-    ["workshop-1418746242"]={ configuration_options={  }, enabled=true },
-    -- 中文语言包
-    ["workshop-1301033176"]={ configuration_options={  }, enabled=true }
-    }' > $dst_base_dir/$cluster/Master/modoverrides.lua
+-- 汉化增强 Chinese++ (含中文高清字体)
+["workshop-1418746242"]={ configuration_options={  }, enabled=true },
+-- 中文语言包
+["workshop-1301033176"]={ configuration_options={  }, enabled=true }
+}' > $dst_base_dir/$cluster/Master/modoverrides.lua
     echo 'return {
-    -- 汉化增强 Chinese++ (含中文高清字体)
-    ["workshop-1418746242"]={ configuration_options={  }, enabled=true },
-    -- 中文语言包
-    ["workshop-1301033176"]={ configuration_options={  }, enabled=true }
-    }' > $dst_base_dir/$cluster/Caves/modoverrides.lua	
+-- 汉化增强 Chinese++ (含中文高清字体)
+["workshop-1418746242"]={ configuration_options={  }, enabled=true },
+-- 中文语言包
+["workshop-1301033176"]={ configuration_options={  }, enabled=true }
+}' > $dst_base_dir/$cluster/Caves/modoverrides.lua	
 }
 Setup_mod(){
     echo "ServerModSetup(\"1301033176\")
@@ -618,15 +617,16 @@ Setup_mod(){
     cp "$data_dir/mods_setup.lua" "$dst_server_dir/mods/dedicated_server_mods_setup.lua"
 }
 Start_shard(){
+    cd "$dst_server_dir/bin"
     for s in $shard; do
-        tmux new-session -s DST_$s -d "$DST_bin_cmd -cluster $cluster -shard $s"
+        tmux new-session -s DST_$s -d "$dst_bin_cmd -cluster $cluster -shard $s"
     done
 }
 Start_check(){
     masterserverlog_path="$dst_base_dir/$cluster/Master/server_log.txt"
     cavesserverlog_path="$dst_base_dir/$cluster/Caves/server_log.txt"
-    echo "" > masterserverlog_path
-    echo "" > cavesserverlog_path
+    echo "" > $masterserverlog_path
+    echo "" > $cavesserverlog_path
     while (true); do
         if tmux has-session -t DST_Master > /dev/null 2>&1 && tmux has-session -t DST_Caves > /dev/null 2>&1; then
             if [[ $(grep "Sim paused" -c "$masterserverlog_path") > 0 ]]; then
@@ -692,10 +692,10 @@ Open_swap(){
 }
 # 创建文件夹
 Mkdstdir(){
-    mkdir -pv $HOME/steamcmd
-    mkdir -pv $dst_server_dir
-    mkdir -pv $DST_conf_basedir/$DST_conf_dirname
-    mkdir -pv $data_dir
+    mkdir -p $HOME/steamcmd
+    mkdir -p $dst_server_dir
+    mkdir -p $DST_conf_basedir/$DST_conf_dirname
+    mkdir -p $data_dir
 }
 # 检查当前系统信息
 Check_sys(){
@@ -754,7 +754,7 @@ Install_Game(){
 # 修复SteamCMD [S_API FAIL] SteamAPI_Init() failed;
 Fix_steamcmd(){
     info "修复Steamcmd可能存在的依赖问题 ..."
-    mkdir -pv "${HOME}/.steam/sdk32"
+    mkdir -p "${HOME}/.steam/sdk32"
     cp -v $HOME/steamcmd/linux32/steamclient.so "${HOME}/.steam/sdk32/steamclient.so"
     # fix lib for centos
     if [[ $release == "centos" ]] && [ ! -f "$dst_server_dir/bin/lib32/libcurl-gnutls.so.4" ]; then
@@ -779,7 +779,7 @@ Update_script(){
         new_ver=$(cat /tmp/filelist.txt | grep "$file" | cut -d ":" -f2)
         if [[ "$file" != "dstserver.sh" ]]; then file="dstscript/$file"; fi
         if [ -f $HOME/$file ]; then
-            cur_ver=$(cat $HOME/$file | grep "script_ver" | cut -d '"' -f2)
+            cur_ver=$(cat $HOME/$file | grep "script_ver=" | head -n 1 | cut -d '"' -f2)
         else
             cur_ver="000"
         fi
