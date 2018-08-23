@@ -768,7 +768,7 @@ Show_changelog(){
     echo -e "\e[33m=================================脚本更新说明========================================\e[0m"
     curl -s https://raw.githubusercontent.com/ariwori/dstscript/master/dstscript/changelog.txt > /tmp/changelog.txt
     datelog=$(cat /tmp/changelog.txt | head -n 1)
-    cat /tmp/changelog.txt | grep -A 20 "$datelog"
+    cat /tmp/changelog.txt | grep -A 20 "更新日志 $datelog"
     echo -e "\e[33m=====================================================================================\e[0m"
     sleep 3
 }
@@ -790,14 +790,15 @@ Update_script(){
             chmod +x $HOME/DSTServer.sh
             info "$file 已更新为最新版本[ ${new_ver} ] !"
             if [[ "$file" == "dstserver.sh" ]]; then need_exit="true"; fi
+            need_update="true"
         fi
-        Show_changelog
         if [[ "$need_exit" == "true" ]]; then
             tmux kill-session -t Auto_update
             tip "因脚本已更新，自动更新进程已退出，如需要请重新开启！"
             exit 0
         fi
     done
+    if [[ "$need_update" == "true" ]]; then Show_changelog; fi
 }
 ####################################################################################
 if [[ $1 == "au" ]]; then
