@@ -23,9 +23,9 @@ Font_color_suffix="\033[0m"
 Info="${Green_font_prefix}[信息]${Font_color_suffix}"
 Error="${Red_font_prefix}[错误]${Font_color_suffix}"
 Tip="${Yellow_font_prefix}[注意]${Font_color_suffix}"
-info(){ echo -e "${Info} $1"}
-tip(){ echo -e "${Tip} $1"}
-error(){ echo -e "${Error} $1"}
+info(){ echo -e "${Info} $1"; }
+tip(){ echo -e "${Tip} $1"; }
+error(){ echo -e "${Error} $1"; }
 # Main menu
 Menu(){    
     while (true); do
