@@ -1,3 +1,4 @@
+-- script_ver="1.1.9"
 require "modinfo"
 
 function list()

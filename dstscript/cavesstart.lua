@@ -1,3 +1,4 @@
+-- script_ver="1.1.9"
 return {
   background_node_range={ 0, 1 },
   desc="Delve into the caves... together!",

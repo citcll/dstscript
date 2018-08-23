@@ -1,3 +1,4 @@
+script_ver="1.1.9"
 banana default food 香蕉 never 无 rare 较少 default 默认 often 较多 always 大量
 bats default monster 蝙蝠 never 无 rare 较少 default 默认 often 较多 always 大量
 berrybush often food 浆果丛 never 无 rare 较少 default 默认 often 较多 always 大量
@@ -39,7 +40,7 @@ tentacles never monster 触手怪 never 无 rare 较少 default 默认 often 较
 touchstone default environment 猪头祭坛 never 无 rare 较少 default 默认 often 较多 always 大量
 trees default source 树木 never 无 rare 较少 default 默认 often 较多 always 大量
 weather default environment 雨 never 无 rare 较少 default 默认 often 较多 always 大量
-world_size default environment 地图大小 small 小型 medium 中等 huge 巨型 default 大型s
+world_size default environment 地图大小 small 小型 medium 中等 huge 巨型 default 大型
 wormattacks default monster 蠕虫袭击 never 无 rare 较少 default 默认 often 较多 always 大量
 wormhole_prefab tentacle_pillar other 其他
 wormlights default environment 发光浆果 never 无 rare 较少 default 默认 often 较多 always 大量

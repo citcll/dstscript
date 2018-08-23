@@ -630,7 +630,7 @@ auto_update {
             if [[ "$i" != "" && "$i" != "donotdelete" ]]; then
                 if [[ $(grep "$i" -c "$DST_script_filepath/cur_modlist.txt") != 0 ]]; then
                     old_post_date=$(grep "$i" "$DST_script_filepath/cur_modlist.txt" | cut -d "*" -f3)
-                    curl -s "https://steamcommunity.com/sharedfiles/filedetails/?id=$i" > "$DST_script_filepath/temp.tmp"
+                    curl -s "https://steamcommunity.com/sharedfiles/filedetails/?id=1480535263" > "$DST_script_filepath/temp.tmp"
                     new_post_date=$(cat "$DST_script_filepath/temp.tmp" | grep "detailsStatRight" | tail -n 1 | cut -d">" -f2 | cut -d"<" -f1)
                     mod_name=$(cat "$DST_script_filepath/temp.tmp" | grep "workshopItemTitle" | cut -d">" -f2 | cut -d"<" -f1)
                     if [[ "$old_post_date" != "" && "$new_post_date" != "" && "$old_post_date" != "$new_post_date" ]]; then

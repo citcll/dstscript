@@ -1,3 +1,4 @@
+script_ver="1.1.9"
 alternatehunt default source 动物脚印 never 无 rare 较少 default 默认 often 较多 always 大量
 angrybees default animal 杀人蜂 never 无 rare 较少 default 默认 often 较多 always 大量
 antliontribute default monster 蚁狮事件 never 无 rare 较少 default 默认 often 较多 always 大量
