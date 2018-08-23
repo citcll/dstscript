@@ -81,8 +81,190 @@ Server_detail(){
 Server_console(){
 	Not_work_now
 }
+MOD_manager(){
+	read -p "你要 1.添加mod  2.删除mod :" mc
+	case $mc in
+		1)
+		Listallmod
+   		Addmod;;
+		2)
+		Listusedmod
+   		Delmod;;
+		*)
+		break;;
+	esac
+}
+MOD_conf(){
+	echo "fuc = \"$fuc\"
+	modid = \"$moddir\"" > "$data_dir/modinfo.lua"
+	if [[ -f "$dst_server_dir/mods/$moddir/modinfo.lua" ]]; then
+		cat "${dst_server_dir}/mods/$moddir/modinfo.lua" >> "$data_dir/modinfo.lua"
+	else
+		echo "name = UNKNOWN" >> "$data_dir/modinfo.lua"
+	fi
+	cd $data_dir
+	lua $data_dir/modconf.lua
+	cd $HOME
+}
+Listallmod(){
+	if [ ! -f $data_dir/mod_setup.lua ]; then
+		echo "---MOD自动更新列表：" > $data_dir/mods_setup.lua
+	fi
+	echo "" > $data_dir/modconflist.lua
+	for moddir in $(ls -F "$dst_server_dir/mods" | grep "/$" | cut -d '/' -f1); do
+		if [[ "$moddir" != "" ]]; then
+			fuc="list"
+			MOD_conf
+		fi
+	done
+	grep -n "^" $data_dir/modconflist.lua
+}
+Listusedmod(){
+	echo "" > $data_dir/modconflist.lua
+	for moddir in $(grep "^[" "$dst_base_dir/$cluster/Master/modoverrides.lua" | cut -d '' -f2| cut -d "-" -f2); do
+		if [[ "$moddir" != "" ]]; then
+			fuc = "list"
+			MOD_conf
+		fi
+	done
+	grep -n "^" $data_dir/modconflist.lua
+}
+Addmod(){
+	echo "请从以上列表选择你要启用的MOD编号，不存在的直接输入MODID"
+	echo "具体配置已写入 modoverride.lua, shell下修改太麻烦，可打开配置文件手动修改"
+	echo "不存在的直接输入MODID，添加完毕要退出请输入数字 0 ！"
+	while (true); do
+		read modid
+		if [[ "$modid" == "0" ]]; then
+			echo "添加完毕 ！"
+			break
+		else
+			Addmodfunc
+		fi
+	done
+	echo "要修改具体参数配置请手动打开***更改："
+	echo "$dst_base_dir/$cluster/Master/modoverrides.lua"
+	echo "$dst_base_dir/$cluster/Caves/modoverrides.lua"
+	sleep 3
+	clear
+}
+Addmodtoshard(){
+	if [[ $(grep "$moddir" "$dst_base_dir/$cluster/$shard/modoverrides.lua") > 0 ]]; then
+		echo "地上世界该Mod($moddir)已添加"
+	else
+		sed -i '1d' $dst_base_dir/$cluster/$shard/modoverrides.lua
+		cat $dst_base_dir/$cluster/$shard/modoverrides.lua > $data_dir/modconftemp.txt
+		echo "return {" > $dst_base_dir/$cluster/$shard/modoverrides.lua
+		cat $data_dir/modconfwrite.lua >> $dst_base_dir/$cluster/$shard/modoverrides.lua
+		cat $data_dir/modconftemp.txt >> $dst_base_dir/$cluster/$shard/modoverrides.lua
+		echo "地上世界Mod($moddir)添加完成"
+	fi
+}
+Truemodid(){
+	if [ $modid -lt 1000 ]; then
+		moddir=$(sed -n ${modid}p $data_dir/modconfwrite.lua | cut -d ':' -f1)
+	else
+		moddir="workshop-$modid"
+	fi
+}
+Addmodfunc(){
+    Truemodid
+	fuc="writein"
+	MOD_conf
+	for shard in (Master Caves); do Addmodtoshard; done
+	if [[ $(grep "$moddir" -c "$data_dir/mods_setup.lua") = 0 ]] ;then
+		moddir=$(echo $moddir | cut -d '-' -f2)
+		echo "ServerModSetup(\"$moddir\")" >> "$data_dir/mods_setup.lua"
+	fi
+}
+Delmodfromshard(){
+	if [[ $(grep "$moddir" "$dst_base_dir/$cluster/$shard/modoverrides.lua") > 0 ]]; then
+		grep "workshop" -n "$dst_base_dir/$cluster/$shard/modoverrides.lua" > $data_dir/modidlist.txt
+		up=$(grep "$moddir" "$data_dir/modidlist.txt" | cut -d ":" -f1)
+		down=$(grep -A 1 "$moddir" "$data_dir/modidlist.txt" | tail -1 |cut -d ":" -f1)
+		upnum=$(($up - 1))
+		downnum=$(($down - 2))
+		sed -i "$upnum,${downnum}d" "$dst_base_dir/$cluster/$shard/modoverrides.lua"
+		echo "地上世界该Mod($moddir)已停用！"
+	else
+		echo "地上世界该Mod($moddir)未启用！"
+	fi
+}
+Delmod(){
+	echo "请从以上列表选择你要停用的MODID编号,非脚本添加的MOD不要使用本功能,完毕请输数字 0 ！"
+	while (true); do
+		read modid
+		if [[ "$modid" == "0" ]]; then
+			break
+		else
+			Truemodid
+			for shard in (Master Caves); do Delmodfromshard; done
+		fi
+	done
+}
+List_manager(){
+	echo -e "\e[92m你要设置：1.管理员  2.黑名单  3.白名单\e[0m"
+	read list
+	case $list in
+		1)
+		listfile="alist.txt"
+		listname="管理员";;
+		2)
+		listfile="blist.txt"
+		listname="黑名单";;
+		3)
+		listfile="wlist.txt"
+		listname="白名单";;
+		*)
+		error "输入有误，请输入数字[1-3]";;
+	esac
+	echo -e "\e[92m你要：1.添加$listname  2.移除$listname\e[0m"
+	read addordel
+	case $addordel in
+		1)
+		Addlist;;
+		2)
+		Dellist;;
+	esac
+}
+Addlist(){
+	echo -e "\e[92m请输入你要添加的KLEIID（KU_XXXXXXX）：(添加完毕请输入数字 0 )\e[0m"
+	while (true); do
+		read kleiid
+		if [[ "$kleiid" == "0" ]]; then
+			echo "添加完毕！"
+			break
+		else
+			if [[ $(grep "$kleiid" -c "$data_dir/$listfile") > 0 ]]; then
+				echo -e "\e[92m名单$kleiid已经存在！\e[0m"
+			else
+				echo "$kleiid" >> $data_dir/$listfile
+				echo -e "\e[92m名单$kleiid已添加！\e[0m"
+			fi
+		fi
+	done
+}
+Dellist()
+{
+	while (ture); do
+		echo "=========================================================================="
+		grep -n "KU" "$data_dir/$listfile"
+		echo -e "\e[92m请输入你要移除的KLEIID编号：删除完毕请输入数字 0 \e[0m"
+		read kleiid
+		if [[ "$kleiid" == "0" ]]; then
+			echo "移除完毕！"
+			break
+		else
+			sed -i "${kleid}d" $dst_base_dir/$listfile
+			echo -e "\e[92m名单已移除！\e[0m"
+		fi
+	done
+}
 Cluster_manager(){
-	Not_work_now
+	cluster_str="删除"
+	Choose_exit_cluster
+	rm -rf $dst_base_dir/$cluster
+	info "存档 $cluster 已删除！"
 }
 Auto_update(){
 	if tmux has-session -t Auto_update > /dev/null 2>&1; then
@@ -127,7 +309,7 @@ Reboot_server(){
 	Run_server
 }
 Run_server(){
-	cluster_name=$(cat $server_conf_file | grep "^cluster" | cut -d "=" -f2)
+	cluster=$(cat $server_conf_file | grep "^cluster" | cut -d "=" -f2)
 	shard=$(cat $server_conf_file | grep "^shard" | cut -d "=" -f2)
 	Start_shard
 	info "服务器开启中。。。请稍候。。。"
@@ -158,20 +340,11 @@ Start_server(){
 	    fi
 		Set_cluster
 		Set_token
-		Default_list
 		Set_serverini
 		Set_world
     else
-        echo -e "\e[92m已有存档：\e[0m"
-		ls -l $dst_base_dir | awk '/^d/ {print $NF}' > /tmp/dirlist.txt
-        index=1
-        for dirlist in $(cat /tmp/dirlist.txt); do
-            echo "$index. $dirlist"
-            let index++
-        done 
-		echo -e "\e[92m请输入你要开启的存档编号：\e[0m\c"
-		read listnum
-		cluster=$(cat /tmp/dirlist.txt | head -n $listnum | tail -n 1)
+		cluster_str="开启"
+        Choose_exit_cluster
     fi
     echo "cluster=$cluster" > $server_conf_file
     mkdir -pv $dst_base_dir/$cluster/Master
@@ -179,7 +352,8 @@ Start_server(){
 	if ! find $dst_base_dir/$cluster -name modoverrides.lua > /dev/null 2>&1; then
         Default_mod
     fi
-    Setup_mod	
+    Setup_mod
+	Set_list
 	cd "$dst_server_dir/bin"
 	echo -e "\e[92m请选择要启动的世界：1.仅地上  2.仅洞穴  3.地上 + 洞穴 ?\e[0m\c"
 	read shard 
@@ -193,6 +367,18 @@ Start_server(){
 	esac
 	echo "shard=$shard" >> $server_conf_file
 	Run_server
+}
+Choose_exit_cluster(){
+	echo -e "\e[92m已有存档：\e[0m"
+		ls -l $dst_base_dir | awk '/^d/ {print $NF}' > /tmp/dirlist.txt
+        index=1
+        for dirlist in $(cat /tmp/dirlist.txt); do
+            echo "$index. $dirlist"
+            let index++
+        done 
+		echo -e "\e[92m请输入你要$cluster_str的存档编号：\e[0m\c"
+		read listnum
+		cluster=$(cat /tmp/dirlist.txt | head -n $listnum | tail -n 1)
 }
 Close_server(){
     if tmux has-session -t DST_Master > /dev/null 2>&1 || tmux has-session -t DST_Caves > /dev/null 2>&1; then
@@ -299,7 +485,7 @@ Set_token(){
 	fi
 	cat $dst_token_file > $dst_base_dir/$cluster/cluster_token.txt
 }
-Default_list(){
+Set_list(){
     if [ ! -f $data_dir/alist.txt ]; then touch $data_dir/alist.txt; fi
     if [ ! -f $data_dir/blist.txt ]; then touch $data_dir/blist.txt; fi
     if [ ! -f $data_dir/wlist.txt ]; then touch $data_dir/wlist.txt; fi
@@ -421,20 +607,19 @@ Default_mod(){
 	}" > $dst_base_dir/$cluster/Caves/modoverrides.lua	
 }
 Setup_mod(){
-	echo "ServerModSetup(\"1301033176\")" >> "$dst_base_dir/mods_setup.lua"
-    dir=$(ls -l "$dst_server_dir/mods" |awk '/^d/ {print $NF}'|grep "workshop"|cut -f2 -d"-")
-    for modid in $dir; do
-	    if [[ $(grep "$modid" -c "$dst_base_dir/mods_setup.lua") > 0 ]] ;then 
-		    echo "" >> "$dst_base_dir/mods_setup.lua"
-		else	
-            echo "ServerModSetup(\"$modid\")" >> "$dst_base_dir/mods_setup.lua"
+	echo "ServerModSetup(\"1301033176\")
+	ServerModSetup(\"1418746242\")" >> "$data_dir/mods_setup.lua"
+    dir=$(cat $dst_base_dir/$cluster/Master/modoverrides.lua | grep "workshop" | cut -f1 -d "]" | cut -d "-" -f2)
+    for moddir in $dir; do
+	    if [[ $(grep "$moddir" -c "$data_dir/mods_setup.lua") = 0 ]] ;then 
+            echo "ServerModSetup(\"$moddir\")" >> "$data_dir/mods_setup.lua"
 		fi
     done
     cp "$data_dir/mods_setup.lua" "$dst_server_dir/mods/dedicated_server_mods_setup.lua"
 }
 Start_shard(){
     for s in $shard; do
-		tmux new-session -s DST_$s -d "$DST_bin_cmd -cluster $cluster_name -shard $s"
+		tmux new-session -s DST_$s -d "$DST_bin_cmd -cluster $cluster -shard $s"
 	done
 }
 Start_check(){
