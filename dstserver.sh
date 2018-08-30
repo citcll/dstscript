@@ -6,7 +6,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com/blog/dstscript.html
 #===============================================================================
-script_ver="1.1.9"
+script_ver="1.2.0"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="$HOME/.klei"
 dst_base_dir="$dst_conf_basedir/$dst_conf_dirname"
@@ -475,7 +475,7 @@ Set_token(){
     info "当前预设的服务器令牌：$default_token"
     read -p "是否更改？1.是 2.否" ch
     if [ $ch -eq 1 ]; then
-        warming "请输入或粘贴你的令牌到此处，注意最后不要输入空格："
+        tip "请输入或粘贴你的令牌到此处，注意最后不要输入空格："
         read mytoken
         echo $mytoken > $dst_token_file
         info "已更改服务器默认令牌！"
