@@ -293,9 +293,7 @@ Update_DST_Check(){
     fi
 }
 Update_DST(){
-    if tmux has-session -t DST_Master > /dev/null 2>&1 || tmux has-session -t DST_Caves > /dev/null 2>&1; then
-        serveropen=true
-    fi
+    serveropen=$(grep "serveropen" $server_conf_file | cut -d "=" -f2)
     Update_DST_Check
     if [[ $serveropen == "true" && dst_need_update == "true" ]]; then
         Run_server
@@ -308,9 +306,18 @@ Reboot_server(){
     Close_server
     Run_server
 }
+exchangestatus(){
+    if [ $(grep "serveropen" -c $server_conf_file) -eq 0 ]; then
+        echo "serveropen=$1" >> $server_conf_file
+    else
+        str=$(grep "serveropen" $server_conf_file)
+        sed -i "s/$str/serveropen=$1/g" $server_conf_file
+    fi
+}
 Run_server(){
     cluster=$(cat $server_conf_file | grep "^cluster" | cut -d "=" -f2)
     shard=$(cat $server_conf_file | grep "^shard" | cut -d "=" -f2)
+    exchangestatus true
     Start_shard
     info "服务器开启中。。。请稍候。。。"
     sleep 10
@@ -394,6 +401,7 @@ Close_server(){
         info "服务器为未开启！"
     fi
     Exit_auto_update
+    exchangestatus false
 }
 Exit_auto_update(){
     if tmux has-session -t Auto_update > /dev/null 2>&1; then
@@ -800,12 +808,48 @@ Update_script(){
     done
     if [[ "$need_update" == "true" ]]; then Show_changelog; fi
 }
+# MOD update check
+Update_DST_MOD(){
+    info "检查启用的创意工坊MOD是否有更新 ..."
+    for modid in $(cat $data_dir/mods_setup.lua | grep "ServerModSetup" | cut -d '"' -f2); do
+        mod_new_ver=$(curl -s https://wqlin.com/api/dstmod.php?modid=$modid)
+        if [ -f $dst_server_dir/mods/workshop-$modid/modinfo.lua ]; then
+            echo "fuc=getver" > $data_dir/modinfo.lua
+            cat $dst_server_dir/mods/workshop-$modid/modinfo.lua >> $data_dir/modinfo.lua
+            cd $data_dir
+            mod_cur_ver=$(lua modconf.lua)
+        else
+            mod_cur_ver=$mod_new_ver
+        fi
+        if [ $mod_cur_ver != $mod_new_ver ]; then
+            info "MOD 有更新，即将重启更新 ..."
+            Reboot_server
+            break
+        fi
+    done
+}
+Status_keep(){
+    for shard in $(grep "shard" $server_conf_file | cut -d "=" -f2); do
+        if ! tmux has-session -t DST_$shard > /dev/null 2>&1; then
+            server_alive=false
+            break
+        else
+            server_alive=true
+        fi
+    done
+    if [[ $(grep "serveropen" $server_conf_file | cut -d "=" -f2) == "true" &&  $server_alive == "false" ]]; then
+        tip "服务器异常退出，即将重启 ..."
+        Reboot_server
+    fi
+}
 ####################################################################################
 if [[ $1 == "au" ]]; then
     while (true); do
         Update_DST
-        info "每十分钟进行一次更新检测。。。"
-        sleep 600
+        Update_DST_MOD
+        Status_keep
+        info "每半小时进行一次更新检测。。。"
+        sleep 1800
     done
 fi
 # Run from here

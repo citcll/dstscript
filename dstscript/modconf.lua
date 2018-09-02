@@ -96,9 +96,13 @@ function writein()
     end
     f:close()
 end
-
+function getver()
+    print(version)
+end
 if fuc == "list" then
     list()
+elseif fuc == "getver" then
+    getver()
 else
     writein()
 end
