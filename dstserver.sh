@@ -6,7 +6,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com/blog/dstscript.html
 #===============================================================================
-script_ver="1.2.4"
+script_ver="1.2.5"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="$HOME/.klei"
 dst_base_dir="$dst_conf_basedir/$dst_conf_dirname"
@@ -513,7 +513,7 @@ Set_world(){
         configure_file="$data_dir/masterleveldata.txt"
         data_file="$dst_base_dir/$cluster/Master/leveldataoverride.lua"
         Set_world_config
-        Write_in
+        Write_in master
     fi
     info "是否修改洞穴世界配置？：1.是 2.否（同上）"
     read cw
@@ -521,7 +521,7 @@ Set_world(){
         configure_file="$data_dir/cavesleveldata.txt"
         data_file="$dst_base_dir/$cluster/Caves/leveldataoverride.lua"
         Set_world_config
-        Write_in
+        Write_in caves
     fi
 }
 Set_world_config(){
@@ -586,7 +586,7 @@ Set_world_config(){
 }
 Write_in(){
     data_num=$[$(grep -n "^" $configure_file | tail -n 1 | cut -d : -f1) - 1]
-    cat "$data_dir/masterstart.lua" > $data_file
+    cat "$data_dir/${1}start.lua" > $data_file
     index=1
     cat $configure_file | grep -v "script_ver" | while read line; do
         ss=($line)
@@ -599,7 +599,7 @@ Write_in(){
         str="${ss[0]}=\"${ss[1]}\"$char"
         echo "$str" >> $data_file
     done
-    cat "$data_dir/masterend.lua" >> $data_file
+    cat "$data_dir/${1}end.lua" >> $data_file
 }
 Default_mod(){
     echo 'return {
