@@ -6,7 +6,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com/blog/dstscript.html
 #===============================================================================
-script_ver="1.2.6"
+script_ver="1.2.7"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="$HOME/.klei"
 dst_base_dir="$dst_conf_basedir/$dst_conf_dirname"
@@ -610,9 +610,12 @@ Write_in(){
             char=""
         fi
         index=$[$index + 1]
-        if [[ ${ss[1]} == "highlyrandom" ]]; then ${ss[1]}="highly random"; fi
-        str="${ss[0]}=\"${ss[1]}\"$char"
-        echo "$str" >> $data_file
+        if [[ ${ss[1]} == "highlyrandom" ]]; then
+            str="${ss[0]}=\"highly random\"$char"
+        else
+            str="${ss[0]}=\"${ss[1]}\"$char"
+        fi
+        echo "    $str" >> $data_file
     done
     cat "$data_dir/${1}end.lua" >> $data_file
 }
