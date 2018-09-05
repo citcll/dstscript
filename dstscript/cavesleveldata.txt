@@ -1,4 +1,4 @@
-script_ver="1.2.0"
+script_ver="1.2.1"
 banana default food 香蕉 never 无 rare 较少 default 默认 often 较多 always 大量
 bats rare monster 蝙蝠 never 无 rare 较少 default 默认 often 较多 always 大量
 berrybush often food 浆果丛 never 无 rare 较少 default 默认 often 较多 always 大量
@@ -25,7 +25,7 @@ monkey default animal 猴子 never 无 rare 较少 default 默认 often 较多 a
 mushroom default food 蘑菇 never 无 rare 较少 default 默认 often 较多 always 大量
 mushtree default source 蘑菇树 never 无 rare 较少 default 默认 often 较多 always 大量
 petrification default environment 石化速率 none 无 few 慢 default 默认 many 快 max 极快
-"prefabswaps_start" "default" "environment" "初始多样性" "classic" "经典" "highly random" "高度随机" "default" "默认"
+prefabswaps_start default environment 初始多样性 classic 经典 highlyrandom 高度随机 default 默认
 reeds default source 芦苇 never 无 rare 较少 default 默认 often 较多 always 大量
 regrowth default environment 资源再生 veryslow 极慢 slow 慢 default 默认 fast 快 veryfast 极快
 roads never other 道路  never 无 default 默认

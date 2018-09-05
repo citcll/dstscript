@@ -6,7 +6,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com/blog/dstscript.html
 #===============================================================================
-script_ver="1.2.5"
+script_ver="1.2.6"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="$HOME/.klei"
 dst_base_dir="$dst_conf_basedir/$dst_conf_dirname"
@@ -433,7 +433,14 @@ Set_cluster(){
             index=$[$index + 1]
         done
         echo -e "\e[92m===============================================\e[0m"
-        read -p "请选择你要更改的选项(修改完毕输入数字 0 确认修改并退出)：" cmd
+        cmd=""
+        while (true); do
+            if [[ $cmd == "" ]]; then
+                read -p "请选择你要更改的选项(修改完毕输入数字 0 确认修改并退出)：" cmd
+            else
+                break
+            fi
+        done
         case $cmd in
             0)
             info "更改已保存！"
@@ -561,7 +568,14 @@ Set_world_config(){
             done
         done
         printf "\n"
-        read -p "请选择你要更改的选项(修改完毕输入数字 0 确认修改并退出)：" cmd
+        cmd=""
+        while (true); do
+            if [[ $cmd == "" ]]; then
+                read -p "请选择你要更改的选项(修改完毕输入数字 0 确认修改并退出)：" cmd
+            else
+                break
+            fi
+        done
         case $cmd in
             0)
             info "更改已保存！"
@@ -596,6 +610,7 @@ Write_in(){
             char=""
         fi
         index=$[$index + 1]
+        if [[ ${ss[1]} == "highlyrandom" ]]; then ${ss[1]}="highly random"; fi
         str="${ss[0]}=\"${ss[1]}\"$char"
         echo "$str" >> $data_file
     done
