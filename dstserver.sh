@@ -6,7 +6,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com/blog/dstscript.html
 #===============================================================================
-script_ver="1.2.3"
+script_ver="1.2.4"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="$HOME/.klei"
 dst_base_dir="$dst_conf_basedir/$dst_conf_dirname"
@@ -130,9 +130,9 @@ Listusedmod(){
     grep -n "^" $data_dir/modconflist.lua
 }
 Addmod(){
-    echo "请从以上列表选择你要启用的MOD编号，不存在的直接输入MODID"
+    echo "请从以上列表选择你要启用的MOD${Red_font_prefix}[编号]${Font_color_suffix}，不存在的直接输入MODID"
     echo "具体配置已写入 modoverride.lua, shell下修改太麻烦，可打开配置文件手动修改"
-    echo "不存在的直接输入MODID，添加完毕要退出请输入数字 0 ！"
+    echo "添加完毕要退出请输入数字 0 ！"
     while (true); do
         read modid
         if [[ "$modid" == "0" ]]; then
@@ -191,7 +191,7 @@ Delmodfromshard(){
     fi
 }
 Delmod(){
-    echo "请从以上列表选择你要停用的MODID编号,非脚本添加的MOD不要使用本功能,完毕请输数字 0 ！"
+    echo "请从以上列表选择你要停用的MOD${Red_font_prefix}[编号]${Font_color_suffix},非脚本添加的MOD不要使用本功能,完毕请输数字 0 ！"
     while (true); do
         read modid
         if [[ "$modid" == "0" ]]; then
@@ -606,13 +606,17 @@ Default_mod(){
 -- 汉化增强 Chinese++ (含中文高清字体)
 ["workshop-1418746242"]={ configuration_options={  }, enabled=true },
 -- 中文语言包
-["workshop-1301033176"]={ configuration_options={  }, enabled=true }
+["workshop-1301033176"]={ configuration_options={  }, enabled=true },
+-- 别删这个
+["DONOTDELETE"]={ configuration_options={  }, enabled=true }
 }' > $dst_base_dir/$cluster/Master/modoverrides.lua
     echo 'return {
 -- 汉化增强 Chinese++ (含中文高清字体)
 ["workshop-1418746242"]={ configuration_options={  }, enabled=true },
 -- 中文语言包
-["workshop-1301033176"]={ configuration_options={  }, enabled=true }
+["workshop-1301033176"]={ configuration_options={  }, enabled=true },
+-- 别删这个
+["DONOTDELETE"]={ configuration_options={  }, enabled=true }
 }' > $dst_base_dir/$cluster/Caves/modoverrides.lua	
 }
 Setup_mod(){
