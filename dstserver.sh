@@ -6,7 +6,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com/blog/dstscript.html
 #===============================================================================
-script_ver="1.2.1"
+script_ver="1.2.2"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="$HOME/.klei"
 dst_base_dir="$dst_conf_basedir/$dst_conf_dirname"
