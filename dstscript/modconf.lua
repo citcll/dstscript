@@ -1,4 +1,4 @@
--- script_ver="1.2.0"
+-- script_ver="1.2.1"
 require "modinfo"
 
 function list()
@@ -23,12 +23,12 @@ end
 function writein()
     local f = assert(io.open("modconfwrite.lua", 'w'))
     if name == "UNKNOWN" then
-        f:write("    --", name, "\n")
+        f:write("--", name, "\n")
     else
         if modid ~= "workshop-1115709310" and modid ~= "workshop-1084023218" then
-            f:write("    --", name, "\n")
+            f:write("--", name, "\n")
         else
-            f:write("    --", name)
+            f:write("--", name)
         end
     end
     if configuration_options ~= nil and #configuration_options > 0 then
