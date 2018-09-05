@@ -1,4 +1,4 @@
-script_ver="1.1.9"
+script_ver="1.2.0"
 cluster_name uiwhcie 房间名称 [NETWORK] read
 cluster_description MyDSTServer 房间简介 [NETWORK] read
 cluster_intention madness 游戏风格 [NETWORK] choose social 休闲 cooperative 合作 competitive 竞赛 madness 疯狂
@@ -11,7 +11,7 @@ vote_enabled true 投票 [GAMEPLAY] choose true 开启 false 关闭
 pvp true PVP竞技 [GAMEPLAY] choose true 开启 false 关闭
 whitelist_slots 0 房间预留位置个数 [NETWORK] read
 cluster_password 无 房间密码 [NETWORK] read
-max_player 6 最大玩家人数 [GAMEPLAY] read
+max_players 6 最大玩家人数 [GAMEPLAY] read
 master_ip 127.0.0.1 主世界IP(多服务器必须修改此项) [SHARD] read
 lan_only_cluster false 仅局域网 [NETWORK] readonly
 offline_cluster false 离线模式 [NETWORK] readonly

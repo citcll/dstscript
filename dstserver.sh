@@ -307,6 +307,7 @@ Reboot_server(){
     Run_server
 }
 exchangestatus(){
+    if [ ! -f $server_conf_file ]; then touch $server_conf_file; fi
     if [ $(grep "serveropen" -c $server_conf_file) -eq 0 ]; then
         echo "serveropen=$1" >> $server_conf_file
     else
@@ -381,7 +382,7 @@ Choose_exit_cluster(){
         echo "$index. $dirlist"
         let index++
     done 
-    echo -e "\e[92m请输入你要$cluster_str的存档编号：\e[0m\c"
+    echo -e "\e[92m请输入你要$cluster_str的$Red_font_prefix存档编号：\e[0m\c"
     read listnum
     cluster=$(cat /tmp/dirlist.txt | head -n $listnum | tail -n 1)
 }
@@ -394,10 +395,10 @@ Close_server(){
         if tmux has-session -t DST_Caves > /dev/null 2>&1; then
             tmux send-keys -t DST_Caves "c_shutdown(true)" C-m
         fi
-        sleep 1
+        sleep 5
         info "服务器已关闭！"
     else
-        sleep 1
+        sleep 5
         info "服务器为未开启！"
     fi
     Exit_auto_update
@@ -480,7 +481,7 @@ Set_token(){
     else
         default_token="pds-g^KU_6yNrwFkC^9WDPAGhDM9eN6y2v8UUjEL3oDLdvIkt2AuDQB2mgaGE="
     fi
-    info "当前预设的服务器令牌：$default_token"
+    info "当前预设的服务器令牌：\n $default_token"
     read -p "是否更改？1.是 2.否" ch
     if [ $ch -eq 1 ]; then
         tip "请输入或粘贴你的令牌到此处，注意最后不要输入空格："
@@ -691,8 +692,8 @@ Open_swap(){
     info "创建并开启虚拟内存 ..."
     sudo dd if=/dev/zero of=/swapfile bs=1M count=2048
     sudo mkswap /swapfile
-    sudo swapon /swapfile
     sudo chmod 0600 /swapfile
+    sudo swapon /swapfile
     sudo chmod 0666 /etc/fstab
     echo "/swapfile swap swap defaults 0 0" >> /etc/fstab
     sudo chmod 0644 /etc/fstab
