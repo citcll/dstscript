@@ -6,7 +6,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com/blog/dstscript.html
 #===============================================================================
-script_ver="1.2.2"
+script_ver="1.2.3"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="$HOME/.klei"
 dst_base_dir="$dst_conf_basedir/$dst_conf_dirname"
@@ -387,6 +387,7 @@ Choose_exit_cluster(){
     cluster=$(cat /tmp/dirlist.txt | head -n $listnum | tail -n 1)
 }
 Close_server(){
+    tip "正在关闭已开启的服务器（有的话） ..."
     if tmux has-session -t DST_Master > /dev/null 2>&1 || tmux has-session -t DST_Caves > /dev/null 2>&1; then
         if tmux has-session -t DST_Master > /dev/null 2>&1; then
             tmux send-keys -t DST_Master "c_shutdown(true)" C-m
@@ -399,7 +400,7 @@ Close_server(){
         info "服务器已关闭！"
     else
         sleep 5
-        info "服务器为未开启！"
+        info "服务器未开启！"
     fi
     Exit_auto_update
     exchangestatus false
