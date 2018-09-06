@@ -18,13 +18,17 @@ if TheNet and TheNet:GetIsServer() then
     local SERVER_MODSLIST = TheNet:GetServerModNames()
     
     local function GetStatus(inst, source)
-        local data = {}
-        local settings = {}
-        local players = {}
-        local statevars = {}
-        local world = {}
-
-        settings["servername"] = SERVER_NAME
+        local f = _G.io.open("gifts_info.json","w")
+        
+        f:write("房间名称：", SERVER_NAME, "\n")
+        f:write("房间名称：", SERVER_DESCRIPTION, "\n")
+        f:write("房间名称：", SERVER_MAXPLAYERS, "\n")
+        f:write("房间名称：", SERVER_GAMEMODE, "\n")
+        f:write("房间名称：", SERVER_NAME, "\n")
+        f:write("房间名称：", SERVER_NAME, "\n")
+        f:write("房间名称：", SERVER_NAME, "\n")
+        f:write("房间名称：", SERVER_NAME, "\n")
+        f:write("房间名称：", SERVER_NAME, "\n")
         settings["description"] = SERVER_DESCRIPTION
         settings["maxplayers"] = SERVER_MAXPLAYERS
         settings["gamemode"] = SERVER_GAMEMODE
