@@ -1,13 +1,13 @@
--- script_ver="1.1.9"
+-- script_ver="1.2.0"
 return {
-  desc="The standard Don't Starve experience.",
+  desc="标准的饥荒联机体验。",
   hideminimap=false,
   id="SURVIVAL_TOGETHER",
   location="forest",
   max_playlist_position=999,
   min_playlist_position=0,
-  name="Default",
-  numrandom_set_pieces=4,
+  name="默认",
+  numrandom_set_pieces=10,
   ordered_story_setpieces={ "Sculptures_1", "Maxwell5" },
   override_level_string=false,
   overrides={

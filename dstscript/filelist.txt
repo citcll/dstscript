@@ -1,11 +1,11 @@
 dstserver.sh:1.2.7
 modconf.lua:1.2.1
-cavesleveldata.txt:1.2.1
-masterleveldata.txt:1.2.1
+cavesleveldata.txt:1.2.2
+masterleveldata.txt:1.2.2
 clusterdata.txt:1.2.0
 masterend.lua:1.1.9
-masterstart.lua:1.1.9
-cavesstart.lua:1.1.9
+masterstart.lua:1.2.0
+cavesstart.lua:1.2.0
 cavesend.lua:1.1.9
 masterini.ini:1.1.9
 cavesini.ini:1.1.9
