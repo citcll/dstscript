@@ -18,6 +18,8 @@ weather default environment 雨 never 无 rare 较少 default 默认 often 较�
 wildfires default environment 自燃 never 无 rare 较少 default 默认 often 较多 always 大量
 winter default environment 冬天 noseason 无 veryshortseason 很短 shortseason 短 longseason 长 verylongseason 很长 random 随机 default 默认
 world_size default environment 地图大小 small 小型 medium 中等 huge 巨型 default 大型
+roads default environment 道路 never 无 default 默认
+task_set default environment 生物群落 classic 没有巨人 default 联机
 prefabswaps_start default environment 初始多样性 classic 经典 highlyrandom 高度随机 default 默认
 alternatehunt default source 动物脚印 never 无 rare 较少 default 默认 often 较多 always 大量
 flint default source 燧石 never 无 rare 较少 default 默认 often 较多 always 大量
@@ -70,7 +72,5 @@ spiders default monster 蜘蛛 never 无 rare 较少 default 默认 often 较多
 tentacles default monster 触手怪 never 无 rare 较少 default 默认 often 较多 always 大量
 walrus default monster 海象 never 无 rare 较少 default 默认 often 较多 always 大量
 layout_mode LinkNodesByKeys other 其他
-roads default other 道路 never 无 default 默认
-task_set default other 生物群落 classic 没有巨人 default 联机
 wormhole_prefab wormhole other 虫洞生物
-script_ver="1.2.4"
+script_ver="1.2.5"

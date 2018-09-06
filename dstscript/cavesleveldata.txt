@@ -5,12 +5,13 @@ disease_delay default environment 作物患病 none 无 random 随机 long 慢 d
 earthquakes default environment 地震频率 never 无 rare 较少 default 默认 often 较多 always 大量
 loop default environment 环状地形 never 无 least 最少 default 默认 most 最多
 petrification default environment 石化速率 none 无 few 慢 default 默认 many 快 max 极快
-prefabswaps_start default environment 初始多样性 classic 经典 highlyrandom 高度随机 default 默认
 regrowth default environment 资源再生 veryslow 极慢 slow 慢 default 默认 fast 快 veryfast 极快
 touchstone default environment 猪头祭坛 never 无 rare 较少 default 默认 often 较多 always 大量
 weather default environment 雨 never 无 rare 较少 default 默认 often 较多 always 大量
 world_size default environment 地图大小 small 小型 medium 中等 huge 巨型 default 大型
 wormlights default environment 发光浆果 never 无 rare 较少 default 默认 often 较多 always 大量
+roads never environment 道路  never 无 default 默认
+prefabswaps_start default environment 初始多样性 classic 经典 highlyrandom 高度随机 default 默认
 fern default source 蕨类植物 never 无 rare 较少 default 默认 often 较多 always 大量
 flint default source 燧石 never 无 rare 较少 default 默认 often 较多 always 大量
 flower_cave default source 荧光花 never 无 rare 较少 default 默认 often 较多 always 大量
@@ -40,8 +41,7 @@ tentacles rare monster 触手怪 never 无 rare 较少 default 默认 often 较�
 wormattacks default monster 蠕虫袭击 never 无 rare 较少 default 默认 often 较多 always 大量
 worms default monster 蠕虫 never 无 rare 较少 default 默认 often 较多 always 大量
 layout_mode RestrictNodesByKey other 其他
-roads never other 道路  never 无 default 默认
 start_location caves other 其他
 task_set cave_default other 其他
 wormhole_prefab tentacle_pillar other 其他
-script_ver="1.2.4"
+script_ver="1.2.5"
