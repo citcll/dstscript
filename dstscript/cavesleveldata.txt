@@ -1,4 +1,3 @@
-script_ver="1.2.2"
 boons default environment 前辈遗迹 never 无 rare 较少 default 默认 often 较多 always 大量
 branching default environment 岔路地形 never 无 least 最少 default 默认 most 最多
 cavelight default environment 洞穴光照 veryslow 极慢 slow 慢 default 默认 fast 快 veryfast 极快
@@ -45,3 +44,4 @@ roads never other 道路  never 无 default 默认
 start_location caves other 其他
 task_set cave_default other 其他
 wormhole_prefab tentacle_pillar other 其他
+script_ver="1.2.3"

@@ -1,4 +1,3 @@
-script_ver="1.2.2"
 autumn default environment 秋天 noseason 无 veryshortseason 很短 shortseason 短 longseason 长 verylongseason 很长 random 随机 default 默认
 boons default environment 前辈遗迹 never 无 rare 较少 default 默认 often 较多 always 大量
 branching default environment 岔路地形 never 无 least 最少 default 默认 most 最多
@@ -74,3 +73,4 @@ layout_mode LinkNodesByKeys other 其他
 roads default other 道路 never 无 default 默认
 task_set default other 生物群落 classic 没有巨人 default 联机
 wormhole_prefab wormhole other 虫洞生物
+script_ver="1.2.3"
