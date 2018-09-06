@@ -6,7 +6,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com/blog/dstscript.html
 #===============================================================================
-script_ver="1.3.1"
+script_ver="1.3.2"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="$HOME/.klei"
 dst_base_dir="$dst_conf_basedir/$dst_conf_dirname"
@@ -642,7 +642,7 @@ ServerModSetup(\"1418746242\")" > "$data_dir/mods_setup.lua"
     dir=$(cat $dst_base_dir/$cluster/Master/modoverrides.lua | grep "workshop" | cut -f2 -d '"' | cut -d "-" -f2)
     for moddir in $dir; do
         if [[ $(grep "$moddir" -c "$data_dir/mods_setup.lua") = 0 ]]; then 
-            echo "ServerModSetup(\"$moddir)" >> "$data_dir/mods_setup.lua"
+            echo "ServerModSetup(\"$moddir\")" >> "$data_dir/mods_setup.lua"
         fi
     done
     cp "$data_dir/mods_setup.lua" "$dst_server_dir/mods/dedicated_server_mods_setup.lua"
