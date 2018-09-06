@@ -179,10 +179,6 @@ Addmodfunc(){
     fuc="writein"
     MOD_conf
     for shard in "Master" "Caves"; do Addmodtoshard; done
-    if [[ $(grep "$moddir" -c "$data_dir/mods_setup.lua") = 0 ]] ;then
-        moddir=$(echo $moddir | cut -d '-' -f2)
-        echo "ServerModSetup(\"$moddir\")" >> "$data_dir/mods_setup.lua"
-    fi
 }
 Delmodfromshard(){
     if [[ $(grep "$moddir" -c "$dst_base_dir/$cluster/$shard/modoverrides.lua") > 0 ]]; then
