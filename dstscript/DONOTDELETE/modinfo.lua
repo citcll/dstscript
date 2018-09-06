@@ -1,0 +1,15 @@
+-- script_ver="1.0.0"
+name = "Server Status"
+description = "Only for my script."
+author = "Ariwori"
+version = "1.0.0"
+api_version = 10
+forumthread = ""
+icon_atlas = ""
+icon = ""
+dont_starve_compatible = false
+reign_of_giants_compatible = false
+dst_compatible = true
+client_only_mod = false
+all_clients_require_mod = false
+server_filter_tags = { "server status" }
