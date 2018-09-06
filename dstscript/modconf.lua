@@ -1,9 +1,17 @@
--- script_ver="1.2.1"
+-- script_ver="1.2.2"
 require "modinfo"
 
 function list()
     local f = assert(io.open("modconflist.lua", 'a'))
+    if used == "true" then
+        f:write("[已启用]:")
+    else
+        f:write("[未启用]:")
+    end
     if modid ~= nil then
+        if modid == "DONOTDELETE" then
+            name = "一定不要删这个，不然MOD增删功能会出错导致服务器无法运行"
+        end
         f:write(modid)
     end
     if name ~= nil then
@@ -22,13 +30,15 @@ end
 
 function writein()
     local f = assert(io.open("modconfwrite.lua", 'w'))
-    if name == "UNKNOWN" then
-        f:write("--", name, "\n")
-    else
-        if modid ~= "workshop-1115709310" and modid ~= "workshop-1084023218" then
+    if name ~= nil then
+        if name == "UNKNOWN" then
             f:write("--", name, "\n")
         else
-            f:write("--", name)
+            if modid ~= "workshop-1115709310" and modid ~= "workshop-1084023218" then
+                f:write("--", name, "\n")
+            else
+                f:write("--", name)
+            end
         end
     end
     if configuration_options ~= nil and #configuration_options > 0 then
@@ -92,7 +102,7 @@ function writein()
         f:write("        enabled=true\n")
         f:write("    },\n")
     else
-        f:write('    ["', modid, '"]={ configuration_options={ }, enabled=true },\n')
+        f:write('["', modid, '"]={ configuration_options={ }, enabled=true },\n')
     end
     f:close()
 end

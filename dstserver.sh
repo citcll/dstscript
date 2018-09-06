@@ -6,7 +6,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com/blog/dstscript.html
 #===============================================================================
-script_ver="1.2.9"
+script_ver="1.3.0"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="$HOME/.klei"
 dst_base_dir="$dst_conf_basedir/$dst_conf_dirname"
@@ -82,7 +82,7 @@ Server_console(){
 }
 MOD_manager(){
     [ -z $cluster ] && cluster=$(cat $server_conf_file | grep "^cluster" | cut -d "=" -f2)
-    read -p "你要 1.添加mod  2.删除mod :" mc
+    read -p "你要 1.添加mod  2.删除mod 【存档：$cluster】:" mc
     case $mc in
         1)
         Listallmod
@@ -96,11 +96,12 @@ MOD_manager(){
 }
 MOD_conf(){
     echo "fuc = \"$fuc\"
-    modid = \"$moddir\"" > "$data_dir/modinfo.lua"
+modid = \"$moddir\"
+used = \"$used\"" > "$data_dir/modinfo.lua"
     if [[ -f "$dst_server_dir/mods/$moddir/modinfo.lua" ]]; then
         cat "${dst_server_dir}/mods/$moddir/modinfo.lua" >> "$data_dir/modinfo.lua"
     else
-        echo "name = UNKNOWN" >> "$data_dir/modinfo.lua"
+        echo "name = \"UNKNOWN\"" >> "$data_dir/modinfo.lua"
     fi
     cd $data_dir
     lua $data_dir/modconf.lua
@@ -112,6 +113,11 @@ Listallmod(){
     fi
     rm -f $data_dir/modconflist.lua
     for moddir in $(ls -F "$dst_server_dir/mods" | grep "/$" | cut -d '/' -f1); do
+        if [ $(grep "$moddir" -c "$dst_base_dir/$cluster/Master/modoverrides.lua") -gt 0 ]; then
+            used="true"
+        else
+            used="false"
+        fi
         if [[ "$moddir" != "" ]]; then
             fuc="list"
             MOD_conf
@@ -124,13 +130,14 @@ Listusedmod(){
     for moddir in $(grep "^\[" "$dst_base_dir/$cluster/Master/modoverrides.lua" | cut -d '"' -f2); do
         if [[ "$moddir" != "" ]]; then
             fuc="list"
+            used="true"
             MOD_conf
         fi
     done
     grep -n "^" $data_dir/modconflist.lua
 }
 Addmod(){
-    echo "请从以上列表选择你要启用的MOD${Red_font_prefix}[编号]${Font_color_suffix}，不存在的直接输入MODID"
+    echo -e "请从以上列表选择你要启用的MOD${Red_font_prefix}[编号]${Font_color_suffix}，不存在的直接输入MODID"
     echo "具体配置已写入 modoverride.lua, shell下修改太麻烦，可打开配置文件手动修改"
     echo "添加完毕要退出请输入数字 0 ！"
     while (true); do
@@ -162,7 +169,7 @@ Addmodtoshard(){
 }
 Truemodid(){
     if [ $modid -lt 1000 ]; then
-        moddir=$(sed -n ${modid}p $data_dir/modconflist.lua | cut -d ':' -f1)
+        moddir=$(sed -n ${modid}p $data_dir/modconflist.lua | cut -d ':' -f2)
     else
         moddir="workshop-$modid"
     fi
@@ -191,7 +198,7 @@ Delmodfromshard(){
     fi
 }
 Delmod(){
-    echo "请从以上列表选择你要停用的MOD${Red_font_prefix}[编号]${Font_color_suffix},非脚本添加的MOD不要使用本功能,完毕请输数字 0 ！"
+    echo -e "请从以上列表选择你要停用的MOD${Red_font_prefix}[编号]${Font_color_suffix},非脚本添加的MOD不要使用本功能,完毕请输数字 0 ！"
     while (true); do
         read modid
         if [[ "$modid" == "0" ]]; then
@@ -249,7 +256,7 @@ Dellist()
     while (ture); do
         echo "=========================================================================="
         grep -n "KU" "$data_dir/$listfile"
-        echo -e "\e[92m请输入你要移除的KLEIID编号：删除完毕请输入数字 0 \e[0m"
+        echo -e "\e[92m请输入你要移除的KLEIID${Red_font_prefix}[编号]${Font_color_suffix}，删除完毕请输入数字 0 \e[0m"
         read kleiid
         if [[ "$kleiid" == "0" ]]; then
             echo "移除完毕！"
@@ -382,7 +389,7 @@ Choose_exit_cluster(){
         echo "$index. $dirlist"
         let index++
     done 
-    echo -e "\e[92m请输入你要$cluster_str的$Red_font_prefix存档编号：\e[0m\c"
+    echo -e "\e[92m请输入你要$cluster_str的存档${Red_font_prefix}[编号]${Font_color_suffix}：\e[0m\c"
     read listnum
     cluster=$(cat /tmp/dirlist.txt | head -n $listnum | tail -n 1)
 }
