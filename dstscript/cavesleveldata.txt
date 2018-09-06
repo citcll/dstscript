@@ -44,4 +44,4 @@ roads never other 道路  never 无 default 默认
 start_location caves other 其他
 task_set cave_default other 其他
 wormhole_prefab tentacle_pillar other 其他
-script_ver="1.2.3"
+script_ver="1.2.4"

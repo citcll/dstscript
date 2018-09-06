@@ -11,7 +11,7 @@ regrowth default environment 资源再生 veryslow 极慢 slow 慢 default 默�
 season_start default environment 初始季节 default 秋季 winter 冬季 spring 春季 summer 夏季 autumnorspring 秋或春 winterorsummer 冬或夏 random 随机
 specialevent default environment 节日活动 none 无 default 自动 hallowed_nights 万圣夜 winters_feast 冬季盛宴 winters_feast 鸡年活动
 spring default environment 春天 noseason 无 veryshortseason 很短 shortseason 短 longseason 长 verylongseason 很长 random 随机 default 默认
-start_location default environment 初始环境 plus 三箱 darkness 永夜 default
+start_location default environment 初始环境 plus 三箱 darkness 永夜 default 默认
 summer default environment 夏天 noseason 无 veryshortseason 很短 shortseason 短 longseason 长 verylongseason 很长 random 随机 default 默认
 touchstone default environment 猪头祭坛 never 无 rare 较少 default 默认 often 较多 always 大量
 weather default environment 雨 never 无 rare 较少 default 默认 often 较多 always 大量
@@ -73,4 +73,4 @@ layout_mode LinkNodesByKeys other 其他
 roads default other 道路 never 无 default 默认
 task_set default other 生物群落 classic 没有巨人 default 联机
 wormhole_prefab wormhole other 虫洞生物
-script_ver="1.2.3"
+script_ver="1.2.4"

@@ -6,7 +6,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com/blog/dstscript.html
 #===============================================================================
-script_ver="1.2.8"
+script_ver="1.2.9"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="$HOME/.klei"
 dst_base_dir="$dst_conf_basedir/$dst_conf_dirname"
@@ -446,7 +446,6 @@ Set_cluster(){
             info "更改已保存！"
                break;;
             *)
-            cmd=$[$cmd + 1]
             changelist=($(sed -n "${cmd}p" $dst_cluster_file))
                if [ "${changelist[4]}" = "choose" ]; then
                    echo -e "\e[92m请选择${changelist[2]}： \e[0m\c"
@@ -549,22 +548,21 @@ Set_world_config(){
             cat $configure_file | grep -v "script_ver" | while read line; do
                 ss=($line)
                 if [ ${#ss[@]} -gt 4 ]; then
-                    if [ $index -le 4 ]; then
-                        for ((i=4;i<${#ss[*]};i++)); do
-                            if [ "${ss[$i]}" == "${ss[1]}" ]; then
-                                value=${ss[$i+1]}
-                            fi
-                        done
-                        if [ "${list[$j]}" == "${ss[2]}" ]; then
-                            printf "%-21s\t" "[$linenum]${ss[3]}: $value"
-                            index=$[$index + 1]
-                            linenum=$[$linenum + 1]
-                        fi
-                    else
+                    if [ $index -gt 3 ]; then
                         printf "\n"
                         index=1
                     fi
+                    for ((i=4;i<${#ss[*]};i++)); do
+                        if [ "${ss[$i]}" == "${ss[1]}" ]; then
+                            value=${ss[$i+1]}
+                        fi
+                    done
+                    if [ "${list[$j]}" == "${ss[2]}" ]; then
+                        printf "%-21s\t" "[$linenum]${ss[3]}: $value"
+                        index=$[$index + 1]
+                    fi
                 fi
+                linenum=$[$linenum + 1]
             done
         done
         printf "\n"
@@ -581,7 +579,6 @@ Set_world_config(){
             info "更改已保存！"
             break;;
             *)
-            cmd=$[$cmd + 1]
             changelist=($(sed -n "${cmd}p" $configure_file))
                echo -e "\e[92m请选择${changelist[3]}： \e[0m\c"
                index=1

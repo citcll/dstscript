@@ -1,8 +1,8 @@
-dstserver.sh:1.2.8
+dstserver.sh:1.2.9
 modconf.lua:1.2.1
-cavesleveldata.txt:1.2.3
-masterleveldata.txt:1.2.3
-clusterdata.txt:1.2.0
+cavesleveldata.txt:1.2.4
+masterleveldata.txt:1.2.4
+clusterdata.txt:1.2.1
 masterend.lua:1.1.9
 masterstart.lua:1.2.0
 cavesstart.lua:1.2.0
