@@ -109,7 +109,7 @@ used = \"$used\"" > "$data_dir/modinfo.lua"
 }
 Listallmod(){
     if [ ! -f $data_dir/mod_setup.lua ]; then
-        echo "---MOD自动更新列表：" > $data_dir/mods_setup.lua
+        touch $data_dir/mods_setup.lua
     fi
     rm -f $data_dir/modconflist.lua
     for moddir in $(ls -F "$dst_server_dir/mods" | grep "/$" | cut -d '/' -f1); do
@@ -366,7 +366,6 @@ Start_server(){
     if [ ! -f $dst_base_dir/$cluster/Master/modoverrides.lua ]; then
         Default_mod
     fi
-    Setup_mod
     Set_list
     echo -e "\e[92m请选择要启动的世界：1.仅地上  2.仅洞穴  3.地上 + 洞穴 ?\e[0m\c"
     read shard 
@@ -643,7 +642,7 @@ Default_mod(){
 }
 Setup_mod(){
     echo "ServerModSetup(\"1301033176\")
-    ServerModSetup(\"1418746242\")" >> "$data_dir/mods_setup.lua"
+ServerModSetup(\"1418746242\")" > "$data_dir/mods_setup.lua"
     dir=$(cat $dst_base_dir/$cluster/Master/modoverrides.lua | grep "workshop" | cut -f1 -d "]" | cut -d "-" -f2)
     for moddir in $dir; do
         if [[ $(grep "$moddir" -c "$data_dir/mods_setup.lua") = 0 ]]; then 
@@ -653,6 +652,7 @@ Setup_mod(){
     cp "$data_dir/mods_setup.lua" "$dst_server_dir/mods/dedicated_server_mods_setup.lua"
 }
 Start_shard(){
+    Setup_mod
     cd "$dst_server_dir/bin"
     for s in $shard; do
         tmux new-session -s DST_$s -d "$dst_bin_cmd -cluster $cluster -shard $s"
