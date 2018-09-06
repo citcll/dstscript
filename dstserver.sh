@@ -6,7 +6,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com/blog/dstscript.html
 #===============================================================================
-script_ver="1.2.7"
+script_ver="1.2.8"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="$HOME/.klei"
 dst_base_dir="$dst_conf_basedir/$dst_conf_dirname"
@@ -818,7 +818,7 @@ Update_script(){
         [[ -z ${new_ver} ]] && new_ver=$cur_ver
         if [[ ${new_ver} != ${cur_ver} ]]; then
             info "$file 发现新版本[ ${new_ver} ]，更新中..."
-            wget https://raw.githubusercontent.com/ariwori/dstscript/master/$file -O $HOME/$file
+            wget https://raw.githubusercontent.com/ariwori/dstscript/master/$file -O $HOME/$file > /dev/null 2>&1
             chmod +x $HOME/dstserver.sh
             info "$file 已更新为最新版本[ ${new_ver} ] !"
             if [[ "$file" == "dstserver.sh" ]]; then need_exit="true"; fi
