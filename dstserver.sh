@@ -549,7 +549,7 @@ Set_world_config(){
             cat $configure_file | grep -v "script_ver" | while read line; do
                 ss=($line)
                 if [ ${#ss[@]} -gt 4 ]; then
-                    if [ $index -lt 4 ]; then
+                    if [ $index -le 4 ]; then
                         for ((i=4;i<${#ss[*]};i++)); do
                             if [ "${ss[$i]}" == "${ss[1]}" ]; then
                                 value=${ss[$i+1]}
@@ -558,13 +558,13 @@ Set_world_config(){
                         if [ "${list[$j]}" == "${ss[2]}" ]; then
                             printf "%-21s\t" "[$linenum]${ss[3]}: $value"
                             index=$[$index + 1]
+                            linenum=$[$linenum + 1]
                         fi
                     else
                         printf "\n"
                         index=1
                     fi
                 fi
-                linenum=$[$linenum + 1]
             done
         done
         printf "\n"
