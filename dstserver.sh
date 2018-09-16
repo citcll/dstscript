@@ -4,9 +4,9 @@
 #    Description: Install and manager the Don't Starve Together Dedicated Server
 #    Version: 1.1.9 2018-08-22 22:49:02
 #    Author: Ariwori
-#    Blog: https://wqlin.com/blog/dstscript.html
+#    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.3.2"
+script_ver="1.3.3"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="$HOME/.klei"
 dst_base_dir="$dst_conf_basedir/$dst_conf_dirname"
@@ -16,6 +16,7 @@ data_dir="$HOME/dstscript"
 dst_token_file="$data_dir/clustertoken.txt"
 server_conf_file="$data_dir/server.conf"
 dst_cluster_file="$data_dir/clusterdata.txt"
+my_blog_link="https://wqlin.com/dstscript.html"
 # 屏幕输出
 Green_font_prefix="\033[32m"
 Red_font_prefix="\033[31m"
@@ -32,7 +33,7 @@ Menu(){
     while (true); do
         echo -e "\e[33m==============欢迎使用饥荒联机版独立服务器脚本[Linux-Steam]($script_ver)==============\e[0m"
         echo
-        echo -e "\e[33m作者：Ariwori        Bug反馈：https://wqlin.com/blog/dstscript.html\e[0m"
+        echo -e "\e[33m作者：Ariwori        Bug反馈：${my_blog_link}\e[0m"
         echo -e "\e[33m本脚本一切权利归作者所有。未经许可禁止使用本脚本进行任何的商业活动！\e[0m"
         echo -e "\e[31m游戏服务端安装目录：$dst_server_dir (Version: $(cat $dst_server_dir/version.txt))\e[0m"
         echo
