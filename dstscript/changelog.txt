@@ -1,4 +1,4 @@
-433434
+3292432
 DSTServer.sh 更新记录
 # 2018-08-22 13:18:37 更新日志 343434
 东方闪电
@@ -22,3 +22,5 @@ DSTServer.sh 更新记录
 修改Bug反馈链接为 https://wqlin.com/dstscript.html
 # 2018-09-26 22:48:55 更新日志 342142
 代码项目由Github迁移到Coding
+# 2018-09-26 23:55:59 更新日志 3292432
+Fuck coding and gitee, back to github
