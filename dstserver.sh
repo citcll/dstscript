@@ -2,11 +2,10 @@
 #===============================================================================
 #    System Required: Ubuntu12+/Debian7+
 #    Description: Install and manager the Don't Starve Together Dedicated Server
-#    Version: 1.1.9 2018-08-22 22:49:02
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.3.3"
+script_ver="1.3.4"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="$HOME/.klei"
 dst_base_dir="$dst_conf_basedir/$dst_conf_dirname"
@@ -16,7 +15,9 @@ data_dir="$HOME/dstscript"
 dst_token_file="$data_dir/clustertoken.txt"
 server_conf_file="$data_dir/server.conf"
 dst_cluster_file="$data_dir/clusterdata.txt"
-my_blog_link="https://wqlin.com/dstscript.html"
+feedback_link="https://wqlin.com/dstscript.html"
+update_link="https://coding.net/u/ariwori/p/dstscript/git/raw/master"
+mod_api_link="https://bwh.wqlin.com/api/dstmod.php"
 # 屏幕输出
 Green_font_prefix="\033[32m"
 Red_font_prefix="\033[31m"
@@ -33,7 +34,7 @@ Menu(){
     while (true); do
         echo -e "\e[33m==============欢迎使用饥荒联机版独立服务器脚本[Linux-Steam]($script_ver)==============\e[0m"
         echo
-        echo -e "\e[33m作者：Ariwori        Bug反馈：${my_blog_link}\e[0m"
+        echo -e "\e[33m作者：Ariwori        Bug反馈：${feedback_link}\e[0m"
         echo -e "\e[33m本脚本一切权利归作者所有。未经许可禁止使用本脚本进行任何的商业活动！\e[0m"
         echo -e "\e[31m游戏服务端安装目录：$dst_server_dir (Version: $(cat $dst_server_dir/version.txt))\e[0m"
         echo
@@ -799,7 +800,7 @@ Fix_steamcmd(){
 # Show change log
 Show_changelog(){
     echo -e "\e[33m=================================脚本更新说明========================================\e[0m"
-    curl -s https://raw.githubusercontent.com/ariwori/dstscript/master/dstscript/changelog.txt > /tmp/changelog.txt
+    curl -s ${update_link}/dstscript/changelog.txt > /tmp/changelog.txt
     datelog=$(cat /tmp/changelog.txt | head -n 1)
     cat /tmp/changelog.txt | grep -A 20 "更新日志 $datelog"
     echo -e "\e[33m=====================================================================================\e[0m"
@@ -807,7 +808,7 @@ Show_changelog(){
 }
 # 脚本更新
 Update_script(){
-    curl -s https://raw.githubusercontent.com/ariwori/dstscript/master/dstscript/filelist.txt > /tmp/filelist.txt
+    curl -s ${update_link}/dstscript/filelist.txt > /tmp/filelist.txt
     for file in $(cat /tmp/filelist.txt | cut -d ":" -f1); do
         new_ver=$(cat /tmp/filelist.txt | grep "$file" | cut -d ":" -f2)
         if [[ "$file" != "dstserver.sh" ]]; then file="dstscript/$file"; fi
@@ -819,7 +820,7 @@ Update_script(){
         [[ -z ${new_ver} ]] && new_ver=$cur_ver
         if [[ ${new_ver} != ${cur_ver} ]]; then
             info "$file 发现新版本[ ${new_ver} ]，更新中..."
-            wget https://raw.githubusercontent.com/ariwori/dstscript/master/$file -O $HOME/$file > /dev/null 2>&1
+            wget ${update_link}/$file -O $HOME/$file > /dev/null 2>&1
             chmod +x $HOME/dstserver.sh
             info "$file 已更新为最新版本[ ${new_ver} ] !"
             if [[ "$file" == "dstserver.sh" ]]; then need_exit="true"; fi
@@ -837,7 +838,7 @@ Update_script(){
 Update_DST_MOD(){
     info "检查启用的创意工坊MOD是否有更新 ..."
     for modid in $(cat $data_dir/mods_setup.lua | grep "ServerModSetup" | cut -d '"' -f2); do
-        mod_new_ver=$(curl -s https://wqlin.com/api/dstmod.php?modid=$modid)
+        mod_new_ver=$(curl -s ${mod_api_link}?modid=$modid)
         if [ -f $dst_server_dir/mods/workshop-$modid/modinfo.lua ]; then
             echo "fuc=getver" > $data_dir/modinfo.lua
             cat $dst_server_dir/mods/workshop-$modid/modinfo.lua >> $data_dir/modinfo.lua
