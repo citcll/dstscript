@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.3.5"
+script_ver="1.3.6"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="$HOME/.klei"
 dst_base_dir="$dst_conf_basedir/$dst_conf_dirname"
@@ -622,25 +622,16 @@ Write_in(){
 }
 Default_mod(){
     echo 'return {
--- 汉化增强 Chinese++ (含中文高清字体)
-["workshop-1418746242"]={ configuration_options={  }, enabled=true },
--- 中文语言包
-["workshop-1301033176"]={ configuration_options={  }, enabled=true },
 -- 别删这个
 ["DONOTDELETE"]={ configuration_options={  }, enabled=true }
 }' > $dst_base_dir/$cluster/Master/modoverrides.lua
     echo 'return {
--- 汉化增强 Chinese++ (含中文高清字体)
-["workshop-1418746242"]={ configuration_options={  }, enabled=true },
--- 中文语言包
-["workshop-1301033176"]={ configuration_options={  }, enabled=true },
 -- 别删这个
 ["DONOTDELETE"]={ configuration_options={  }, enabled=true }
 }' > $dst_base_dir/$cluster/Caves/modoverrides.lua	
 }
 Setup_mod(){
-    echo "ServerModSetup(\"1301033176\")
-ServerModSetup(\"1418746242\")" > "$data_dir/mods_setup.lua"
+    touch $data_dir/mods_setup.lua
     dir=$(cat $dst_base_dir/$cluster/Master/modoverrides.lua | grep "workshop" | cut -f2 -d '"' | cut -d "-" -f2)
     for moddir in $dir; do
         if [[ $(grep "$moddir" -c "$data_dir/mods_setup.lua") = 0 ]]; then 
