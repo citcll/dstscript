@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.3.6"
+script_ver="1.3.7"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="$HOME/.klei"
 dst_base_dir="$dst_conf_basedir/$dst_conf_dirname"
@@ -766,7 +766,7 @@ Install_Dependency(){
 }
 # Install steamcmd
 Install_Steamcmd(){
-    wget "http://media.steampowered.com/client/steamcmd_linux.tar.gz" 
+    wget "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" 
     tar -xzvf steamcmd_linux.tar.gz -C $HOME/steamcmd
     chmod +x $HOME/steamcmd/steamcmd.sh
     rm steamcmd_linux.tar.gz

@@ -25,4 +25,4 @@ DSTServer.sh 更新记录
 # 2018-09-26 23:55:59 更新日志 3292432
 Fuck coding and gitee, back to github
 # 2018-09-30 19:14:55 更新日志 2453243
-移除默认添加的汉化MOD
+移除默认添加的汉化MOD，解决steampowered.com被墙的问题
