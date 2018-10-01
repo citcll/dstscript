@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.3.7"
+script_ver="1.3.8"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="$HOME/.klei"
 dst_base_dir="$dst_conf_basedir/$dst_conf_dirname"
@@ -41,7 +41,7 @@ Menu(){
         echo -e "\e[92m[1]启动服务器           [2]关闭服务器         [3]重启服务器\e[0m"  
         echo -e "\e[92m[4]查看服务器状态       [5]添加或移除MOD      [6]设置管理员和黑名单\e[0m"
         echo -e "\e[92m[7]控制台               [8]自动更新           [9]退出本脚本\e[0m"
-        echo -e "\e[92m[10]删除存档            [11]更新游戏服务端/MOD\e[0m"
+        echo -e "\e[92m[10]删除存档            [11]更新游戏服务端/MOD  [12]DNS修改\e[0m"
         echo -e "\e[33m================================================================================\e[0m"
         echo -e "\e[92m请输入命令代号：\e[0m\c"
         read cmd  
@@ -67,7 +67,9 @@ Menu(){
             10)
             Cluster_manager;;
             11)
-            Update_DST;;			
+            Update_DST;;
+            12)
+            Change_DNS;;
         esac
     done
 }
@@ -81,6 +83,38 @@ Server_detail(){
 }
 Server_console(){
     Not_work_now
+}
+Change_DNS(){
+    tip "修改DNS可能可以解决由网络（墙）引起的问题，有这方面问题可以尝试，修改后有异常可以还原"
+    read -p "你要 1.修改DNS为谷歌DNS  2.修改DNS为自定义DNS  3.还原默认DNS" dns
+    if [ -z $dns ]; then
+        if [ ! -f /etc/resolv.conf.bak ]; then
+            sudo cp -rf /etc/resolv.conf /etc/resolv.conf.bak
+            info "已创建默认DNS解析服务器备份 /etc/resolv.conf.bak"
+        fi
+        sudo chattr -i /etc/resolv.conf
+        case $dns in
+            1)
+            sudo cat > /etc/resolv.conf<<-EOF
+8.8.8.8
+8.8.4.4
+EOF
+            ;;
+            2)
+            read -p "请输入你的主要DNS服务器IP" dns1
+            read -p "请输入你的备用DNS服务器IP" dns2
+            sudo cat > /etc/resolv.conf<<-EOF
+$dns1
+$dns2
+EOF
+            ;;
+            3)
+            sudo cp -rf /etc/resolv.conf.bak /etc/resolv.conf
+        esac
+        info "DNS解析服务器修改完成！当前DNS解析服务器如下："
+        cat /etc/resolv.conf
+        sudo chattr +i /etc/resolv.conf
+    fi
 }
 MOD_manager(){
     [ -z $cluster ] && cluster=$(cat $server_conf_file | grep "^cluster" | cut -d "=" -f2)
