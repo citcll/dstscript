@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.4.2"
+script_ver="1.4.3"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="$HOME/.klei"
 dst_base_dir="$dst_conf_basedir/$dst_conf_dirname"
@@ -115,7 +115,7 @@ Fix_S3(){
             3)
             sudo cp -rf /etc/hosts.bak /etc/hosts
             *)
-            tip "输入有误！请输入[1-3]"
+            tip "输入有误！请输入[1-3]";;
         esac
         info "s3.amazonaws.com的hosts记录修改完成！当前hosts记录如下："
         cat /etc/hosts
