@@ -106,7 +106,7 @@ Fix_S3(){
             sudo cp -rf /etc/hosts /etc/hosts.bak
             info "已创建默认DNS解析服务器备份 /etc/hosts.bak"
         fi
-        case $dns in
+        case $hs in
             1)
             curl -s $update_link/dstscript/s3hosts.txt >> /etc/hosts;;
             2)
