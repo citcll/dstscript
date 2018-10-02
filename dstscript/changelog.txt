@@ -28,3 +28,4 @@ Fuck coding and gitee, back to github
 移除默认添加的汉化MOD，解决steampowered.com被墙的问题
 增加修改服务器DNS解析地址的功能
 add hosts 52.216.136.5 s3.amazonaws.com
+在主面板增加简单的服务器状态信息

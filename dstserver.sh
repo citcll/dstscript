@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.4.7"
+script_ver="1.4.8"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="$HOME/.klei"
 dst_base_dir="$dst_conf_basedir/$dst_conf_dirname"
@@ -42,6 +42,8 @@ Menu(){
         echo -e "\e[92m[4]查看服务器状态       [5]添加或移除MOD      [6]设置管理员和黑名单\e[0m"
         echo -e "\e[92m[7]控制台               [8]自动更新           [9]退出本脚本\e[0m"
         echo -e "\e[92m[10]删除存档            [11]更新游戏服务端/MOD  [12]附加功能\e[0m"
+        echo
+        Simple_server_status
         echo -e "\e[33m================================================================================\e[0m"
         echo -e "\e[92m请输入命令代号：\e[0m\c"
         read cmd  
@@ -863,11 +865,11 @@ Fix_steamcmd(){
 ##########################################################################
 # Show change log
 Show_changelog(){
-    echo -e "\e[33m=================================脚本更新说明========================================\e[0m"
+    echo -e "\e[33m==============================脚本更新说明======================================\e[0m"
     curl -s ${update_link}/dstscript/changelog.txt > /tmp/changelog.txt
     datelog=$(cat /tmp/changelog.txt | head -n 1)
     cat /tmp/changelog.txt | grep -A 20 "更新日志 $datelog"
-    echo -e "\e[33m=====================================================================================\e[0m"
+    echo -e "\e[33m================================================================================\e[0m"
     sleep 3
 }
 # 脚本更新
@@ -931,6 +933,23 @@ Status_keep(){
         tip "服务器异常退出，即将重启 ..."
         Reboot_server
     fi
+}
+Simple_server_status(){
+    cluster="无"
+    [ -f ${server_conf_file} ] && cluster=$(cat $server_conf_file | grep "^cluster" | cut -d "=" -f2)
+    if tmux has-session -t DST_Master > /dev/null 2>&1; then 
+        master_on="开启"
+    else
+        master_on="关闭"
+    fi
+    if tmux has-session -t DST_Caves > /dev/null 2>&1; then
+        caves_on="开启"
+    else
+        caves_on="关闭"
+    fi
+    cluster_name="无"
+    [ -f $dst_base_dir/$cluster/cluster.ini ]; && cluster_name=$(cat $dst_base_dir/$cluster/cluster.ini | grep "^cluster_name" | cut -d "=" -f2)
+    echo -e "\e[33m存档：【$cluster】    地面：【$master_on】    洞穴：【$caves_on】    名称：【$cluster_name】\e[0m"
 }
 ####################################################################################
 if [[ $1 == "au" ]]; then
