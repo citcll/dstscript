@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.4"
+script_ver="1.4.1"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="$HOME/.klei"
 dst_base_dir="$dst_conf_basedir/$dst_conf_dirname"
@@ -89,9 +89,9 @@ Addon_function(){
     read addon
     case $addon in
         1)
-        Fix_S3;;
-        2)
         Change_DNS;;
+        2)
+        Fix_S3;;
         *)
         tip "输入有误！请输入[1-2]";;
     esac
@@ -114,6 +114,8 @@ Fix_S3(){
             echo "$hosts s3.amazonaws.com" >> /etc/hosts;;
             3)
             sudo cp -rf /etc/hosts.bak /etc/hosts
+            *)
+            tip "输入有误！请输入[1-3]"
         esac
         info "s3.amazonaws.com的hosts记录修改完成！当前hosts记录如下："
         cat /etc/hosts
