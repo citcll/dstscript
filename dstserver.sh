@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.4.6"
+script_ver="1.4.7"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="$HOME/.klei"
 dst_base_dir="$dst_conf_basedir/$dst_conf_dirname"
@@ -106,6 +106,7 @@ Fix_S3(){
         sudo cp -rf /etc/hosts /etc/hosts.bak
         info "已创建默认DNS解析服务器备份 /etc/hosts.bak"
     fi
+    sudo cp -rf /etc/hosts.bak /etc/hosts
     case $hs in
         1)
         curl -s $update_link/dstscript/s3hosts.txt >> /etc/hosts;;
@@ -130,6 +131,7 @@ Change_DNS(){
         sudo cp -rf /etc/resolv.conf /etc/resolv.conf.bak
         info "已创建默认DNS解析服务器备份 /etc/resolv.conf.bak"
     fi
+    sudo cp -rf /etc/resolv.conf.bak /etc/resolv.conf
     case $dns in
         1)
         cat > /etc/resolv.conf<<-EOF
