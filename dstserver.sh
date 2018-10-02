@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.4.4"
+script_ver="1.4.5"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="$HOME/.klei"
 dst_base_dir="$dst_conf_basedir/$dst_conf_dirname"
@@ -99,7 +99,8 @@ Addon_function(){
 Fix_S3(){
     info "修改s3.amazonaws.com的hosts记录可能可以解决近期服务器搜不到，洞穴开不了的问题"
     tip "在线获取s3.amazonaws.com的可用hosts记录不可用请反馈，我会再找个能用的，你也可以自己找"
-    echo -e "你要\n    1.在线获取s3.amazonaws.com的可用hosts记录(该hosts不一定适用于所有服务器)\n    2.修改为自己获取的可用hosts记录\n    3.还原默认hosts" hs
+    echo -e "你要\n    1.在线获取s3.amazonaws.com的可用hosts记录(该hosts不一定适用于所有服务器)\n    2.修改为自己获取的可用hosts记录\n    3.还原默认hosts"
+    read hs
     if [ -z $hs ]; then
         sudo chmod 666 /etc/hosts
         if [ ! -f /etc/hosts.bak ]; then
