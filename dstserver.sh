@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.4.3"
+script_ver="1.4.4"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="$HOME/.klei"
 dst_base_dir="$dst_conf_basedir/$dst_conf_dirname"
@@ -113,7 +113,7 @@ Fix_S3(){
             read -p "请输入你的s3.amazonaws.com的可用IP" hosts
             echo "$hosts s3.amazonaws.com" >> /etc/hosts;;
             3)
-            sudo cp -rf /etc/hosts.bak /etc/hosts
+            sudo cp -rf /etc/hosts.bak /etc/hosts;;
             *)
             tip "输入有误！请输入[1-3]";;
         esac
