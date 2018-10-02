@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.4.5"
+script_ver="1.4.6"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="$HOME/.klei"
 dst_base_dir="$dst_conf_basedir/$dst_conf_dirname"
@@ -101,61 +101,57 @@ Fix_S3(){
     tip "在线获取s3.amazonaws.com的可用hosts记录不可用请反馈，我会再找个能用的，你也可以自己找"
     echo -e "你要\n    1.在线获取s3.amazonaws.com的可用hosts记录(该hosts不一定适用于所有服务器)\n    2.修改为自己获取的可用hosts记录\n    3.还原默认hosts"
     read hs
-    if [ -z $hs ]; then
-        sudo chmod 666 /etc/hosts
-        if [ ! -f /etc/hosts.bak ]; then
-            sudo cp -rf /etc/hosts /etc/hosts.bak
-            info "已创建默认DNS解析服务器备份 /etc/hosts.bak"
-        fi
-        case $hs in
-            1)
-            curl -s $update_link/dstscript/s3hosts.txt >> /etc/hosts;;
-            2)
-            read -p "请输入你的s3.amazonaws.com的可用IP" hosts
-            echo "$hosts s3.amazonaws.com" >> /etc/hosts;;
-            3)
-            sudo cp -rf /etc/hosts.bak /etc/hosts;;
-            *)
-            tip "输入有误！请输入[1-3]";;
-        esac
-        info "s3.amazonaws.com的hosts记录修改完成！当前hosts记录如下："
-        cat /etc/hosts
-        sudo chmod 644 /etc/hosts
+    sudo chmod 666 /etc/hosts
+    if [ ! -f /etc/hosts.bak ]; then
+        sudo cp -rf /etc/hosts /etc/hosts.bak
+        info "已创建默认DNS解析服务器备份 /etc/hosts.bak"
     fi
+    case $hs in
+        1)
+        curl -s $update_link/dstscript/s3hosts.txt >> /etc/hosts;;
+        2)
+        read -p "请输入你的s3.amazonaws.com的可用IP" hosts
+        echo "$hosts s3.amazonaws.com" >> /etc/hosts;;
+        3)
+        sudo cp -rf /etc/hosts.bak /etc/hosts;;
+        *)
+        tip "输入有误！请输入[1-3]";;
+    esac
+    info "s3.amazonaws.com的hosts记录修改完成！当前hosts记录如下："
+    cat /etc/hosts
+    sudo chmod 644 /etc/hosts
 }
 Change_DNS(){
     tip "修改DNS可能可以解决由网络（墙）引起的问题，有这方面问题可以尝试，修改后有异常可以还原"
     read -p "你要 1.修改DNS为谷歌DNS  2.修改DNS为自定义DNS  3.还原默认DNS" dns
-    if [ -z $dns ]; then
-        sudo chattr -i /etc/resolv.conf
-        sudo chmod 666 /etc/resolv.conf
-        if [ ! -f /etc/resolv.conf.bak ]; then
-            sudo cp -rf /etc/resolv.conf /etc/resolv.conf.bak
-            info "已创建默认DNS解析服务器备份 /etc/resolv.conf.bak"
-        fi
-        case $dns in
-            1)
-            cat > /etc/resolv.conf<<-EOF
-8.8.8.8
-8.8.4.4
-EOF
-            ;;
-            2)
-            read -p "请输入你的主要DNS服务器IP" dns1
-            read -p "请输入你的备用DNS服务器IP" dns2
-            cat > /etc/resolv.conf<<-EOF
-$dns1
-$dns2
-EOF
-            ;;
-            3)
-            sudo cp -rf /etc/resolv.conf.bak /etc/resolv.conf
-        esac
-        info "DNS解析服务器修改完成！当前DNS解析服务器如下："
-        cat /etc/resolv.conf
-        sudo chmod 644 /etc/resolv.conf
-        sudo chattr +i /etc/resolv.conf
+    sudo chattr -i /etc/resolv.conf
+    sudo chmod 666 /etc/resolv.conf
+    if [ ! -f /etc/resolv.conf.bak ]; then
+        sudo cp -rf /etc/resolv.conf /etc/resolv.conf.bak
+        info "已创建默认DNS解析服务器备份 /etc/resolv.conf.bak"
     fi
+    case $dns in
+        1)
+        cat > /etc/resolv.conf<<-EOF
+nameserver 8.8.8.8
+nameserver 8.8.4.4
+EOF
+        ;;
+        2)
+        read -p "请输入你的主要DNS服务器IP" dns1
+        read -p "请输入你的备用DNS服务器IP" dns2
+        cat > /etc/resolv.conf<<-EOF
+nameserver $dns1
+nameserver $dns2
+EOF
+        ;;
+        3)
+        sudo cp -rf /etc/resolv.conf.bak /etc/resolv.conf
+    esac
+    info "DNS解析服务器修改完成！当前DNS解析服务器如下："
+    cat /etc/resolv.conf
+    sudo chmod 644 /etc/resolv.conf
+    sudo chattr +i /etc/resolv.conf
 }
 MOD_manager(){
     [ -z $cluster ] && cluster=$(cat $server_conf_file | grep "^cluster" | cut -d "=" -f2)
