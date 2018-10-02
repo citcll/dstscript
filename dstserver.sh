@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.3.8"
+script_ver="1.3.9"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="$HOME/.klei"
 dst_base_dir="$dst_conf_basedir/$dst_conf_dirname"
@@ -17,7 +17,7 @@ server_conf_file="$data_dir/server.conf"
 dst_cluster_file="$data_dir/clusterdata.txt"
 feedback_link="https://wqlin.com/dstscript.html"
 update_link="https://raw.githubusercontent.com/ariwori/dstscript/master"
-mod_api_link="https://bwh.wqlin.com/api/dstmod.php"
+mod_api_link="https://wqlin.com/api/dstmod.php"
 # 屏幕输出
 Green_font_prefix="\033[32m"
 Red_font_prefix="\033[31m"
@@ -41,7 +41,7 @@ Menu(){
         echo -e "\e[92m[1]启动服务器           [2]关闭服务器         [3]重启服务器\e[0m"  
         echo -e "\e[92m[4]查看服务器状态       [5]添加或移除MOD      [6]设置管理员和黑名单\e[0m"
         echo -e "\e[92m[7]控制台               [8]自动更新           [9]退出本脚本\e[0m"
-        echo -e "\e[92m[10]删除存档            [11]更新游戏服务端/MOD  [12]DNS修改\e[0m"
+        echo -e "\e[92m[10]删除存档            [11]更新游戏服务端/MOD  [12]附加功能\e[0m"
         echo -e "\e[33m================================================================================\e[0m"
         echo -e "\e[92m请输入命令代号：\e[0m\c"
         read cmd  
@@ -69,7 +69,7 @@ Menu(){
             11)
             Update_DST;;
             12)
-            Change_DNS;;
+            Addon_function;;
         esac
     done
 }
@@ -84,18 +84,55 @@ Server_detail(){
 Server_console(){
     Not_work_now
 }
+Addon_function(){
+    echo "你要\n    1.修改DNS\n    2.修改s3.amazonaws.com的hosts记录"
+    read addon
+    case $addon in
+        1)
+        Fix_S3;;
+        2)
+        Change_DNS;;
+        *)
+        tip "输入有误！请输入[1-2]";;
+    esac
+}
+Fix_S3(){
+    info "修改s3.amazonaws.com的hosts记录可能可以解决近期服务器搜不到，洞穴开不了的问题"
+    tip "在线获取s3.amazonaws.com的可用hosts记录不可用请反馈，我会再找个能用的，你也可以自己找"
+    echo "你要\n    1.在线获取s3.amazonaws.com的可用hosts记录(该hosts不一定适用于所有服务器)\n    2.修改为自己获取的可用hosts记录\n    3.还原默认hosts" hs
+    if [ -z $hs ]; then
+        sudo chmod 666 /etc/hosts
+        if [ ! -f /etc/hosts.bak ]; then
+            sudo cp -rf /etc/hosts /etc/hosts.bak
+            info "已创建默认DNS解析服务器备份 /etc/hosts.bak"
+        fi
+        case $dns in
+            1)
+            curl -s $update_link/dstscript/s3hosts.txt >> /etc/hosts;;
+            2)
+            read -p "请输入你的s3.amazonaws.com的可用IP" hosts
+            echo "$hosts s3.amazonaws.com" >> /etc/hosts;;
+            3)
+            sudo cp -rf /etc/hosts.bak /etc/hosts
+        esac
+        info "s3.amazonaws.com的hosts记录修改完成！当前hosts记录如下："
+        cat /etc/hosts
+        sudo chmod 644 /etc/hosts
+    fi
+}
 Change_DNS(){
     tip "修改DNS可能可以解决由网络（墙）引起的问题，有这方面问题可以尝试，修改后有异常可以还原"
     read -p "你要 1.修改DNS为谷歌DNS  2.修改DNS为自定义DNS  3.还原默认DNS" dns
     if [ -z $dns ]; then
+        sudo chattr -i /etc/resolv.conf
+        sudo chmod 666 /etc/resolv.conf
         if [ ! -f /etc/resolv.conf.bak ]; then
             sudo cp -rf /etc/resolv.conf /etc/resolv.conf.bak
             info "已创建默认DNS解析服务器备份 /etc/resolv.conf.bak"
         fi
-        sudo chattr -i /etc/resolv.conf
         case $dns in
             1)
-            sudo cat > /etc/resolv.conf<<-EOF
+            cat > /etc/resolv.conf<<-EOF
 8.8.8.8
 8.8.4.4
 EOF
@@ -103,7 +140,7 @@ EOF
             2)
             read -p "请输入你的主要DNS服务器IP" dns1
             read -p "请输入你的备用DNS服务器IP" dns2
-            sudo cat > /etc/resolv.conf<<-EOF
+            cat > /etc/resolv.conf<<-EOF
 $dns1
 $dns2
 EOF
@@ -113,6 +150,7 @@ EOF
         esac
         info "DNS解析服务器修改完成！当前DNS解析服务器如下："
         cat /etc/resolv.conf
+        sudo chmod 644 /etc/resolv.conf
         sudo chattr +i /etc/resolv.conf
     fi
 }
