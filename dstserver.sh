@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.5.0"
+script_ver="1.5.1"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="$HOME/.klei"
 dst_base_dir="$dst_conf_basedir/$dst_conf_dirname"
@@ -957,7 +957,7 @@ Simple_server_status(){
     fi
     cluster_name="无"
     [ -f $dst_base_dir/$cluster/cluster.ini ] && cluster_name=$(cat $dst_base_dir/$cluster/cluster.ini | grep "^cluster_name" | cut -d "=" -f2)
-    echo -e "\e[33m存档：【$cluster】 地面：【$master_on】 洞穴：【$caves_on】 名称：【$cluster_name】\e[0m"
+    echo -e "\e[33m存档:【$cluster】 地面:【$master_on】 洞穴:【$caves_on】 名称:【$cluster_name】\e[0m"
 }
 ####################################################################################
 if [[ $1 == "au" ]]; then
@@ -971,5 +971,6 @@ if [[ $1 == "au" ]]; then
 fi
 # Run from here
 First_run_check
+Update_DST_Check
 Update_script
 Menu
