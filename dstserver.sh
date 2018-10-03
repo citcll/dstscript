@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.5.2"
+script_ver="1.5.3"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="$HOME/.klei"
 dst_base_dir="$dst_conf_basedir/$dst_conf_dirname"
@@ -32,6 +32,7 @@ error(){ echo -e "${Error} $1"; }
 # Main menu
 Menu(){    
     while (true); do
+        Update_DST_Check
         echo -e "\e[33m==============欢迎使用饥荒联机版独立服务器脚本[Linux-Steam]($script_ver)==============\e[0m"
         echo
         echo -e "\e[33m作者：Ariwori        Bug反馈：${feedback_link}\e[0m"
@@ -376,15 +377,13 @@ Update_DST(){
     info "正在检查是否有更新可用！"
     game_cur_ver=$(cat $dst_server_dir/version.txt)
     Update_DST_Check
-    if [[ dst_need_update == "true" ]]; then
+    if [[ $dst_need_update == "true" ]]; then
         info "更新可用(${currentbuild}===>${availablebuild}！即将执行更新..."
-        dst_need_update=true
         Reboot_announce
         Close_server
         Install_Game
     else
         tip "无可用更新！当前Steam构建版本（$currentbuild）"
-        dst_need_update=false
     fi
     game_new_ver=$(cat $dst_server_dir/version.txt)
     if [[ "$game_cur_ver" != "$game_new_ver" ]]; then
@@ -978,6 +977,5 @@ if [[ $1 == "au" ]]; then
 fi
 # Run from here
 First_run_check
-Update_DST_Check
 Update_script
 Menu
