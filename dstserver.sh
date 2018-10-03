@@ -38,9 +38,9 @@ Menu(){
         echo -e "\e[33m本脚本一切权利归作者所有。未经许可禁止使用本脚本进行任何的商业活动！\e[0m"
         echo -e "\e[31m游戏服务端安装目录：$dst_server_dir (Version: $(cat $dst_server_dir/version.txt))\e[33m【$dst_need_update_str】\e[0m"
         echo
-        echo -e "\e[92m[1]启动服务器           [2]关闭服务器         [3]重启服务器\e[0m"  
-        echo -e "\e[92m[4]查看服务器状态       [5]添加或移除MOD      [6]设置管理员和黑名单\e[0m"
-        echo -e "\e[92m[7]控制台               [8]自动更新           [9]退出本脚本\e[0m"
+        echo -e "\e[92m[1]启动服务器           [2]关闭服务器           [3]重启服务器\e[0m"  
+        echo -e "\e[92m[4]查看服务器状态       [5]添加或移除MOD        [6]设置管理员和黑名单\e[0m"
+        echo -e "\e[92m[7]控制台               [8]自动更新             [9]退出本脚本\e[0m"
         echo -e "\e[92m[10]删除存档            [11]更新游戏服务端/MOD  [12]附加功能\e[0m"
         echo
         Simple_server_status
