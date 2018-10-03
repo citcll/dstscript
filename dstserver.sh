@@ -357,10 +357,12 @@ Auto_update(){
     fi
 }
 Update_DST_Check(){
-    appmanifestfile=$(find "$dst_server_dir" -type f -name "appmanifest_343050.acf")
-    currentbuild=$(grep buildid "${appmanifestfile}" | tr '[:blank:]"' ' ' | tr -s ' ' | cut -d\  -f3)
-    cd $HOME/steamcmd || exit
-    availablebuild=$(./steamcmd.sh +login "anonymous" +app_info_update 1 +app_info_print 343050 +app_info_print 343050 +quit | sed -n '/branch/,$p' | grep -m 1 buildid | tr -cd '[:digit:]')
+    if [ ! -f $data_dir/version.txt ]; then
+        touch $data_dir/version.txt
+    fi
+    # data from steam db
+    currentbuild=$(cat $data_dir/version.txt)
+    availablebuild=$(curl -s https://steamdb.info/app/322330/history/ | grep -A 1 'Last Change Number' | tail -1 | cut -d / -f3)
     if [ "${currentbuild}" != "${availablebuild}" ]; then
         dst_need_update=true
         dst_need_update_str="需要更新"
@@ -371,7 +373,8 @@ Update_DST_Check(){
 }
 Update_DST(){
     serveropen=$(grep "serveropen" $server_conf_file | cut -d "=" -f2)
-        info "正在检查是否有更新可用！"
+    info "正在检查是否有更新可用！"
+    game_cur_ver=$(cat $dst_server_dir/version.txt)
     Update_DST_Check
     if [[ dst_need_update == "true" ]]; then
         info "更新可用(${currentbuild}===>${availablebuild}！即将执行更新..."
@@ -382,6 +385,10 @@ Update_DST(){
     else
         tip "无可用更新！当前Steam构建版本（$currentbuild）"
         dst_need_update=false
+    fi
+    game_new_ver=$(cat $dst_server_dir/version.txt)
+    if [[ "$game_cur_ver" != "$game_new_ver" ]]; then
+        echo $availablebuild > $data_dir/version.txt
     fi
     if [[ $serveropen == "true" && dst_need_update == "true" ]]; then
         Run_server
