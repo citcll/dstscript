@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.4.9"
+script_ver="1.5.0"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="$HOME/.klei"
 dst_base_dir="$dst_conf_basedir/$dst_conf_dirname"
@@ -36,7 +36,7 @@ Menu(){
         echo
         echo -e "\e[33m作者：Ariwori        Bug反馈：${feedback_link}\e[0m"
         echo -e "\e[33m本脚本一切权利归作者所有。未经许可禁止使用本脚本进行任何的商业活动！\e[0m"
-        echo -e "\e[31m游戏服务端安装目录：$dst_server_dir (Version: $(cat $dst_server_dir/version.txt))\e[0m"
+        echo -e "\e[31m游戏服务端安装目录：$dst_server_dir (Version: $(cat $dst_server_dir/version.txt))\e[33m【$dst_need_update_str】\e[0m"
         echo
         echo -e "\e[92m[1]启动服务器           [2]关闭服务器         [3]重启服务器\e[0m"  
         echo -e "\e[92m[4]查看服务器状态       [5]添加或移除MOD      [6]设置管理员和黑名单\e[0m"
@@ -362,6 +362,18 @@ Update_DST_Check(){
     cd $HOME/steamcmd || exit
     availablebuild=$(./steamcmd.sh +login "anonymous" +app_info_update 1 +app_info_print 343050 +app_info_print 343050 +quit | sed -n '/branch/,$p' | grep -m 1 buildid | tr -cd '[:digit:]')
     if [ "${currentbuild}" != "${availablebuild}" ]; then
+        dst_need_update=true
+        dst_need_update_str="需要更新"
+    else
+        dst_need_update=false
+        dst_need_update_str="无需更新"
+    fi
+}
+Update_DST(){
+    serveropen=$(grep "serveropen" $server_conf_file | cut -d "=" -f2)
+        info "正在检查是否有更新可用！"
+    Update_DST_Check
+    if [[ dst_need_update == "true" ]]; then
         info "更新可用(${currentbuild}===>${availablebuild}！即将执行更新..."
         dst_need_update=true
         Reboot_announce
@@ -371,10 +383,6 @@ Update_DST_Check(){
         tip "无可用更新！当前Steam构建版本（$currentbuild）"
         dst_need_update=false
     fi
-}
-Update_DST(){
-    serveropen=$(grep "serveropen" $server_conf_file | cut -d "=" -f2)
-    Update_DST_Check
     if [[ $serveropen == "true" && dst_need_update == "true" ]]; then
         Run_server
     fi
@@ -949,7 +957,7 @@ Simple_server_status(){
     fi
     cluster_name="无"
     [ -f $dst_base_dir/$cluster/cluster.ini ] && cluster_name=$(cat $dst_base_dir/$cluster/cluster.ini | grep "^cluster_name" | cut -d "=" -f2)
-    echo -e "\e[33m存档：【$cluster】    地面：【$master_on】    洞穴：【$caves_on】    名称：【$cluster_name】\e[0m"
+    echo -e "\e[33m存档：【$cluster】 地面：【$master_on】 洞穴：【$caves_on】 名称：【$cluster_name】\e[0m"
 }
 ####################################################################################
 if [[ $1 == "au" ]]; then
