@@ -502,7 +502,7 @@ Close_server(){
 }
 Exit_auto_update(){
     if tmux has-session -t Auto_update > /dev/null 2>&1; then
-        tmux kill-session -t Auto_update
+        tmux kill-session -t Auto_update > /dev/null 2>&1
     fi
     info "自动更新进程已停止运行 ..."
 }
@@ -911,7 +911,7 @@ Update_script(){
     done
     if [[ "$need_update" == "true" ]]; then Show_changelog; fi
     if [[ "$need_exit" == "true" ]]; then
-        tmux kill-session -t Auto_update
+        tmux kill-session -t Auto_update > /dev/null 2>&1
         tip "因脚本已更新，自动更新进程已退出，如需要请重新开启！"
         exit 0
     fi
