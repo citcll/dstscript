@@ -277,6 +277,7 @@ Delmod(){
     while (true); do
         read modid
         if [[ "$modid" == "0" ]]; then
+            info "MOD删除完毕！"
             break
         else
             Truemodid
