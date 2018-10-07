@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.5.6"
+script_ver="1.5.7"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="$HOME/.klei"
 dst_base_dir="$dst_conf_basedir/$dst_conf_dirname"
@@ -610,17 +610,17 @@ Set_serverini(){
 Set_world(){
     info "是否修改地上世界配置？：1.是 2.否（默认为上次配置）"
     read wc
+    configure_file="$data_dir/masterleveldata.txt"
+    data_file="$dst_base_dir/$cluster/Master/leveldataoverride.lua"
     if [ $wc -ne 2 ]; then
-        configure_file="$data_dir/masterleveldata.txt"
-        data_file="$dst_base_dir/$cluster/Master/leveldataoverride.lua"
         Set_world_config
     fi
     Write_in master
     info "是否修改洞穴世界配置？：1.是 2.否（同上）"
     read cw
+    configure_file="$data_dir/cavesleveldata.txt"
+    data_file="$dst_base_dir/$cluster/Caves/leveldataoverride.lua"
     if [ $cw -ne 2 ]; then
-        configure_file="$data_dir/cavesleveldata.txt"
-        data_file="$dst_base_dir/$cluster/Caves/leveldataoverride.lua"
         Set_world_config
     fi
     Write_in caves
