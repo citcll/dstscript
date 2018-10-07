@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.5.7"
+script_ver="1.5.8"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="$HOME/.klei"
 dst_base_dir="$dst_conf_basedir/$dst_conf_dirname"
@@ -908,13 +908,13 @@ Update_script(){
             if [[ "$file" == "dstserver.sh" ]]; then need_exit="true"; fi
             need_update="true"
         fi
-        if [[ "$need_exit" == "true" ]]; then
-            tmux kill-session -t Auto_update
-            tip "因脚本已更新，自动更新进程已退出，如需要请重新开启！"
-            exit 0
-        fi
     done
     if [[ "$need_update" == "true" ]]; then Show_changelog; fi
+    if [[ "$need_exit" == "true" ]]; then
+        tmux kill-session -t Auto_update
+        tip "因脚本已更新，自动更新进程已退出，如需要请重新开启！"
+        exit 0
+    fi
 }
 # MOD update check
 Update_DST_MOD(){
