@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.5.4"
+script_ver="1.5.5"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="$HOME/.klei"
 dst_base_dir="$dst_conf_basedir/$dst_conf_dirname"
@@ -52,7 +52,8 @@ Menu(){
             1)
             Start_server;;
             2)
-            Close_server;;
+            Close_server
+            Exit_auto_update;;
             3)
             Reboot_server;;
             4)
@@ -430,6 +431,7 @@ Reboot_announce(){
 Start_server(){
     info "本操作将会关闭已开启的服务器 ..."
     Close_server
+    Exit_auto_update
     echo -e "\e[92m是否新建存档: [y|n] (默认: y): \e[0m\c"
     read yn
     [[ -z "${yn}" ]] && yn="y"
@@ -495,7 +497,6 @@ Close_server(){
         sleep 5
         info "服务器未开启！"
     fi
-    Exit_auto_update
     exchangestatus false
 }
 Exit_auto_update(){
@@ -920,7 +921,7 @@ Update_DST_MOD(){
     for modid in $(cat $data_dir/mods_setup.lua | grep "ServerModSetup" | cut -d '"' -f2); do
         mod_new_ver=$(curl -s ${mod_api_link}?modid=$modid)
         if [ -f $dst_server_dir/mods/workshop-$modid/modinfo.lua ]; then
-            echo "fuc=getver" > $data_dir/modinfo.lua
+            echo "fuc=\"getver\"" > $data_dir/modinfo.lua
             cat $dst_server_dir/mods/workshop-$modid/modinfo.lua >> $data_dir/modinfo.lua
             cd $data_dir
             mod_cur_ver=$(lua modconf.lua)
@@ -928,7 +929,7 @@ Update_DST_MOD(){
             mod_cur_ver=$mod_new_ver
         fi
         if [[ $mod_cur_ver != $mod_new_ver ]]; then
-            info "MOD 有更新，即将重启更新 ..."
+            info "MOD 有更新($modid[$mod_cur_ver ==> $mod_new_ver])，即将重启更新 ..."
             Reboot_server
             break
         fi
