@@ -929,7 +929,7 @@ Update_DST_MOD(){
         else
             mod_cur_ver=$mod_new_ver
         fi
-        if [[ $mod_cur_ver != $mod_new_ver ]]; then
+        if [[ $mod_cur_ver != "" && $mod_new_ver != "" && $mod_new_ver != "nil" $mod_cur_ver != $mod_new_ver ]]; then
             info "MOD 有更新($modid[$mod_cur_ver ==> $mod_new_ver])，即将重启更新 ..."
             Reboot_server
             break
