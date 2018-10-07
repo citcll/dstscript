@@ -41,7 +41,7 @@ Menu(){
         echo
         echo -e "\e[92m[1]启动服务器           [2]关闭服务器           [3]重启服务器\e[0m"  
         echo -e "\e[92m[4]查看服务器状态       [5]添加或移除MOD        [6]设置管理员和黑名单\e[0m"
-        echo -e "\e[92m[7]控制台               [8]自动更新             [9]退出本脚本\e[0m"
+        echo -e "\e[92m[7]控制台               [8]自动更新及异常维护   [9]退出本脚本\e[0m"
         echo -e "\e[92m[10]删除存档            [11]更新游戏服务端/MOD  [12]附加功能\e[0m"
         echo
         Simple_server_status
@@ -267,9 +267,9 @@ Delmodfromshard(){
         upnum=$(($up - 1))
         downnum=$(($down - 2))
         sed -i "$upnum,${downnum}d" "$dst_base_dir/$cluster/$shard/modoverrides.lua"
-        echo "地上世界该Mod($moddir)已停用！"
+        echo "$shard世界该Mod($moddir)已停用！"
     else
-        echo "地上世界该Mod($moddir)未启用！"
+        echo "$shard世界该Mod($moddir)未启用！"
     fi
 }
 Delmod(){
