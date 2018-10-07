@@ -113,6 +113,6 @@ if fuc == "list" then
     list()
 elseif fuc == "getver" then
     getver()
-elseif fuc == "writein"
+elseif fuc == "writein" then
     writein()
 end
