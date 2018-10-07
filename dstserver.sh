@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.5.3"
+script_ver="1.5.4"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="$HOME/.klei"
 dst_base_dir="$dst_conf_basedir/$dst_conf_dirname"
@@ -378,12 +378,12 @@ Update_DST(){
     game_cur_ver=$(cat $dst_server_dir/version.txt)
     Update_DST_Check
     if [[ $dst_need_update == "true" ]]; then
-        info "更新可用(${currentbuild}===>${availablebuild}！即将执行更新..."
+        info "更新可用(${currentbuild}===>${availablebuild})！即将执行更新..."
         Reboot_announce
         Close_server
         Install_Game
     else
-        tip "无可用更新！当前Steam构建版本（$currentbuild）"
+        tip "无可用更新！当前SteamDB版本（$currentbuild）"
     fi
     game_new_ver=$(cat $dst_server_dir/version.txt)
     if [[ "$game_cur_ver" != "$game_new_ver" ]]; then
@@ -927,7 +927,7 @@ Update_DST_MOD(){
         else
             mod_cur_ver=$mod_new_ver
         fi
-        if [ $mod_cur_ver != $mod_new_ver ]; then
+        if [[ $mod_cur_ver != $mod_new_ver ]]; then
             info "MOD 有更新，即将重启更新 ..."
             Reboot_server
             break

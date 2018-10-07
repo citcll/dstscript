@@ -1,4 +1,4 @@
--- script_ver="1.2.2"
+-- script_ver="1.2.3"
 require "modinfo"
 
 function list()
@@ -113,6 +113,6 @@ if fuc == "list" then
     list()
 elseif fuc == "getver" then
     getver()
-else
+elseif fuc == "writein"
     writein()
 end
