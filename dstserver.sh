@@ -862,7 +862,7 @@ Update_DST_MOD_Check(){
             MOD_update="true"
             break
         else
-            info "MOD 无更新！"
+            info "MOD ($modid) 无更新！"
         fi
     done
 }
