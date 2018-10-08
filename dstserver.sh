@@ -900,7 +900,7 @@ Simple_server_status(){
     fi
     cluster_name="无"
     [ -f $dst_base_dir/$cluster/cluster.ini ] && cluster_name=$(cat $dst_base_dir/$cluster/cluster.ini | grep "^cluster_name" | cut -d "=" -f2)
-    echo -e "\e[33m存档:【$cluster】 地面:【$master_on】 洞穴:【$caves_on】 名称:【$cluster_name】 自动更新维护：【$auto_on】\e[0m"
+    echo -e "\e[33m存档:【$cluster】 地面:【$master_on】 洞穴:【$caves_on】 名称:【$cluster_name】\n自动更新维护：【$auto_on】\e[0m"
 }
 Fix_Net_hosts(){
     sudo chmod 666 /etc/hosts
