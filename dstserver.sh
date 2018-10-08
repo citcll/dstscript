@@ -236,14 +236,14 @@ Addmod(){
 }
 Addmodtoshard(){
     if [[ $(grep "$moddir" "$dst_base_dir/$cluster/$shard/modoverrides.lua") > 0 ]]; then
-        echo "地上世界该Mod($moddir)已添加"
+        echo "$shard世界该Mod($moddir)已添加"
     else
         sed -i '1d' $dst_base_dir/$cluster/$shard/modoverrides.lua
         cat $dst_base_dir/$cluster/$shard/modoverrides.lua > $data_dir/modconftemp.txt
         echo "return {" > $dst_base_dir/$cluster/$shard/modoverrides.lua
         cat $data_dir/modconfwrite.lua >> $dst_base_dir/$cluster/$shard/modoverrides.lua
         cat $data_dir/modconftemp.txt >> $dst_base_dir/$cluster/$shard/modoverrides.lua
-        echo "地上世界Mod($moddir)添加完成"
+        echo "$shard世界Mod($moddir)添加完成"
     fi
 }
 Truemodid(){
