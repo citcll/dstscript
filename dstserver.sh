@@ -915,7 +915,7 @@ Update_MOD(){
         Download_MOD
     fi
 }
-Download_MOD{
+Download_MOD(){
     info "正在安装/更新新添加的MOD，请稍候 。。。"
     if tmux has-session -t DST_MODUPDATE > /dev/null 2>&1; then
         tmux kill-session -t DST_MODUPDATE
