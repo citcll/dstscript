@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.6.0"
+script_ver="1.6.1"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="$HOME/.klei"
 dst_base_dir="$dst_conf_basedir/$dst_conf_dirname"
@@ -23,16 +23,15 @@ Green_font_prefix="\033[32m"
 Red_font_prefix="\033[31m"
 Yellow_font_prefix="\033[33m"
 Font_color_suffix="\033[0m"
-Info="${Green_font_prefix}[信息]${Font_color_suffix}"
-Error="${Red_font_prefix}[错误]${Font_color_suffix}"
-Tip="${Yellow_font_prefix}[注意]${Font_color_suffix}"
+Info="${Green_font_prefix}[Info]${Font_color_suffix}"
+Error="${Red_font_prefix}[Error]${Font_color_suffix}"
+Tip="${Yellow_font_prefix}[Tips]${Font_color_suffix}"
 info(){ echo -e "${Info} $1"; }
 tip(){ echo -e "${Tip} $1"; }
 error(){ echo -e "${Error} $1"; }
 # Main menu
 Menu(){    
     while (true); do
-        Update_DST_Check
         echo -e "\e[33m==============欢迎使用饥荒联机版独立服务器脚本[Linux-Steam]($script_ver)==============\e[0m"
         echo
         echo -e "\e[33m作者：Ariwori        Bug反馈：${feedback_link}\e[0m"
@@ -42,7 +41,7 @@ Menu(){
         echo -e "\e[92m[1]启动服务器           [2]关闭服务器           [3]重启服务器\e[0m"  
         echo -e "\e[92m[4]查看服务器状态       [5]添加或移除MOD        [6]设置管理员和黑名单\e[0m"
         echo -e "\e[92m[7]控制台               [8]自动更新及异常维护   [9]退出本脚本\e[0m"
-        echo -e "\e[92m[10]删除存档            [11]更新游戏服务端/MOD  \e[0m" #[12]附加功能
+        echo -e "\e[92m[10]删除存档            [11]更新游戏服务端/MOD  \e[0m"
         echo
         Simple_server_status
         echo -e "\e[33m================================================================================\e[0m"
@@ -72,8 +71,6 @@ Menu(){
             Cluster_manager;;
             11)
             Update_DST;;
-            #12)
-            #Addon_function;;
         esac
     done
 }
@@ -88,77 +85,6 @@ Server_detail(){
 Server_console(){
     Not_work_now
 }
-# Addon_function(){
-#     echo -e "你要\n    1.修改DNS\n    2.修改s3.amazonaws.com的hosts记录"
-#     read addon
-#     case $addon in
-#         1)
-#         Change_DNS;;
-#         2)
-#         Fix_S3;;
-#         *)
-#         tip "输入有误！请输入[1-2]";;
-#     esac
-# }
-# Fix_S3(){
-#     info "修改s3.amazonaws.com的hosts记录可能可以解决近期服务器搜不到，洞穴开不了的问题"
-#     tip "在线获取s3.amazonaws.com的可用hosts记录不可用请反馈，我会再找个能用的，你也可以自己找"
-#     echo -e "你要\n    1.在线获取s3.amazonaws.com的可用hosts记录(该hosts不一定适用于所有服务器)\n    2.修改为自己获取的可用hosts记录\n    3.还原默认hosts"
-#     read hs
-#     sudo chmod 666 /etc/hosts
-#     if [ ! -f /etc/hosts.bak ]; then
-#         sudo cp -rf /etc/hosts /etc/hosts.bak
-#         info "已创建默认DNS解析服务器备份 /etc/hosts.bak"
-#     fi
-#     sudo cp -rf /etc/hosts.bak /etc/hosts
-#     case $hs in
-#         1)
-#         curl -s $update_link/dstscript/s3hosts.txt >> /etc/hosts;;
-#         2)
-#         read -p "请输入你的s3.amazonaws.com的可用IP" hosts
-#         echo "$hosts s3.amazonaws.com" >> /etc/hosts;;
-#         3)
-#         sudo cp -rf /etc/hosts.bak /etc/hosts;;
-#         *)
-#         tip "输入有误！请输入[1-3]";;
-#     esac
-#     info "s3.amazonaws.com的hosts记录修改完成！当前hosts记录如下："
-#     cat /etc/hosts
-#     sudo chmod 644 /etc/hosts
-# }
-# Change_DNS(){
-#     tip "修改DNS可能可以解决由网络（墙）引起的问题，有这方面问题可以尝试，修改后有异常可以还原"
-#     read -p "你要 1.修改DNS为谷歌DNS  2.修改DNS为自定义DNS  3.还原默认DNS" dns
-#     sudo chattr -i /etc/resolv.conf
-#     sudo chmod 666 /etc/resolv.conf
-#     if [ ! -f /etc/resolv.conf.bak ]; then
-#         sudo cp -rf /etc/resolv.conf /etc/resolv.conf.bak
-#         info "已创建默认DNS解析服务器备份 /etc/resolv.conf.bak"
-#     fi
-#     sudo cp -rf /etc/resolv.conf.bak /etc/resolv.conf
-#     case $dns in
-#         1)
-#         cat > /etc/resolv.conf<<-EOF
-# nameserver 8.8.8.8
-# nameserver 8.8.4.4
-# EOF
-#         ;;
-#         2)
-#         read -p "请输入你的主要DNS服务器IP" dns1
-#         read -p "请输入你的备用DNS服务器IP" dns2
-#         cat > /etc/resolv.conf<<-EOF
-# nameserver $dns1
-# nameserver $dns2
-# EOF
-#         ;;
-#         3)
-#         sudo cp -rf /etc/resolv.conf.bak /etc/resolv.conf
-#     esac
-#     info "DNS解析服务器修改完成！当前DNS解析服务器如下："
-#     cat /etc/resolv.conf
-#     sudo chmod 644 /etc/resolv.conf
-#     sudo chattr +i /etc/resolv.conf
-# }
 MOD_manager(){
     [ -z $cluster ] && cluster=$(cat $server_conf_file | grep "^cluster" | cut -d "=" -f2)
     read -p "你要 1.添加mod  2.删除mod 【存档：$cluster】:" mc
@@ -360,7 +286,8 @@ Auto_update(){
     fi
 }
 Update_DST_Check(){
-    # data from klei froums
+    # data from klei forums
+    info "Checking if the game is updated from the klei forums... please wait!"
     currentbuild=$(cat $dst_server_dir/version.txt)
     availablebuild=$(curl -s https://forums.kleientertainment.com/game-updates/dst/ | grep 'data-releaseID=' | cut -d '/' -f6 | cut -d "-" -f1 | sort | tail -n 1)
     if [ "${currentbuild}" != "${availablebuild}" ]; then
@@ -373,7 +300,6 @@ Update_DST_Check(){
 }
 Update_DST(){
     serveropen=$(grep "serveropen" $server_conf_file | cut -d "=" -f2)
-    info "正在检查是否有更新可用！"
     Update_DST_Check
     if [[ $dst_need_update == "true" ]]; then
         info "更新可用(${currentbuild}===>${availablebuild})！即将执行更新..."
@@ -983,4 +909,5 @@ fi
 First_run_check
 Fix_Net_hosts
 Update_script
+Update_DST_Check
 Menu
