@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.6.1"
+script_ver="1.6.2"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="$HOME/.klei"
 dst_base_dir="$dst_conf_basedir/$dst_conf_dirname"
@@ -41,7 +41,7 @@ Menu(){
         echo -e "\e[92m[1]启动服务器           [2]关闭服务器           [3]重启服务器\e[0m"  
         echo -e "\e[92m[4]查看服务器状态       [5]添加或移除MOD        [6]设置管理员和黑名单\e[0m"
         echo -e "\e[92m[7]控制台               [8]自动更新及异常维护   [9]退出本脚本\e[0m"
-        echo -e "\e[92m[10]删除存档            [11]更新游戏服务端/MOD  \e[0m"
+        echo -e "\e[92m[10]删除存档            [11]更新游戏服务端      [12]更新MOD\e[0m"
         echo
         Simple_server_status
         echo -e "\e[33m================================================================================\e[0m"
@@ -71,6 +71,8 @@ Menu(){
             Cluster_manager;;
             11)
             Update_DST;;
+            12)
+            Update_MOD;;
         esac
     done
 }
@@ -106,7 +108,14 @@ used = \"$used\"" > "$data_dir/modinfo.lua"
     if [[ -f "$dst_server_dir/mods/$moddir/modinfo.lua" ]]; then
         cat "${dst_server_dir}/mods/$moddir/modinfo.lua" >> "$data_dir/modinfo.lua"
     else
-        echo "name = \"UNKNOWN\"" >> "$data_dir/modinfo.lua"
+        needdownloadid=$(echo $moddir | cut -d "-" -f2)
+        echo "ServerModSetup(\"$needdownloadid\")" > $dst_server_dir/mods/dedicated_server_mods_setup.lua
+        Download_MOD
+        if [[ -f "$dst_server_dir/mods/$moddir/modinfo.lua" ]]; then
+            cat "${dst_server_dir}/mods/$moddir/modinfo.lua" >> "$data_dir/modinfo.lua"
+        else
+            echo "name = \"UNKNOWN\"" >> "$data_dir/modinfo.lua"
+        fi
     fi
     cd $data_dir
     lua $data_dir/modconf.lua
@@ -390,7 +399,7 @@ Start_server(){
 }
 Choose_exit_cluster(){
     echo -e "\e[92m已有存档：\e[0m"
-    ls -l $dst_base_dir | awk '/^d/ {print $NF}' > /tmp/dirlist.txt
+    ls -l $dst_base_dir | awk '/^d/ {print $NF}' | grep -v Cluster_1 > /tmp/dirlist.txt
     index=1
     for dirlist in $(cat /tmp/dirlist.txt); do
         echo "$index. $dirlist"
@@ -835,8 +844,9 @@ Update_script(){
     fi
 }
 # MOD update check
-Update_DST_MOD(){
+Update_DST_MOD_Check(){
     info "检查启用的创意工坊MOD是否有更新 ..."
+    MOD_update="false"
     for modid in $(cat $data_dir/mods_setup.lua | grep "ServerModSetup" | cut -d '"' -f2); do
         mod_new_ver=$(curl -s ${mod_api_link}?modid=$modid)
         if [ -f $dst_server_dir/mods/workshop-$modid/modinfo.lua ]; then
@@ -849,8 +859,10 @@ Update_DST_MOD(){
         fi
         if [[ $mod_cur_ver != "" && $mod_new_ver != "" && $mod_new_ver != "nil" && $mod_cur_ver != $mod_new_ver ]]; then
             info "MOD 有更新($modid[$mod_cur_ver ==> $mod_new_ver])，即将重启更新 ..."
-            Reboot_server
+            MOD_update="true"
             break
+        else
+            info "MOD 无更新！"
         fi
     done
 }
@@ -895,11 +907,35 @@ Fix_Net_hosts(){
     fi
     sudo chmod 644 /etc/hosts
 }
+Update_MOD{
+    cluster=$(cat $server_conf_file | grep "^cluster" | cut -d "=" -f2)
+    Setup_mod
+    Update_DST_MOD_Check
+    if [[ $MOD_update == "true" ]]; then
+        Download_MOD
+    fi
+}
+Download_MOD{
+    info "正在安装/更新新添加的MOD，请稍候 。。。"
+    if tmux has-session -t DST_MODUPDATE > /dev/null 2>&1; then
+        tmux kill-session -t DST_MODUPDATE
+    fi
+    cd $dst_server_dir/bin || exit 1
+    tmux new-session -s DST_MODUPDATE -d "$dst_bin_cmd"
+    while (true) do
+        if [[ $(grep "Your Server Will Not Start" -c "$dst_base_dir/Cluster_1/Master/server_log.txt") > 0 ]]; then
+            info "新MOD安装/更新完毕！"
+            tmux kill-session -t DST_MODUPDATE
+            break
+        fi
+    done
+}
 ####################################################################################
 if [[ $1 == "au" ]]; then
     while (true); do
         Update_DST
-        Update_DST_MOD
+        Update_DST_MOD_Check
+        if [[ $MOD_update == "true" ]]; then Reboot_server; fi
         Status_keep
         info "每半小时进行一次更新检测。。。"
         sleep 1800
