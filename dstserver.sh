@@ -907,7 +907,7 @@ Fix_Net_hosts(){
     fi
     sudo chmod 644 /etc/hosts
 }
-Update_MOD{
+Update_MOD(){
     cluster=$(cat $server_conf_file | grep "^cluster" | cut -d "=" -f2)
     Setup_mod
     Update_DST_MOD_Check
