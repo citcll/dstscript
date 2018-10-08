@@ -1,4 +1,4 @@
--- script_ver="1.2.3"
+-- script_ver="1.2.4"
 require "modinfo"
 
 -- Addon function
