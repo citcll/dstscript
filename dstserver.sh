@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.5.8"
+script_ver="1.5.9"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="$HOME/.klei"
 dst_base_dir="$dst_conf_basedir/$dst_conf_dirname"
@@ -360,12 +360,9 @@ Auto_update(){
     fi
 }
 Update_DST_Check(){
-    if [ ! -f $data_dir/version.txt ]; then
-        touch $data_dir/version.txt
-    fi
-    # data from steam db
-    currentbuild=$(cat $data_dir/version.txt)
-    availablebuild=$(curl -s https://steamdb.info/app/322330/history/ | grep -A 1 'Last Change Number' | tail -1 | cut -d / -f3)
+    # data from klei froums
+    currentbuild=$(cat $dst_server_dir/version.txt)
+    availablebuild=$(curl -s https://forums.kleientertainment.com/game-updates/dst/ | grep 'data-releaseID=' | cut -d '/' -f6 | cut -d "-" -f1 | sort | tail -n 1)
     if [ "${currentbuild}" != "${availablebuild}" ]; then
         dst_need_update=true
         dst_need_update_str="需要更新"
@@ -377,7 +374,6 @@ Update_DST_Check(){
 Update_DST(){
     serveropen=$(grep "serveropen" $server_conf_file | cut -d "=" -f2)
     info "正在检查是否有更新可用！"
-    game_cur_ver=$(cat $dst_server_dir/version.txt)
     Update_DST_Check
     if [[ $dst_need_update == "true" ]]; then
         info "更新可用(${currentbuild}===>${availablebuild})！即将执行更新..."
@@ -385,11 +381,7 @@ Update_DST(){
         Close_server
         Install_Game
     else
-        tip "无可用更新！当前SteamDB版本（$currentbuild）"
-    fi
-    game_new_ver=$(cat $dst_server_dir/version.txt)
-    if [[ "$game_cur_ver" != "$game_new_ver" ]]; then
-        echo $availablebuild > $data_dir/version.txt
+        tip "无可用更新！当前版本（$currentbuild）"
     fi
     if [[ $serveropen == "true" && dst_need_update == "true" ]]; then
         Run_server
@@ -967,6 +959,16 @@ Simple_server_status(){
     [ -f $dst_base_dir/$cluster/cluster.ini ] && cluster_name=$(cat $dst_base_dir/$cluster/cluster.ini | grep "^cluster_name" | cut -d "=" -f2)
     echo -e "\e[33m存档:【$cluster】 地面:【$master_on】 洞穴:【$caves_on】 名称:【$cluster_name】\e[0m"
 }
+Fix_Net_hosts(){
+    sudo chmod 666 /etc/hosts
+    if ! grep steamusercontent-a.akamaihd.net -e /etc/hosts > /dev/null 2>&1; then
+        echo "72.246.103.17 steamusercontent-a.akamaihd.net" >> /etc/hosts
+    fi
+    if ! grep s3.amazonaws.com -e /etc/hosts > /dev/null 2>&1; then
+        echo "52.216.136.5 s3.amazonaws.com" >> /etc/hosts
+    fi
+    sudo chmod 644 /etc/hosts
+}
 ####################################################################################
 if [[ $1 == "au" ]]; then
     while (true); do
@@ -979,5 +981,6 @@ if [[ $1 == "au" ]]; then
 fi
 # Run from here
 First_run_check
+Fix_Net_hosts
 Update_script
 Menu
