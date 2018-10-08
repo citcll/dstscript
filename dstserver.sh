@@ -910,4 +910,5 @@ First_run_check
 Fix_Net_hosts
 Update_script
 Update_DST_Check
+clear
 Menu
