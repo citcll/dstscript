@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.5.9"
+script_ver="1.6.0"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="$HOME/.klei"
 dst_base_dir="$dst_conf_basedir/$dst_conf_dirname"
@@ -961,10 +961,10 @@ Simple_server_status(){
 }
 Fix_Net_hosts(){
     sudo chmod 666 /etc/hosts
-    if ! grep steamusercontent-a.akamaihd.net -e /etc/hosts > /dev/null 2>&1; then
+    if ! grep steamusercontent-a.akamaihd.net /etc/hosts > /dev/null 2>&1; then
         echo "72.246.103.17 steamusercontent-a.akamaihd.net" >> /etc/hosts
     fi
-    if ! grep s3.amazonaws.com -e /etc/hosts > /dev/null 2>&1; then
+    if ! grep s3.amazonaws.com /etc/hosts > /dev/null 2>&1; then
         echo "52.216.136.5 s3.amazonaws.com" >> /etc/hosts
     fi
     sudo chmod 644 /etc/hosts
