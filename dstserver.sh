@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.6.2"
+script_ver="1.6.3"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="$HOME/.klei"
 dst_base_dir="$dst_conf_basedir/$dst_conf_dirname"
@@ -110,7 +110,7 @@ used = \"$used\"" > "$data_dir/modinfo.lua"
     else
         needdownloadid=$(echo $moddir | cut -d "-" -f2)
         echo "ServerModSetup(\"$needdownloadid\")" > $dst_server_dir/mods/dedicated_server_mods_setup.lua
-        Download_MOD
+        if [[ $fuc == "writein" ]]; then Download_MOD; fi
         if [[ -f "$dst_server_dir/mods/$moddir/modinfo.lua" ]]; then
             cat "${dst_server_dir}/mods/$moddir/modinfo.lua" >> "$data_dir/modinfo.lua"
         else
@@ -893,9 +893,14 @@ Simple_server_status(){
     else
         caves_on="关闭"
     fi
+    if tmux has-session -t Auto_update > /dev/null 2>&1; then
+        auto_on="开启"
+    else
+        auto_on="关闭"
+    fi
     cluster_name="无"
     [ -f $dst_base_dir/$cluster/cluster.ini ] && cluster_name=$(cat $dst_base_dir/$cluster/cluster.ini | grep "^cluster_name" | cut -d "=" -f2)
-    echo -e "\e[33m存档:【$cluster】 地面:【$master_on】 洞穴:【$caves_on】 名称:【$cluster_name】\e[0m"
+    echo -e "\e[33m存档:【$cluster】 地面:【$master_on】 洞穴:【$caves_on】 名称:【$cluster_name】 自动更新维护：【$auto_on】\e[0m"
 }
 Fix_Net_hosts(){
     sudo chmod 666 /etc/hosts
