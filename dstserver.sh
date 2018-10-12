@@ -108,7 +108,7 @@ Server_console(){
 }
 MOD_manager(){
     [ -z ${cluster} ] && cluster=$(cat ${server_conf_file} | grep "^cluster" | cut -d "=" -f2)
-    read -p "你要 1.添加mod  2.删除mod 【存档：${cluster}】:" mc
+    read -p "【存档：${cluster}】 你要 1.添加mod  2.删除mod" mc
     case ${mc} in
         1)
         Listallmod
