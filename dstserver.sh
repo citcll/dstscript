@@ -1078,6 +1078,10 @@ Fix_Net_hosts(){
     then
         echo "52.216.136.5 s3.amazonaws.com" >> /etc/hosts
     fi
+    if ! grep steamcommunity.com /etc/hosts > /dev/null 2>&1
+    then
+        echo "23.222.167.249 steamcommunity.com" >> /etc/hosts
+    fi
     sudo chmod 644 /etc/hosts
 }
 Update_MOD(){
