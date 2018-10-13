@@ -1122,6 +1122,7 @@ if [[ $1 == "au" ]]; then
 fi
 # 移动根目录到隐藏目录
 if [ -d ${HOME}/dstscript ]
+then
     mv ${HOME}/dstscript ${HOME}/.dstscript
 fi
 # Run from here
