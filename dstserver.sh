@@ -6,7 +6,7 @@
 #    Blog: https://wqlin.com
 #===============================================================================
 script_ver="1.6.5"
-dst_conf_dirname="DoNotStarveTogether"   
+dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
 dst_server_dir="${HOME}/DSTServer"
@@ -29,31 +29,33 @@ Tip="${Yellow_font_prefix}[Tips]${Font_color_suffix}"
 info(){
     echo -e "${Info} $1"
 }
-tip(){ 
+tip(){
     echo -e "${Tip} $1"
 }
-error(){ 
+error(){
     echo -e "${Error} $1"
 }
 # Main menu
-Menu(){    
+Menu(){
     while (true)
     do
+        Simple_server_status
         echo -e "\e[33m==============欢迎使用饥荒联机版独立服务器脚本[Linux-Steam](${script_ver})==============\e[0m"
         echo
         echo -e "\e[33m作者：Ariwori        Bug反馈：${feedback_link}\e[0m"
         echo -e "\e[33m本脚本一切权利归作者所有。未经许可禁止使用本脚本进行任何的商业活动！\e[0m"
         echo -e "\e[31m游戏服务端安装目录：${dst_server_dir} (Version: $(cat ${dst_server_dir}/version.txt))\e[33m【${dst_need_update_str}】\e[0m"
         echo
-        echo -e "\e[92m[1]启动服务器           [2]关闭服务器           [3]重启服务器\e[0m"  
+        echo -e "\e[92m[1]启动服务器           [2]关闭服务器           [3]重启服务器\e[0m"
         echo -e "\e[92m[4]查看服务器状态       [5]添加或移除MOD        [6]设置管理员和黑名单\e[0m"
         echo -e "\e[92m[7]控制台               [8]自动更新及异常维护   [9]退出本脚本\e[0m"
         echo -e "\e[92m[10]删除存档            [11]更新游戏服务端      [12]更新MOD\e[0m"
         echo
-        Simple_server_status
+        echo -e "\e[33m存档:[${cluster}] 地面:[${master_on}] 洞穴:[${caves_on}] 名称:[${cluster_name}]\e[0m"
+        echo -e "\e[33m自动更新维护：[${auto_on}]\e[0m"
         echo -e "\e[33m================================================================================\e[0m"
         echo -e "\e[92m请输入命令代号：\e[0m\c"
-        read cmd  
+        read cmd
         case ${cmd} in
             1)
             Start_server
@@ -82,7 +84,7 @@ Menu(){
             ;;
             9)
             exit
-            ;;	
+            ;;
             10)
             Cluster_manager
             ;;
@@ -227,7 +229,7 @@ Addmodfunc(){
     fuc="writein"
     MOD_conf
     for shard in "Master" "Caves"
-    do 
+    do
         Addmodtoshard
     done
 }
@@ -257,7 +259,7 @@ Delmod(){
         else
             Truemodid
             for shard in "Master" "Caves"
-            do 
+            do
                 Delmodfromshard
             done
         fi
@@ -389,7 +391,7 @@ Reboot_server(){
 }
 exchangestatus(){
     if [ ! -f ${server_conf_file} ]
-    then 
+    then
         touch ${server_conf_file}
     fi
     if [ $(grep "serveropen" -c ${server_conf_file}) -eq 0 ]
@@ -411,11 +413,11 @@ Run_server(){
 }
 Reboot_announce(){
     if tmux has-session -t DST_Master > /dev/null 2>&1
-    then   									        
+    then
         tmux send-keys -t DST_Master "c_announce(\"服务器因改动或更新需要重启，预计耗时三分钟，给你带来的不便还请谅解！\")" C-m
     fi
     if tmux has-session -t DST_Caves > /dev/null 2>&1
-    then						        
+    then
         tmux send-keys -t DST_Caves "c_announce(\"服务器设因改动或更新需要重启，预计耗时三分钟，给你带来的不便还请谅解！\")" C-m
     fi
     sleep 5
@@ -432,7 +434,7 @@ Start_server(){
         echo -e "\e[92m请输入新建存档名称：（不要包含中文、符号和空格）\e[0m"
         read cluster
         if [ ! -d "${dst_base_dir}/${cluster}" ]
-        then 
+        then
             mkdir -p ${dst_base_dir}/${cluster}
             mkdir -p ${dst_base_dir}/${cluster}/Master
             mkdir -p ${dst_base_dir}/${cluster}/Caves
@@ -452,9 +454,9 @@ Start_server(){
     fi
     Set_list
     echo -e "\e[92m请选择要启动的世界：1.仅地上  2.仅洞穴  3.地上 + 洞穴 ?\e[0m\c"
-    read shard 
+    read shard
     case ${shard} in
-        1)		
+        1)
         shard="Master";;
         2)
         shard="Caves";;
@@ -472,7 +474,7 @@ Choose_exit_cluster(){
     do
         echo "${index}. ${dirlist}"
         let index++
-    done 
+    done
     echo -e "\e[92m请输入你要${cluster}_str的存档${Red_font_prefix}[编号]${Font_color_suffix}：\e[0m\c"
     read listnum
     cluster=$(cat /tmp/dirlist.txt | head -n ${listnum} | tail -n 1)
@@ -613,15 +615,15 @@ Set_token(){
 }
 Set_list(){
     if [ ! -f ${data_dir}/alist.txt ]
-    then 
+    then
         touch ${data_dir}/alist.txt
     fi
     if [ ! -f ${data_dir}/blist.txt ]
-    then 
+    then
         touch ${data_dir}/blist.txt
     fi
     if [ ! -f ${data_dir}/wlist.txt ]
-    then 
+    then
         touch ${data_dir}/wlist.txt
     fi
     cat ${data_dir}/alist.txt > ${dst_base_dir}/${cluster}/adminlist.txt
@@ -761,7 +763,7 @@ Default_mod(){
     echo 'return {
 -- 别删这个
 ["DONOTDELETE"]={ configuration_options={  }, enabled=true }
-}' > ${dst_base_dir}/${cluster}/Caves/modoverrides.lua	
+}' > ${dst_base_dir}/${cluster}/Caves/modoverrides.lua
 }
 Setup_mod(){
     touch ${data_dir}/mods_setup.lua
@@ -769,7 +771,7 @@ Setup_mod(){
     for moddir in ${dir}
     do
         if [[ $(grep "${moddir}" -c "${data_dir}/mods_setup.lua") = 0 ]]
-        then 
+        then
             echo "ServerModSetup(\"${moddir}\")" >> "${data_dir}/mods_setup.lua"
         fi
     done
@@ -815,7 +817,7 @@ Start_check(){
                 echo "服务器开启未成功，请执行关闭服务器命令后再次尝试，并注意令牌是否成功设置且有效。"
                 break
             fi
-        fi	
+        fi
         if ! tmux has-session -t DST_Master > /dev/null 2>&1 && tmux has-session -t DST_Caves > /dev/null 2>&1
         then
             if [[ $(grep "Sim paused" -c "${cavesserverlog_path}") > 0 ]]
@@ -828,8 +830,8 @@ Start_check(){
                 echo "服务器开启未成功，请执行关闭服务器命令后再次尝试，并注意令牌是否成功设置且有效。"
                 break
             fi
-        fi	
-    done 
+        fi
+    done
 }
 #############################################################################
 First_run_check(){
@@ -911,7 +913,7 @@ Install_Dependency(){
                 sudo apt update
                 sudo apt install -y lib32gcc1 libstdc++6 libstdc++6:i386 libcurl4-gnutls-dev:i386 tmux wget lua5.2
         else
-             sudo apt update   
+             sudo apt update
             sudo apt install -y libstdc++6 libcurl4-gnutls-dev tmux wget lua5.2
         fi
     else
@@ -925,7 +927,7 @@ Install_Dependency(){
 }
 # Install steamcmd
 Install_Steamcmd(){
-    wget "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" 
+    wget "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz"
     tar -xzvf steamcmd_linux.tar.gz -C ${HOME}/steamcmd
     chmod +x ${HOME}/steamcmd/steamcmd.sh
     rm steamcmd_linux.tar.gz
@@ -964,7 +966,7 @@ Update_script(){
     do
         new_ver=$(cat /tmp/filelist.txt | grep "${file}" | cut -d ":" -f2)
         if [[ "${file}" != "dstserver.sh" ]]
-        then 
+        then
             file=".dstscript/${file}"
         fi
         if [ -f ${HOME}/${file} ]
@@ -981,14 +983,14 @@ Update_script(){
             chmod +x ${HOME}/dstserver.sh
             info "${file} 已更新为最新版本[ ${new_ver} ] !"
             if [[ "${file}" == "dstserver.sh" ]]
-            then 
+            then
                 need_exit="true"
             fi
             need_update="true"
         fi
     done
     if [[ "${need_update}" == "true" ]]
-    then 
+    then
         Show_changelog
     fi
     if [[ "${need_exit}" == "true" ]]
@@ -1045,7 +1047,7 @@ Simple_server_status(){
     cluster="无"
     [ -f ${server_conf_file} ] && cluster=$(cat ${server_conf_file} | grep "^cluster" | cut -d "=" -f2)
     if tmux has-session -t DST_Master > /dev/null 2>&1
-    then 
+    then
         master_on="开启"
     else
         master_on="关闭"
@@ -1064,7 +1066,6 @@ Simple_server_status(){
     fi
     cluster_name="无"
     [ -f ${dst_base_dir}/${cluster}/cluster.ini ] && cluster_name=$(cat ${dst_base_dir}/${cluster}/cluster.ini | grep "^cluster_name" | cut -d "=" -f2)
-    echo -e "\e[33m存档:【${cluster}】 地面:【${master_on}】 洞穴:【${caves_on}】 名称:【${cluster_name}】\n自动更新维护：【${auto_on}】\e[0m"
 }
 Fix_Net_hosts(){
     sudo chmod 666 /etc/hosts
@@ -1112,7 +1113,7 @@ if [[ $1 == "au" ]]; then
         Update_DST
         Update_DST_MOD_Check
         if [[ ${MOD_update} == "true" ]]
-        then 
+        then
             Reboot_server
         fi
         Status_keep
