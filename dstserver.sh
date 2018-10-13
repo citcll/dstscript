@@ -5,13 +5,13 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.6.4"
+script_ver="1.6.5"
 dst_conf_dirname="DoNotStarveTogether"   
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
 dst_server_dir="${HOME}/DSTServer"
 dst_bin_cmd="./dontstarve_dedicated_server_nullrenderer"
-data_dir="${HOME}/dstscript"
+data_dir="${HOME}/.dstscript"
 dst_token_file="${data_dir}/clustertoken.txt"
 server_conf_file="${data_dir}/server.conf"
 dst_cluster_file="${data_dir}/clusterdata.txt"
@@ -965,7 +965,7 @@ Update_script(){
         new_ver=$(cat /tmp/filelist.txt | grep "${file}" | cut -d ":" -f2)
         if [[ "${file}" != "dstserver.sh" ]]
         then 
-            file="dstscript/${file}"
+            file=".dstscript/${file}"
         fi
         if [ -f ${HOME}/${file} ]
         then
@@ -1119,6 +1119,10 @@ if [[ $1 == "au" ]]; then
         info "每半小时进行一次更新检测。。。"
         sleep 1800
     done
+fi
+# 移动根目录到隐藏目录
+if [ -d ${HOME}/dstscript ]
+    mv ${HOME}/dstscript ${HOME}/.dstscript
 fi
 # Run from here
 First_run_check
