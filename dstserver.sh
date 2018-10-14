@@ -787,8 +787,8 @@ Start_shard(){
 Start_check(){
     masterserverlog_path="${dst_base_dir}/${cluster}/Master/server_log.txt"
     cavesserverlog_path="${dst_base_dir}/${cluster}/Caves/server_log.txt"
-    echo "" > ${masterserverlog_path}
-    echo "" > ${cavesserverlog_path}
+    echo "" > ${masterserverlog_path} > /dev/null 2>&1
+    echo "" > ${cavesserverlog_path} > /dev/null 2>&1
     while (true)
     do
         if tmux has-session -t DST_Master > /dev/null 2>&1 && tmux has-session -t DST_Caves > /dev/null 2>&1
@@ -1064,7 +1064,7 @@ Simple_server_status(){
         auto_on="关闭"
     fi
     cluster_name="无"
-    [ -f ${dst_base_dir}/${cluster}/cluster.ini ] && cluster_name=$(cat ${dst_base_dir}/${cluster}/cluster.ini | grep "^cluster_name" | cut -d "=" -f2)
+    [ -f ${dst_base_dir}/${cluster}/cluster.ini ] && cluster_name=$(cat ${dst_base_dir}/${cluster}/cluster.ini | grep "^cluster_name" | cut -d " " -f3-20)
     echo "存档:[${cluster}] 地面:[${master_on}] 洞穴:[${caves_on}] 名称:[${cluster_name}]" > $data_dir/server_status.txt
     echo "自动更新维护：[${auto_on}]" >> $data_dir/server_status.txt
 }
