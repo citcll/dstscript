@@ -353,7 +353,7 @@ Update_DST_Check(){
     # data from klei forums
     info "正在检查游戏服务端是否有更新 。。。 请稍后 。。。"
     currentbuild=$(cat ${dst_server_dir}/version.txt)
-    availablebuild=$(curl -s ${my_api_link})
+    availablebuild=$(curl -s ${my_api_link} | sed 's/[ \t]*$//g')
     if [ "${currentbuild}" != "${availablebuild}" ]
     then
         dst_need_update=true
@@ -1004,7 +1004,7 @@ Update_DST_MOD_Check(){
     MOD_update="false"
     for modid in $(cat ${data_dir}/mods_setup.lua | grep "ServerModSetup" | cut -d '"' -f2)
     do
-        mod_new_ver=$(curl -s ${my_api_link}?type=mod&modid=${modid})
+        mod_new_ver=$(curl -s ${my_api_link}?type=mod&modid=${modid} | sed 's/[ \t]*$//g')
         if [ -f ${dst_server_dir}/mods/workshop-${modid}/modinfo.lua ]
         then
             echo "fuc=\"getver\"" > ${data_dir}/modinfo.lua
