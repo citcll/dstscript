@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.6.7"
+script_ver="1.6.8"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -17,7 +17,7 @@ server_conf_file="${data_dir}/server.conf"
 dst_cluster_file="${data_dir}/clusterdata.txt"
 feedback_link="https://wqlin.com/dstscript.html"
 update_link="https://raw.githubusercontent.com/ariwori/dstscript/master"
-mod_api_link="https://wqlin.com/api/dstmod.php"
+my_api_link="https://wqlin.com/api/dst.php"
 # 屏幕输出
 Green_font_prefix="\033[32m"
 Red_font_prefix="\033[31m"
@@ -354,8 +354,8 @@ Update_DST_Check(){
     # data from klei forums
     info "Checking if the game is updated from the klei forums... please wait!"
     currentbuild=$(cat ${dst_server_dir}/version.txt)
-    availablebuild=$(curl -s https://forums.kleientertainment.com/game-updates/dst/ | grep 'data-releaseID=' | cut -d '/' -f6 | cut -d "-" -f1 | sort | tail -n 1)
-    if [ "${currentbuild}" != "${availablebuild}" ]
+    availablebuild=$(curl -s ${my_api_link})
+    if [ "${currentbuild}" != "${availablebuild}" && ${availablebuild} != "nil" ]
     then
         dst_need_update=true
         dst_need_update_str="需要更新"
@@ -1005,7 +1005,7 @@ Update_DST_MOD_Check(){
     MOD_update="false"
     for modid in $(cat ${data_dir}/mods_setup.lua | grep "ServerModSetup" | cut -d '"' -f2)
     do
-        mod_new_ver=$(curl -s ${mod_api_link}?modid=${modid})
+        mod_new_ver=$(curl -s ${my_api_link}?type=mod&modid=${modid})
         if [ -f ${dst_server_dir}/mods/workshop-${modid}/modinfo.lua ]
         then
             echo "fuc=\"getver\"" > ${data_dir}/modinfo.lua
