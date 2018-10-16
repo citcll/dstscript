@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.7.1"
+script_ver="1.7.2"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -23,17 +23,17 @@ Green_font_prefix="\033[32m"
 Red_font_prefix="\033[31m"
 Yellow_font_prefix="\033[33m"
 Font_color_suffix="\033[0m"
-Info="${Green_font_prefix}[Info]${Font_color_suffix}"
-Error="${Red_font_prefix}[Error]${Font_color_suffix}"
-Tip="${Yellow_font_prefix}[Tips]${Font_color_suffix}"
+Info="${Green_font_prefix}[信息]${Font_color_suffix}"
+Error="${Red_font_prefix}[错误]${Font_color_suffix}"
+Tip="${Yellow_font_prefix}[提示]${Font_color_suffix}"
 info(){
-    echo -e "${信息} $1"
+    echo -e "${Info} $1"
 }
 tip(){
-    echo -e "${提示} $1"
+    echo -e "${Tip} $1"
 }
 error(){
-    echo -e "${错误} $1"
+    echo -e "${Error} $1"
 }
 # Main menu
 Menu(){
