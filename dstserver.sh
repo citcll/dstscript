@@ -352,10 +352,10 @@ Auto_update(){
 }
 Update_DST_Check(){
     # data from klei forums
-    info "Checking if the game is updated from the klei forums... please wait!"
+    info "Checking if the game is updated from API BY ME... please wait!"
     currentbuild=$(cat ${dst_server_dir}/version.txt)
     availablebuild=$(curl -s ${my_api_link})
-    if [ "${currentbuild}" != "${availablebuild}" && ${availablebuild} != "nil" ]
+    if [[ "${currentbuild}" != "${availablebuild}" && "${availablebuild}" != "nil" ]]
     then
         dst_need_update=true
         dst_need_update_str="需要更新"
