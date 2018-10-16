@@ -51,7 +51,7 @@ Menu(){
         echo -e "\e[92m[7]控制台               [8]自动更新及异常维护   [9]退出本脚本\e[0m"
         echo -e "\e[92m[10]删除存档            [11]更新游戏服务端      [12]更新MOD\e[0m"
         echo
-        cat ${data_dir}/server_status.txt
+        Simple_server_status
         echo -e "\e[33m================================================================================\e[0m"
         echo -e "\e[92m请输入命令代号：\e[0m\c"
         read cmd
@@ -1065,8 +1065,8 @@ Simple_server_status(){
     fi
     cluster_name="无"
     [ -f ${dst_base_dir}/${cluster}/cluster.ini ] && cluster_name=$(cat ${dst_base_dir}/${cluster}/cluster.ini | grep "^cluster_name" | cut -d " " -f3-20)
-    echo "存档:【${cluster}】  地面:【${master_on}】  洞穴:【${caves_on}】  名称:【${cluster_name}】" > $data_dir/server_status.txt
-    echo "自动更新维护：【${auto_on}】" >> $data_dir/server_status.txt
+    echo -e "\e[33m存档:【${cluster}】  地面:【${master_on}】  洞穴:【${caves_on}】  名称:【${cluster_name}】\e[0m"
+    echo -e "\e[33m自动更新维护：【${auto_on}】\e[0m"
 }
 Fix_Net_hosts(){
     sudo chmod 666 /etc/hosts
