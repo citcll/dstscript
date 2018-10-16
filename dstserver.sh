@@ -354,7 +354,7 @@ Update_DST_Check(){
     info "正在检查游戏服务端是否有更新 。。。 请稍后 。。。"
     currentbuild=$(cat ${dst_server_dir}/version.txt)
     availablebuild=$(curl -s ${my_api_link})
-    if [[ "${currentbuild}" != "${availablebuild}" && "${availablebuild}" != "nil" ]]
+    if [ "${currentbuild}" != "${availablebuild}" ]
     then
         dst_need_update=true
         dst_need_update_str="需要更新"
