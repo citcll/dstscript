@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.6.8"
+script_ver="1.6.9"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -27,13 +27,13 @@ Info="${Green_font_prefix}[Info]${Font_color_suffix}"
 Error="${Red_font_prefix}[Error]${Font_color_suffix}"
 Tip="${Yellow_font_prefix}[Tips]${Font_color_suffix}"
 info(){
-    echo -e "${Info} $1"
+    echo -e "${信息} $1"
 }
 tip(){
-    echo -e "${Tip} $1"
+    echo -e "${提示} $1"
 }
 error(){
-    echo -e "${Error} $1"
+    echo -e "${错误} $1"
 }
 # Main menu
 Menu(){
@@ -352,7 +352,7 @@ Auto_update(){
 }
 Update_DST_Check(){
     # data from klei forums
-    info "Checking if the game is updated from API BY ME... please wait!"
+    info "正在检查游戏服务端是否有更新 。。。 请稍后 。。。"
     currentbuild=$(cat ${dst_server_dir}/version.txt)
     availablebuild=$(curl -s ${my_api_link})
     if [[ "${currentbuild}" != "${availablebuild}" && "${availablebuild}" != "nil" ]]
@@ -1065,8 +1065,8 @@ Simple_server_status(){
     fi
     cluster_name="无"
     [ -f ${dst_base_dir}/${cluster}/cluster.ini ] && cluster_name=$(cat ${dst_base_dir}/${cluster}/cluster.ini | grep "^cluster_name" | cut -d " " -f3-20)
-    echo "存档:[${cluster}] 地面:[${master_on}] 洞穴:[${caves_on}] 名称:[${cluster_name}]" > $data_dir/server_status.txt
-    echo "自动更新维护：[${auto_on}]" >> $data_dir/server_status.txt
+    echo "存档:【${cluster}】  地面:【${master_on}】  洞穴:【${caves_on}】  名称:【${cluster_name}】" > $data_dir/server_status.txt
+    echo "自动更新维护：【${auto_on}】" >> $data_dir/server_status.txt
 }
 Fix_Net_hosts(){
     sudo chmod 666 /etc/hosts
