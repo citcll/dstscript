@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.6.9"
+script_ver="1.7.0"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -39,7 +39,6 @@ error(){
 Menu(){
     while (true)
     do
-        Simple_server_status
         echo -e "\e[33m==============欢迎使用饥荒联机版独立服务器脚本[Linux-Steam](${script_ver})==============\e[0m"
         echo
         echo -e "\e[33m作者：Ariwori        Bug反馈：${feedback_link}\e[0m"
@@ -1065,8 +1064,8 @@ Simple_server_status(){
     fi
     cluster_name="无"
     [ -f ${dst_base_dir}/${cluster}/cluster.ini ] && cluster_name=$(cat ${dst_base_dir}/${cluster}/cluster.ini | grep "^cluster_name" | cut -d " " -f3-20)
-    echo -e "\e[33m存档:【${cluster}】  地面:【${master_on}】  洞穴:【${caves_on}】  名称:【${cluster_name}】\e[0m"
-    echo -e "\e[33m自动更新维护：【${auto_on}】\e[0m"
+    echo -e "\e[33m存档: ${cluster}   地面: ${master_on}   洞穴: ${caves_on}   名称: ${cluster_name}\e[0m"
+    echo -e "\e[33m自动更新维护：${auto_on}\e[0m"
 }
 Fix_Net_hosts(){
     sudo chmod 666 /etc/hosts
