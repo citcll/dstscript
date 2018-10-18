@@ -17,7 +17,7 @@ server_conf_file="${data_dir}/server.conf"
 dst_cluster_file="${data_dir}/clusterdata.txt"
 feedback_link="https://blog.wqlin.com/dstscript.html"
 update_link="https://raw.githubusercontent.com/ariwori/dstscript/master"
-my_api_link="https://api.wqlin.com/api/dst/"
+my_api_link="https://api.wqlin.com/dst/"
 # 屏幕输出
 Green_font_prefix="\033[32m"
 Red_font_prefix="\033[31m"
