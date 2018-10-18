@@ -355,7 +355,7 @@ Update_DST_Check(){
     currentbuild=$(cat ${dst_server_dir}/version.txt)
     availablebuild=$(curl -s ${my_api_link} | sed 's/[ \t]*$//g')
     respond=$(echo ${availablebuild} | tr -cd [0-9])
-	if [ ${respond} != "" && "${currentbuild}" != "${availablebuild}" ]
+	if [ ${respond} != "" ] && ["${currentbuild}" != "${availablebuild}" ]
     then
         dst_need_update=true
         dst_need_update_str="需要更新"
