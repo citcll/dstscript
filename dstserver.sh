@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.7.7"
+script_ver="1.7.8"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -52,7 +52,7 @@ Menu(){
         echo
         Simple_server_status
         echo -e "\e[33m================================================================================\e[0m"
-        echo -e "\e[92m请输入命令代号：\e[0m\c"
+        echo -e "\e[92m（如需中断任何操作请直接按Ctrl+C）请输入命令代号：\e[0m\c"
         read cmd
         case ${cmd} in
             1)
