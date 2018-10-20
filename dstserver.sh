@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.7.4"
+script_ver="1.7.5"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -353,8 +353,12 @@ Update_DST_Check(){
     # data from klei forums
     info "正在检查游戏服务端是否有更新 。。。 请稍后 。。。"
     currentbuild=$(cat ${dst_server_dir}/version.txt)
-    availablebuild=$(curl -s ${my_api_link} | sed 's/[ \t]*$//g')
-    if [ "${currentbuild}" != "${availablebuild}" ]
+    # availablebuild=$(curl -s ${my_api_link} | sed 's/[ \t]*$//g' | tr -cd [0-9])
+    # Gets availablebuild info
+	#cd "${steamcmddir}" || exit
+	#availablebuild=$(./steamcmd.sh +login "${steamuser}" "${steampass}" +app_info_update 1 +app_info_print "${appid}" +app_info_print "${appid}" +quit | sed -n '/branch/,$p' | grep -m 1 buildid | tr -cd '[:digit:]')
+    availablebuild=$(curl -s https://forums.kleientertainment.com/game-updates/dst/ | grep 'data-releaseID=' | cut -d '/' -f6 | cut -d "-" -f1 | sort | tail -n 1 | tr -cd [0-9])
+    if [[ "${currentbuild}" != "${availablebuild}" && "${availablebuild}" != "" ]]
     then
         dst_need_update=true
         dst_need_update_str="需要更新"
@@ -1063,7 +1067,7 @@ Simple_server_status(){
         auto_on="关闭"
     fi
     cluster_name="无"
-    [ -f ${dst_base_dir}/${cluster}/cluster.ini ] && cluster_name=$(cat ${dst_base_dir}/${cluster}/cluster.ini | grep "^cluster_name" | cut -d " " -f3-20)
+    [ -f ${dst_base_dir}/${cluster}/cluster.ini ] && cluster_name=$(cat ${dst_base_dir}/${cluster}/cluster.ini | grep "^cluster_name" | cut -d "=" -f2)
     echo -e "\e[33m存档: ${cluster}   地面: ${master_on}   洞穴: ${caves_on}   名称: ${cluster_name}\e[0m"
     echo -e "\e[33m自动更新维护：${auto_on}\e[0m"
 }
