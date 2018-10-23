@@ -16,7 +16,7 @@ dst_token_file="${data_dir}/clustertoken.txt"
 server_conf_file="${data_dir}/server.conf"
 dst_cluster_file="${data_dir}/clusterdata.txt"
 feedback_link="https://blog.wqlin.com/dstscript.html"
-update_link="https://qcloud.coding.net/u/ariwori/p/dstscript/git/raw/master"
+update_link="https://dev.tencent.com/u/ariwori/p/dstscript/git/blame/master"
 my_api_link="https://api.wqlin.com/dst/"
 # 屏幕输出
 Green_font_prefix="\033[32m"
