@@ -986,6 +986,7 @@ Show_changelog(){
 }
 # 脚本更新
 Update_script(){
+    info "正在检查脚本是否有更新 。。。 请稍后 。。。"
     if [ ! -d /tmp/dstscript ]
     then
         git clone ${repo_link} /tmp/dstscript > /dev/null 2>&1
