@@ -936,17 +936,17 @@ Install_Dependency(){
         then
             sudo dpkg --add-architecture i386
                 sudo apt update
-                sudo apt install -y lib32gcc1 libstdc++6 libstdc++6:i386 libcurl4-gnutls-dev:i386 tmux wget lua5.2
+                sudo apt install -y lib32gcc1 libstdc++6 libstdc++6:i386 libcurl4-gnutls-dev:i386 tmux wget lua5.2 git
         else
              sudo apt update
-            sudo apt install -y libstdc++6 libcurl4-gnutls-dev tmux wget lua5.2
+            sudo apt install -y libstdc++6 libcurl4-gnutls-dev tmux wget lua5.2 git
         fi
     else
         if [[ ${bit} = "x86_64" ]]
         then
-            sudo yum install -y tmux glibc.i686 libstdc++ libstdc++.i686 libcurl.i686 wget lua5.2
+            sudo yum install -y tmux glibc.i686 libstdc++ libstdc++.i686 libcurl.i686 wget lua5.2 git
         else
-            sudo yum install -y wget tmux libstdc++ libcurl lua5.2
+            sudo yum install -y wget tmux libstdc++ libcurl lua5.2 git
         fi
      fi
 }
