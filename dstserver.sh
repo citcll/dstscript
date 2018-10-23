@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.7.9"
+script_ver="1.8.0"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -17,6 +17,7 @@ server_conf_file="${data_dir}/server.conf"
 dst_cluster_file="${data_dir}/clusterdata.txt"
 feedback_link="https://blog.wqlin.com/dstscript.html"
 repo_link="https://git.dev.tencent.com/ariwori/dstscript.git"
+#update_link="https://qcloud.coding.net/u/ariwori/p/dstscript/git/raw/master"
 my_api_link="https://api.wqlin.com/dst/"
 # 屏幕输出
 Green_font_prefix="\033[32m"
@@ -979,6 +980,7 @@ Fix_steamcmd(){
 Show_changelog(){
     echo -e "\e[33m==============================脚本更新说明======================================\e[0m"
     cat /tmp/dstscript/.dstscript/changelog.txt > /tmp/changelog.txt
+    # wget ${update_link}/.dstscript/changelog.txt -O /tmp/changelog.txt
     datelog=$(cat /tmp/changelog.txt | head -n 1)
     cat /tmp/changelog.txt | grep -A 20 "更新日志 ${datelog}"
     echo -e "\e[33m================================================================================\e[0m"
@@ -993,6 +995,7 @@ Update_script(){
     else
         cd /tmp/dstscript && git pull > /dev/null 2>&1 && cd
     fi
+    # wget ${update_link}/.dstscript/filelist.txt -O /tmp/filelist.txt
     cat /tmp/dstscript/.dstscript/filelist.txt > /tmp/filelist.txt
     for file in $(cat /tmp/filelist.txt | cut -d ":" -f1)
     do
@@ -1012,6 +1015,7 @@ Update_script(){
         then
             info "${file} 发现新版本[ ${new_ver} ]，更新中..."
             cp -rf /tmp/dstscript/${file} ${HOME}/${file}
+            # wget ${update_link}/${file} -O ${HOME}/${file}
             chmod +x ${HOME}/dstserver.sh
             info "${file} 已更新为最新版本[ ${new_ver} ] !"
             if [[ "${file}" == "dstserver.sh" ]]
