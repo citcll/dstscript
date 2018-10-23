@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.7.3"
+script_ver="1.7.8"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -16,7 +16,7 @@ dst_token_file="${data_dir}/clustertoken.txt"
 server_conf_file="${data_dir}/server.conf"
 dst_cluster_file="${data_dir}/clusterdata.txt"
 feedback_link="https://blog.wqlin.com/dstscript.html"
-update_link="https://raw.githubusercontent.com/ariwori/dstscript/master"
+update_link="https://qcloud.coding.net/u/ariwori/p/dstscript/git/raw/master"
 my_api_link="https://api.wqlin.com/dst/"
 # 屏幕输出
 Green_font_prefix="\033[32m"
@@ -52,7 +52,7 @@ Menu(){
         echo
         Simple_server_status
         echo -e "\e[33m================================================================================\e[0m"
-        echo -e "\e[92m请输入命令代号：\e[0m\c"
+        echo -e "\e[92m（如需中断任何操作请直接按Ctrl+C）请输入命令代号：\e[0m\c"
         read cmd
         case ${cmd} in
             1)
@@ -87,7 +87,7 @@ Menu(){
             Cluster_manager
             ;;
             11)
-            Update_DST
+            Force_update
             ;;
             12)
             Update_MOD
@@ -353,9 +353,15 @@ Update_DST_Check(){
     # data from klei forums
     info "正在检查游戏服务端是否有更新 。。。 请稍后 。。。"
     currentbuild=$(cat ${dst_server_dir}/version.txt)
-    availablebuild=$(curl -s ${my_api_link} | sed 's/[ \t]*$//g')
-    respond=$(echo ${availablebuild} | tr -cd [0-9])
-	if [ ${respond} != "" ] && ["${currentbuild}" != "${availablebuild}" ]
+    #availablebuild=$(curl -s ${my_api_link} | sed 's/[ \t]*$//g')
+    #respond=$(echo ${availablebuild} | tr -cd [0-9])
+	#if [ ${respond} != "" ] && ["${currentbuild}" != "${availablebuild}" ]
+    availablebuild=$(curl -s ${my_api_link} | sed 's/[ \t]*$//g' | tr -cd [0-9])
+    # Gets availablebuild info
+	#cd "${steamcmddir}" || exit
+	#availablebuild=$(./steamcmd.sh +login "${steamuser}" "${steampass}" +app_info_update 1 +app_info_print "${appid}" +app_info_print "${appid}" +quit | sed -n '/branch/,$p' | grep -m 1 buildid | tr -cd '[:digit:]')
+    #availablebuild=$(curl -s https://forums.kleientertainment.com/game-updates/dst/ | grep 'data-releaseID=' | cut -d '/' -f6 | cut -d "-" -f1 | sort | tail -n 1 | tr -cd [0-9])
+    if [[ "${currentbuild}" != "${availablebuild}" && "${availablebuild}" != "" ]]
     then
         dst_need_update=true
         dst_need_update_str="需要更新"
@@ -363,6 +369,25 @@ Update_DST_Check(){
         dst_need_update=false
         dst_need_update_str="无需更新"
     fi
+}
+Force_update(){
+    info "是否强制更新游戏服务端：1.是  2.否"
+    read force
+    case $force in
+        1)
+        Reboot_announce
+        Close_server
+        Install_Game
+        serveropen=$(grep "serveropen" ${server_conf_file} | cut -d "=" -f2)
+        if [[ ${serveropen} == "true" ]]
+        then
+            Run_server
+        fi
+        ;;
+        *)
+        Update_DST
+        ;;
+    esac
 }
 Update_DST(){
     serveropen=$(grep "serveropen" ${server_conf_file} | cut -d "=" -f2)
@@ -376,6 +401,7 @@ Update_DST(){
     else
         tip "无可用更新！当前版本（$currentbuild）"
     fi
+    serveropen=$(grep "serveropen" ${server_conf_file} | cut -d "=" -f2)
     if [[ ${serveropen} == "true" && ${dst_need_update} == "true" ]]
     then
         Run_server
@@ -1064,7 +1090,7 @@ Simple_server_status(){
         auto_on="关闭"
     fi
     cluster_name="无"
-    [ -f ${dst_base_dir}/${cluster}/cluster.ini ] && cluster_name=$(cat ${dst_base_dir}/${cluster}/cluster.ini | grep "^cluster_name" | cut -d " " -f3-20)
+    [ -f ${dst_base_dir}/${cluster}/cluster.ini ] && cluster_name=$(cat ${dst_base_dir}/${cluster}/cluster.ini | grep "^cluster_name" | cut -d "=" -f2)
     echo -e "\e[33m存档: ${cluster}   地面: ${master_on}   洞穴: ${caves_on}   名称: ${cluster_name}\e[0m"
     echo -e "\e[33m自动更新维护：${auto_on}\e[0m"
 }
