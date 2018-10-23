@@ -988,9 +988,9 @@ Show_changelog(){
 Update_script(){
     if [ ! -d /tmp/dstscript ]
     then
-        git clone ${repo_link} /tmp/dstscript
+        git clone ${repo_link} /tmp/dstscript > /dev/null 2>1
     else
-        cd /tmp/dstscript && git pull && cd
+        cd /tmp/dstscript && git pull && cd > /dev/null 2>1
     fi
     cat /tmp/dstscript/.dstscript/filelist.txt > /tmp/filelist.txt
     for file in $(cat /tmp/filelist.txt | cut -d ":" -f1)
