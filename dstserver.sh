@@ -16,7 +16,7 @@ dst_token_file="${data_dir}/clustertoken.txt"
 server_conf_file="${data_dir}/server.conf"
 dst_cluster_file="${data_dir}/clusterdata.txt"
 feedback_link="https://blog.wqlin.com/dstscript.html"
-update_link="https://dev.tencent.com/u/ariwori/p/dstscript/git/blame/master"
+repo_link="https://git.dev.tencent.com/ariwori/dstscript.git"
 my_api_link="https://api.wqlin.com/dst/"
 # 屏幕输出
 Green_font_prefix="\033[32m"
@@ -978,7 +978,7 @@ Fix_steamcmd(){
 # Show change log
 Show_changelog(){
     echo -e "\e[33m==============================脚本更新说明======================================\e[0m"
-    curl -s ${update_link}/dstscript/changelog.txt > /tmp/changelog.txt
+    cat /tmp/dstscript/.dstscript/changelog.txt > /tmp/changelog.txt
     datelog=$(cat /tmp/changelog.txt | head -n 1)
     cat /tmp/changelog.txt | grep -A 20 "更新日志 ${datelog}"
     echo -e "\e[33m================================================================================\e[0m"
@@ -986,7 +986,13 @@ Show_changelog(){
 }
 # 脚本更新
 Update_script(){
-    curl -s ${update_link}/dstscript/filelist.txt > /tmp/filelist.txt
+    if [ ! -d /tmp/dstscript ]
+    then
+        git clone ${repo_link} /tmp/dstscript
+    else
+        cd /tmp/dstscript && git pull && cd
+    fi
+    cat /tmp/dstscript/.dstscript/filelist.txt > /tmp/filelist.txt
     for file in $(cat /tmp/filelist.txt | cut -d ":" -f1)
     do
         new_ver=$(cat /tmp/filelist.txt | grep "${file}" | cut -d ":" -f2)
@@ -1004,7 +1010,7 @@ Update_script(){
         if [[ ${new_ver} != ${cur_ver} ]]
         then
             info "${file} 发现新版本[ ${new_ver} ]，更新中..."
-            wget ${update_link}/${file} -O ${HOME}/${file} > /dev/null 2>&1
+            cp -rf /tmp/dstscript/${file} ${HOME}/${file}
             chmod +x ${HOME}/dstserver.sh
             info "${file} 已更新为最新版本[ ${new_ver} ] !"
             if [[ "${file}" == "dstserver.sh" ]]
