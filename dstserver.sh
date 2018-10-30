@@ -203,17 +203,23 @@ Addmod(){
     clear
 }
 Addmodtoshard(){
-    if [[ $(grep "${moddir}" "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua") > 0 ]]
+    if [ -f ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua ]
     then
-        echo "${shard}世界该Mod(${moddir})已添加"
+        if [[ $(grep "${moddir}" "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua") > 0 ]]
+        then
+            echo "${shard}世界该Mod(${moddir})已添加"
+        else
+            sed -i '1d' ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
+            cat ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua > ${data_dir}/modconftemp.txt
+            echo "return {" > ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
+            cat ${data_dir}/modconfwrite.lua >> ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
+            cat ${data_dir}/modconftemp.txt >> ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
+            echo "${shard}世界Mod(${moddir})添加完成"
+        fi
     else
-        sed -i '1d' ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
-        cat ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua > ${data_dir}/modconftemp.txt
-        echo "return {" > ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
-        cat ${data_dir}/modconfwrite.lua >> ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
-        cat ${data_dir}/modconftemp.txt >> ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
-        echo "${shard}世界Mod(${moddir})添加完成"
+        tip "${shard} MOD配置文件未由脚本初始化，无法操作！如你已自行配置请忽略本提示！"
     fi
+    
 }
 Truemodid(){
     if [ ${modid} -lt 1000 ]
@@ -233,17 +239,22 @@ Addmodfunc(){
     done
 }
 Delmodfromshard(){
-    if [[ $(grep "${moddir}" -c "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua") > 0 ]]
+    if [ -f ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua ]
     then
-        grep -n "^\[" "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua" > ${data_dir}/modidlist.txt
-        up=$(grep "${moddir}" "${data_dir}/modidlist.txt" | cut -d ":" -f1)
-        down=$(grep -A 1 "${moddir}" "${data_dir}/modidlist.txt" | tail -1 |cut -d ":" -f1)
-        upnum=$((${up} - 1))
-        downnum=$((${down} - 2))
-        sed -i "${upnum},${downnum}d" "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua"
-        echo "${shard}世界该Mod(${moddir})已停用！"
+        if [[ $(grep "${moddir}" -c "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua") > 0 ]]
+        then
+            grep -n "^\[" "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua" > ${data_dir}/modidlist.txt
+            up=$(grep "${moddir}" "${data_dir}/modidlist.txt" | cut -d ":" -f1)
+            down=$(grep -A 1 "${moddir}" "${data_dir}/modidlist.txt" | tail -1 |cut -d ":" -f1)
+            upnum=$((${up} - 1))
+            downnum=$((${down} - 2))
+            sed -i "${upnum},${downnum}d" "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua"
+            echo "${shard}世界该Mod(${moddir})已停用！"
+        else
+            echo "${shard}世界该Mod(${moddir})未启用！"
+        fi
     else
-        echo "${shard}世界该Mod(${moddir})未启用！"
+        tip "${shard} MOD配置文件未由脚本初始化，无法操作！如你已自行配置请忽略本提示！"
     fi
 }
 Delmod(){
@@ -462,6 +473,8 @@ Start_server(){
         if [ ! -d "${dst_base_dir}/${cluster}" ]
         then
             mkdir -p ${dst_base_dir}/${cluster}
+            mkdir -p ${dst_base_dir}/${cluster}/Master
+            mkdir -p ${dst_base_dir}/${cluster}/Caves
         fi
         Set_cluster
         Set_token
@@ -471,8 +484,6 @@ Start_server(){
         cluster_str="开启"
         Choose_exit_cluster
     fi
-    mkdir -p ${dst_base_dir}/${cluster}/Master
-    mkdir -p ${dst_base_dir}/${cluster}/Caves
     echo "cluster=${cluster}" > ${server_conf_file}
     if [ ! -f ${dst_base_dir}/${cluster}/Master/modoverrides.lua ]
     then
