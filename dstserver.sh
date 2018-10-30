@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.8.1"
+script_ver="1.8.2"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -462,8 +462,6 @@ Start_server(){
         if [ ! -d "${dst_base_dir}/${cluster}" ]
         then
             mkdir -p ${dst_base_dir}/${cluster}
-            mkdir -p ${dst_base_dir}/${cluster}/Master
-            mkdir -p ${dst_base_dir}/${cluster}/Caves
         fi
         Set_cluster
         Set_token
@@ -473,6 +471,8 @@ Start_server(){
         cluster_str="开启"
         Choose_exit_cluster
     fi
+    mkdir -p ${dst_base_dir}/${cluster}/Master
+    mkdir -p ${dst_base_dir}/${cluster}/Caves
     echo "cluster=${cluster}" > ${server_conf_file}
     if [ ! -f ${dst_base_dir}/${cluster}/Master/modoverrides.lua ]
     then
@@ -501,7 +501,7 @@ Choose_exit_cluster(){
         echo "${index}. ${dirlist}"
         let index++
     done
-    echo -e "\e[92m请输入你要${cluster}_str的存档${Red_font_prefix}[编号]${Font_color_suffix}：\e[0m\c"
+    echo -e "\e[92m请输入你要${cluster_str}的存档${Red_font_prefix}[编号]${Font_color_suffix}：\e[0m\c"
     read listnum
     cluster=$(cat /tmp/dirlist.txt | head -n ${listnum} | tail -n 1)
 }
