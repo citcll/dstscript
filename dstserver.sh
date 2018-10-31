@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.8.7"
+script_ver="1.8.8"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -809,6 +809,10 @@ Default_mod(){
 }' > ${dst_base_dir}/${cluster}/Caves/modoverrides.lua
 }
 Setup_mod(){
+    if [ -f ${data_dir}/mods_setup.lua ]
+    then
+        rm -rf ${data_dir}/mods_setup.lua
+    fi
     touch ${data_dir}/mods_setup.lua
     dir=$(cat ${dst_base_dir}/${cluster}/Master/modoverrides.lua | grep "workshop" | cut -f2 -d '"' | cut -d "-" -f2)
     for moddir in ${dir}
