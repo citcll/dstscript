@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.8.5"
+script_ver="1.8.7"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -41,7 +41,6 @@ Menu(){
     while (true)
     do
         echo -e "\e[33m==============欢迎使用饥荒联机版独立服务器脚本[Linux-Steam](${script_ver})==============\e[0m"
-        echo
         echo -e "\e[33m作者：Ariwori        Bug反馈：${feedback_link}\e[0m"
         echo -e "\e[33m本脚本一切权利归作者所有。未经许可禁止使用本脚本进行任何的商业活动！\e[0m"
         echo -e "\e[31m游戏服务端安装目录：${dst_server_dir} (Version: $(cat ${dst_server_dir}/version.txt))\e[33m【${dst_need_update_str}】\e[0m"
@@ -50,7 +49,6 @@ Menu(){
         echo -e "\e[92m[4]查看服务器状态       [5]添加或移除MOD        [6]设置管理员和黑名单\e[0m"
         echo -e "\e[92m[7]控制台               [8]自动更新及异常维护   [9]退出本脚本\e[0m"
         echo -e "\e[92m[10]删除存档            [11]更新游戏服务端      [12]更新MOD\e[0m"
-        echo
         Simple_server_status
         echo -e "\e[33m================================================================================\e[0m"
         echo -e "\e[92m（如需中断任何操作请直接按Ctrl+C）请输入命令代号：\e[0m\c"
@@ -696,6 +694,7 @@ Set_world(){
     else
         cat ${data_dir}/lavaarena.lua > ${dst_base_dir}/${cluster}/Master/leveldataoverride.lua
         info "熔炉世界配置已写入！"
+        tip "!!! 需要添加熔炉MOD后重启服务器才能成功开启熔炉！！！"
     fi
 }
 Set_world_config(){
