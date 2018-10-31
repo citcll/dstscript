@@ -107,7 +107,8 @@ Server_console(){
 }
 MOD_manager(){
     [ -z ${cluster} ] && cluster=$(cat ${server_conf_file} | grep "^cluster" | cut -d "=" -f2)
-    read -p "【存档：${cluster}】 你要 1.添加mod  2.删除mod" mc
+    echo -e "\e[92m【存档：${cluster}】 你要 1.添加mod  2.删除mod：\e[0m\c"
+    read mc
     case ${mc} in
         1)
         Listallmod
@@ -274,7 +275,7 @@ Delmod(){
     done
 }
 List_manager(){
-    echo -e "\e[92m你要设置：1.管理员  2.黑名单  3.白名单\e[0m"
+    echo -e "\e[92m你要设置：1.管理员  2.黑名单  3.白名单 ? \e[0m\c"
     read list
     case ${list} in
         1)
@@ -293,7 +294,7 @@ List_manager(){
         error "输入有误，请输入数字[1-3]"
         ;;
     esac
-    echo -e "\e[92m你要：1.添加${listname} 2.移除${listname}\e[0m"
+    echo -e "\e[92m你要：1.添加${listname} 2.移除${listname} ? \e[0m\c"
     read addordel
     case ${addordel} in
         1)
@@ -381,7 +382,7 @@ Update_DST_Check(){
     fi
 }
 Force_update(){
-    info "是否强制更新游戏服务端：1.是  2.否"
+    echo -e "\e[92m是否强制更新游戏服务端：1.是  2.否 ? \e[0m\c"
     read force
     case $force in
         1)
@@ -409,7 +410,7 @@ Update_DST(){
         Close_server
         Install_Game
     else
-        tip "无可用更新！当前版本（$currentbuild）"
+        tip "无可用更新！当前版本（${availablebuild}）"
     fi
     serveropen=$(grep "serveropen" ${server_conf_file} | cut -d "=" -f2)
     if [[ ${serveropen} == "true" && ${dst_need_update} == "true" ]]
@@ -488,7 +489,7 @@ Start_server(){
         Choose_exit_cluster
     fi
     echo "cluster=${cluster}" > ${server_conf_file}
-    echo -e "\e[92m请选择要启动的世界：1.仅地上（熔炉MOD选我）  2.仅洞穴  3.地上 + 洞穴 ?\e[0m\c"
+    echo -e "\e[92m请选择要启动的世界：1.仅地上（熔炉MOD选我）  2.仅洞穴  3.地上 + 洞穴 ? \e[0m\c"
     read shard
     case ${shard} in
         1)
@@ -574,7 +575,8 @@ Set_cluster(){
         do
             if [[ ${cmd} == "" ]]
             then
-                read -p "请选择你要更改的选项（请不要包含空格）(修改完毕输入数字 0 确认修改并退出)：" cmd
+                echo -e "\e[92m请选择你要更改的选项（请不要包含空格）(修改完毕输入数字 0 确认修改并退出)：\e[0m\c"
+                read cmd
             else
                 break
             fi
@@ -636,7 +638,8 @@ Set_token(){
         default_token="pds-g^KU_6yNrwFkC^9WDPAGhDM9eN6y2v8UUjEL3oDLdvIkt2AuDQB2mgaGE="
     fi
     info "当前预设的服务器令牌：\n ${default_token}"
-    read -p "是否更改？1.是 2.否" ch
+    echo -e "\e[92m是否更改？ 1.是  2.否 : \e[0m\c"
+    read ch
     if [ $ch -eq 1 ]
     then
         tip "请输入或粘贴你的令牌到此处，注意最后不要输入空格："
@@ -746,7 +749,8 @@ Set_world_config(){
         do
             if [[ ${cmd} == "" ]]
             then
-                read -p "请选择你要更改的选项(修改完毕输入数字 0 确认修改并退出)：" cmd
+                echo -e "\e[92m请选择你要更改的选项(修改完毕输入数字 0 确认修改并退出)： \e[0m\c"
+                read cmd
             else
                 break
             fi
@@ -837,49 +841,30 @@ Start_check(){
     cavesserverlog_path="${dst_base_dir}/${cluster}/Caves/server_log.txt"
     while (true)
     do
-        if [ -f ${masterserverlog_path} ]
+        if tmux has-session -t DST_Master > /dev/null 2>&1
         then
-            if tmux has-session -t DST_Master > /dev/null 2>&1 && tmux has-session -t DST_Caves > /dev/null 2>&1
+            if [[ $(grep "Sim paused" -c "${masterserverlog_path}") > 0 ]]
             then
-                if [[ $(grep "Sim paused" -c "${masterserverlog_path}") > 0 ]]
-                then
-                    echo "服务器开启成功，和小伙伴尽情玩耍吧！"
-                    break
-                fi
-                if [[ $(grep "Your Server Will Not Start" -c "${masterserverlog_path}") > 0 ]]
-                then
-                    echo "服务器开启未成功，请执行关闭服务器命令后再次尝试，并注意令牌是否成功设置且有效。"
-                    break
-                fi
+                echo "地上服务器开启成功，和小伙伴尽情玩耍吧！"
+                break
             fi
-            if tmux has-session -t DST_Master > /dev/null 2>&1 && ! tmux has-session -t DST_Caves > /dev/null 2>&1
+            if [[ $(grep "Your Server Will Not Start" -c "${masterserverlog_path}") > 0 ]]
             then
-                if [[ $(grep "Sim paused" -c "${masterserverlog_path}") > 0 ]]
-                then
-                    echo "服务器开启成功，和小伙伴尽情玩耍吧！"
-                    break
-                fi
-                if [[ $(grep "Your Server Will Not Start" -c "${masterserverlog_path}") > 0 ]]
-                then
-                    echo "服务器开启未成功，请执行关闭服务器命令后再次尝试，并注意令牌是否成功设置且有效。"
-                    break
-                fi
+                echo "地上服务器开启未成功，请执行关闭服务器命令后再次尝试，并注意令牌是否成功设置且有效。"
+                break
             fi
         fi
-        if [ -f ${cavesserverlog_path} ]
+        if tmux has-session -t DST_Caves > /dev/null 2>&1
         then
-            if ! tmux has-session -t DST_Master > /dev/null 2>&1 && tmux has-session -t DST_Caves > /dev/null 2>&1
+            if [[ $(grep "Sim paused" -c "${cavesserverlog_path}") > 0 ]]
             then
-                if [[ $(grep "Sim paused" -c "${cavesserverlog_path}") > 0 ]]
-                then
-                    echo "服务器开启成功，和小伙伴尽情玩耍吧！"
-                    break
-                fi
-                if [[ $(grep "Your Server Will Not Start" -c "${cavesserverlog_path}") > 0 ]]
-                then
-                    echo "服务器开启未成功，请执行关闭服务器命令后再次尝试，并注意令牌是否成功设置且有效。"
-                    break
-                fi
+                echo "洞穴服务器开启成功，和小伙伴尽情玩耍吧！"
+                break
+            fi
+            if [[ $(grep "Your Server Will Not Start" -c "${cavesserverlog_path}") > 0 ]]
+            then
+                echo "洞穴服务器开启未成功，请执行关闭服务器命令后再次尝试，并注意令牌是否成功设置且有效。"
+                break
             fi
         fi
     done
@@ -996,7 +981,7 @@ Fix_steamcmd(){
     # fix lib for centos
     if [[ ${release} == "centos" ]] && [ ! -f "${dst_server_dir}/bin/lib32/libcurl-gnutls.so.4" ]
     then
-        info "libcurl-gnutls.so.4 missing...create a lib link."
+        info "libcurl-gnutls.so.4 missing ... create a lib link."
         ln -s "/usr/lib/libcurl.so.4" "${dst_server_dir}/bin/lib32/libcurl-gnutls.so.4"
     fi
 }
@@ -1177,6 +1162,7 @@ Download_MOD(){
 if [[ $1 == "au" ]]; then
     while (true)
     do
+        echo -e "\e[33m==============欢迎使用饥荒联机版独立服务器脚本[Linux-Steam](${script_ver})==============\e[0m"
         Update_DST
         Update_DST_MOD_Check
         if [[ ${MOD_update} == "true" ]]
