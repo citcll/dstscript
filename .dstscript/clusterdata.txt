@@ -1,7 +1,7 @@
 cluster_name uiwhcie 房间名称 [NETWORK] read
 cluster_description MyDSTServer 房间简介 [NETWORK] read
 cluster_intention madness 游戏风格 [NETWORK] choose social 休闲 cooperative 合作 competitive 竞赛 madness 疯狂
-game_mode survival 游戏模式 [GAMEPLAY] choose endless 无尽 survival 生存 wilderness 荒野
+game_mode survival 游戏模式 [GAMEPLAY] choose endless 无尽 survival 生存 wilderness 荒野 lavaarena 熔炉
 steam_group_id 0 Steam群组ID [STEAM] read
 steam_group_admins false 群组官员设为管理员 [STEAM] choose true 开启 false 关闭
 steam_group_only false 仅群组成员可进 [STEAM] choose true 开启 false 关闭
@@ -22,4 +22,4 @@ shard_enabled true 多世界 [SHARD] readonly
 bind_ip 0.0.0.0 绑定IP [SHARD] readonly
 master_port 10888 游戏端口 [SHARD] readonly
 cluster_key GoforFun 多世界通信秘钥 [SHARD] readonly
-script_ver="1.2.1"
+script_ver="1.2.2"
