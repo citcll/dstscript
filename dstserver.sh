@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.8.3"
+script_ver="1.8.4"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -490,7 +490,7 @@ Start_server(){
         Choose_exit_cluster
     fi
     echo "cluster=${cluster}" > ${server_conf_file}
-    echo -e "\e[92m请选择要启动的世界：1.仅地上  2.仅洞穴  3.地上 + 洞穴 ?\e[0m\c"
+    echo -e "\e[92m请选择要启动的世界：1.仅地上（熔炉MOD选我）  2.仅洞穴  3.地上 + 洞穴 ?\e[0m\c"
     read shard
     case ${shard} in
         1)
@@ -576,7 +576,7 @@ Set_cluster(){
         do
             if [[ ${cmd} == "" ]]
             then
-                read -p "请选择你要更改的选项(修改完毕输入数字 0 确认修改并退出)：" cmd
+                read -p "请选择你要更改的选项（请不要包含空格）(修改完毕输入数字 0 确认修改并退出)：" cmd
             else
                 break
             fi
@@ -672,24 +672,31 @@ Set_serverini(){
     cat ${data_dir}/cavesini.ini > ${dst_base_dir}/${cluster}/Caves/server.ini
 }
 Set_world(){
-    info "是否修改地上世界配置？：1.是 2.否（默认为上次配置）"
-    read wc
-    configure_file="${data_dir}/masterleveldata.txt"
-    data_file="${dst_base_dir}/${cluster}/Master/leveldataoverride.lua"
-    if [ ${wc} -ne 2 ]
+    game_mode=$(cat ${dst_base_dir}/${cluster}/cluster.ini | grep ^game_mode= | cut -d "=" -f2)
+    if [[ ${game_mode} != "lavaarena" ]]
     then
-        Set_world_config
+        info "是否修改地上世界配置？：1.是 2.否（默认为上次配置）"
+        read wc
+        configure_file="${data_dir}/masterleveldata.txt"
+        data_file="${dst_base_dir}/${cluster}/Master/leveldataoverride.lua"
+        if [ ${wc} -ne 2 ]
+        then
+            Set_world_config
+        fi
+        Write_in master
+        info "是否修改洞穴世界配置？：1.是 2.否（同上）"
+        read cw
+        configure_file="${data_dir}/cavesleveldata.txt"
+        data_file="${dst_base_dir}/${cluster}/Caves/leveldataoverride.lua"
+        if [ ${cw} -ne 2 ]
+        then
+            Set_world_config
+        fi
+        Write_in caves
+    else
+        cat ${data_dir}/lavaarena.lua > ${dst_base_dir}/${cluster}/Master/leveldataoverride.lua
+        info "熔炉世界配置已写入！"
     fi
-    Write_in master
-    info "是否修改洞穴世界配置？：1.是 2.否（同上）"
-    read cw
-    configure_file="${data_dir}/cavesleveldata.txt"
-    data_file="${dst_base_dir}/${cluster}/Caves/leveldataoverride.lua"
-    if [ ${cw} -ne 2 ]
-    then
-        Set_world_config
-    fi
-    Write_in caves
 }
 Set_world_config(){
     while (true)
