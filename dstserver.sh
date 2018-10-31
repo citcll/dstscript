@@ -825,47 +825,51 @@ Start_shard(){
 Start_check(){
     masterserverlog_path="${dst_base_dir}/${cluster}/Master/server_log.txt"
     cavesserverlog_path="${dst_base_dir}/${cluster}/Caves/server_log.txt"
-    echo "" > ${masterserverlog_path} > /dev/null 2>&1
-    echo "" > ${cavesserverlog_path} > /dev/null 2>&1
     while (true)
     do
-        if tmux has-session -t DST_Master > /dev/null 2>&1 && tmux has-session -t DST_Caves > /dev/null 2>&1
+        if [ -f ${masterserverlog_path} ]
         then
-            if [[ $(grep "Sim paused" -c "${masterserverlog_path}") > 0 ]]
+            if tmux has-session -t DST_Master > /dev/null 2>&1 && tmux has-session -t DST_Caves > /dev/null 2>&1
             then
-                echo "服务器开启成功，和小伙伴尽情玩耍吧！"
-                break
+                if [[ $(grep "Sim paused" -c "${masterserverlog_path}") > 0 ]]
+                then
+                    echo "服务器开启成功，和小伙伴尽情玩耍吧！"
+                    break
+                fi
+                if [[ $(grep "Your Server Will Not Start" -c "${masterserverlog_path}") > 0 ]]
+                then
+                    echo "服务器开启未成功，请执行关闭服务器命令后再次尝试，并注意令牌是否成功设置且有效。"
+                    break
+                fi
             fi
-            if [[ $(grep "Your Server Will Not Start" -c "${masterserverlog_path}") > 0 ]]
+            if tmux has-session -t DST_Master > /dev/null 2>&1 && ! tmux has-session -t DST_Caves > /dev/null 2>&1
             then
-                echo "服务器开启未成功，请执行关闭服务器命令后再次尝试，并注意令牌是否成功设置且有效。"
-                break
+                if [[ $(grep "Sim paused" -c "${masterserverlog_path}") > 0 ]]
+                then
+                    echo "服务器开启成功，和小伙伴尽情玩耍吧！"
+                    break
+                fi
+                if [[ $(grep "Your Server Will Not Start" -c "${masterserverlog_path}") > 0 ]]
+                then
+                    echo "服务器开启未成功，请执行关闭服务器命令后再次尝试，并注意令牌是否成功设置且有效。"
+                    break
+                fi
             fi
         fi
-        if tmux has-session -t DST_Master > /dev/null 2>&1 && ! tmux has-session -t DST_Caves > /dev/null 2>&1
+        if [ -f ${cavesserverlog_path} ]
         then
-            if [[ $(grep "Sim paused" -c "${masterserverlog_path}") > 0 ]]
+            if ! tmux has-session -t DST_Master > /dev/null 2>&1 && tmux has-session -t DST_Caves > /dev/null 2>&1
             then
-                echo "服务器开启成功，和小伙伴尽情玩耍吧！"
-                break
-            fi
-            if [[ $(grep "Your Server Will Not Start" -c "${masterserverlog_path}") > 0 ]]
-            then
-                echo "服务器开启未成功，请执行关闭服务器命令后再次尝试，并注意令牌是否成功设置且有效。"
-                break
-            fi
-        fi
-        if ! tmux has-session -t DST_Master > /dev/null 2>&1 && tmux has-session -t DST_Caves > /dev/null 2>&1
-        then
-            if [[ $(grep "Sim paused" -c "${cavesserverlog_path}") > 0 ]]
-            then
-                echo "服务器开启成功，和小伙伴尽情玩耍吧！"
-                break
-            fi
-            if [[ $(grep "Your Server Will Not Start" -c "${cavesserverlog_path}") > 0 ]]
-            then
-                echo "服务器开启未成功，请执行关闭服务器命令后再次尝试，并注意令牌是否成功设置且有效。"
-                break
+                if [[ $(grep "Sim paused" -c "${cavesserverlog_path}") > 0 ]]
+                then
+                    echo "服务器开启成功，和小伙伴尽情玩耍吧！"
+                    break
+                fi
+                if [[ $(grep "Your Server Will Not Start" -c "${cavesserverlog_path}") > 0 ]]
+                then
+                    echo "服务器开启未成功，请执行关闭服务器命令后再次尝试，并注意令牌是否成功设置且有效。"
+                    break
+                fi
             fi
         fi
     done
