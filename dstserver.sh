@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.8.4"
+script_ver="1.8.5"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -45,7 +45,7 @@ Menu(){
         echo -e "\e[33m作者：Ariwori        Bug反馈：${feedback_link}\e[0m"
         echo -e "\e[33m本脚本一切权利归作者所有。未经许可禁止使用本脚本进行任何的商业活动！\e[0m"
         echo -e "\e[31m游戏服务端安装目录：${dst_server_dir} (Version: $(cat ${dst_server_dir}/version.txt))\e[33m【${dst_need_update_str}】\e[0m"
-        echo
+        echo -e "\e[35m公告：$(cat /tmp/dstscript/announce.txt)\e[0m"
         echo -e "\e[92m[1]启动服务器           [2]关闭服务器           [3]重启服务器\e[0m"
         echo -e "\e[92m[4]查看服务器状态       [5]添加或移除MOD        [6]设置管理员和黑名单\e[0m"
         echo -e "\e[92m[7]控制台               [8]自动更新及异常维护   [9]退出本脚本\e[0m"
