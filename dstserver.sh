@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.8.2"
+script_ver="1.8.3"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -443,6 +443,11 @@ Run_server(){
     cluster=$(cat ${server_conf_file} | grep "^cluster" | cut -d "=" -f2)
     shard=$(cat ${server_conf_file} | grep "^shard" | cut -d "=" -f2)
     exchangestatus true
+    if [ ! -f ${dst_base_dir}/${cluster}/Master/modoverrides.lua ]
+    then
+        Default_mod
+    fi
+    Set_list
     Start_shard
     info "服务器开启中。。。请稍候。。。"
     sleep 10
@@ -485,11 +490,6 @@ Start_server(){
         Choose_exit_cluster
     fi
     echo "cluster=${cluster}" > ${server_conf_file}
-    if [ ! -f ${dst_base_dir}/${cluster}/Master/modoverrides.lua ]
-    then
-        Default_mod
-    fi
-    Set_list
     echo -e "\e[92m请选择要启动的世界：1.仅地上  2.仅洞穴  3.地上 + 洞穴 ?\e[0m\c"
     read shard
     case ${shard} in
