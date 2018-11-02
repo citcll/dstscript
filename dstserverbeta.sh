@@ -442,10 +442,7 @@ Run_server(){
     cluster=$(cat ${server_conf_file} | grep "^cluster" | cut -d "=" -f2)
     shard=$(cat ${server_conf_file} | grep "^shard" | cut -d "=" -f2)
     exchangestatus true
-    if [ ! -f ${dst_base_dir}/${cluster}/Master/modoverrides.lua ]
-    then
-        Default_mod
-    fi
+    Default_mod
     Set_list
     Start_shard
     info "服务器开启中。。。请稍候。。。"
@@ -508,7 +505,13 @@ Choose_exit_cluster(){
     index=1
     for dirlist in $(cat /tmp/dirlist.txt)
     do
-        echo "${index}. ${dirlist}"
+        if [ -f ${dst_base_dir}/${dirlist}/cluster.ini ]
+        then
+            cluster_name_str=$(cat ${dst_base_dir}/${dirlist}/cluster.ini | grep ^cluster_name= | cut -d "=" -f2)
+        else
+            cluster_name_str="不完整存档"
+        fi
+        echo "${index}. ${dirlist}：${cluster_name_str}"
         let index++
     done
     echo -e "\e[92m请输入你要${cluster_str}的存档${Red_font_prefix}[编号]${Font_color_suffix}：\e[0m\c"
@@ -697,7 +700,24 @@ Set_world(){
     else
         cat ${data_dir}/lavaarena.lua > ${dst_base_dir}/${cluster}/Master/leveldataoverride.lua
         info "熔炉世界配置已写入！"
-        tip "!!! 需要添加熔炉MOD后重启服务器才能成功开启熔炉！！！"
+        info "正在检查熔炉MOD是否已下载安装 。。。"
+        if [ -f ${dst_server_dir}/mods/workshop-1531169447/modinfo.lua ]
+        then
+            info "熔炉MOD已安装 。。。"
+        else
+            tip "熔炉MOD未安装 。。。即将下载 。。。"
+            echo "ServerModSetup(\"1531169447\")" > ${dst_server_dir}/mods/dedicated_server_mods_setup.lua
+            Download_MOD
+        fi
+        if [ -f ${dst_server_dir}/mods/workshop-1531169447/modinfo.lua ]
+        then
+            Default_mod
+            modid=1531169447
+            Addmodfunc
+            info "熔炉MOD已启用 。。。"
+        else
+            tip "熔炉MOD启用失败，请自行检查原因 。。。"
+        fi
     fi
 }
 Set_world_config(){
@@ -803,14 +823,17 @@ Write_in(){
     cat "${data_dir}/${1}end.lua" >> ${data_file}
 }
 Default_mod(){
-    echo 'return {
+    if [ ! -f ${dst_base_dir}/${cluster}/Master/modoverrides.lua ]
+    then
+        echo 'return {
 -- 别删这个
 ["DONOTDELETE"]={ configuration_options={  }, enabled=true }
 }' > ${dst_base_dir}/${cluster}/Master/modoverrides.lua
-    echo 'return {
+        echo 'return {
 -- 别删这个
 ["DONOTDELETE"]={ configuration_options={  }, enabled=true }
 }' > ${dst_base_dir}/${cluster}/Caves/modoverrides.lua
+    fi
 }
 Setup_mod(){
     if [ -f ${data_dir}/mods_setup.lua ]
