@@ -602,9 +602,9 @@ Set_cluster(){
                    listnum=$[${changelistindex} - 1]*2
                    changelist[1]=${changelist[$[$listnum + 5]]}
                else
-                   echo -e "\e[92m请输入${changelist[2]}(请不要输入空格)：\e[0m\c"
+                   echo -e "\e[92m请输入${changelist[2]}：\e[0m\c"
                    read changestr
-                   changelist[1]=${changestr}
+                   changelist[1]="\"${changestr}\""
                fi
                changestr="${changelist[@]}"
                sed -i "${cmd}c ${changestr}" ${dst_cluster_file}
