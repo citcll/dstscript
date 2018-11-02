@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.9.2"
+script_ver="1.9.3"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -181,23 +181,23 @@ Listusedmod(){
     grep -n "^" ${data_dir}/modconflist.lua
 }
 Addmod(){
-    echo -e "请从以上列表选择你要启用的MOD${Red_font_prefix}[编号]${Font_color_suffix}，不存在的直接输入MODID"
-    echo "具体配置已写入 modoverride.lua, shell下修改太麻烦，可打开配置文件手动修改"
-    echo "添加完毕要退出请输入数字 0 ！"
+    info "请从以上列表选择你要启用的MOD${Red_font_prefix}[编号]${Font_color_suffix}，不存在的直接输入MODID"
+    info "具体配置已写入 modoverride.lua, shell下修改太麻烦，可打开配置文件手动修改"
+    info "添加完毕要退出请输入数字 0 ！"
     while (true)
     do
         read modid
         if [[ "${modid}" == "0" ]]
         then
-            echo "添加完毕 ！"
+            info "添加完毕 ！"
             break
         else
             Addmodfunc
         fi
     done
-    echo "要修改具体参数配置请手动打开***更改："
-    echo "${dst_base_dir}/${cluster}/Master/modoverrides.lua"
-    echo "${dst_base_dir}/${cluster}/Caves/modoverrides.lua"
+    info "要修改具体参数配置请手动打开***更改："
+    info "${dst_base_dir}/${cluster}/Master/modoverrides.lua"
+    info "${dst_base_dir}/${cluster}/Caves/modoverrides.lua"
     sleep 3
     clear
 }
@@ -257,7 +257,7 @@ Delmodfromshard(){
     fi
 }
 Delmod(){
-    echo -e "请从以上列表选择你要停用的MOD${Red_font_prefix}[编号]${Font_color_suffix},非脚本添加的MOD不要使用本功能,完毕请输数字 0 ！"
+    info "请从以上列表选择你要停用的MOD${Red_font_prefix}[编号]${Font_color_suffix},非脚本添加的MOD不要使用本功能,完毕请输数字 0 ！"
     while (true)
     do
         read modid
@@ -312,15 +312,15 @@ Addlist(){
         read kleiid
         if [[ "${kleiid}" == "0" ]]
         then
-            echo "添加完毕！"
+            info "添加完毕！"
             break
         else
             if [[ $(grep "${kleiid}" -c "${data_dir}/${listfile}") > 0 ]]
             then
-                echo -e "\e[92m名单${kleiid}已经存在！\e[0m"
+                info "名单${kleiid}已经存在！"
             else
                 echo "${kleiid}" >> ${data_dir}/${listfile}
-                echo -e "\e[92m名单${kleiid}已添加！\e[0m"
+                info "名单${kleiid}已添加！"
             fi
         fi
     done
@@ -335,11 +335,11 @@ Dellist()
         read kleiid
         if [[ "${kleiid}" == "0" ]]
         then
-            echo "移除完毕！"
+            info "移除完毕！"
             break
         else
             sed -i "${kleid}d" ${dst_base_dir}/${listfile}
-            echo -e "\e[92m名单已移除！\e[0m"
+            info "名单已移除！"
         fi
     done
 }
@@ -884,12 +884,12 @@ Start_check(){
         then
             if [[ $(grep "Sim paused" -c "${masterserverlog_path}") > 0 ]]
             then
-                echo "地上服务器开启成功，和小伙伴尽情玩耍吧！"
+                info "地上服务器开启成功，和小伙伴尽情玩耍吧！"
                 break
             fi
             if [[ $(grep "Your Server Will Not Start" -c "${masterserverlog_path}") > 0 ]]
             then
-                echo "地上服务器开启未成功，请执行关闭服务器命令后再次尝试，并注意令牌是否成功设置且有效。"
+                tip "地上服务器开启未成功，请执行关闭服务器命令后再次尝试，并注意令牌是否成功设置且有效。"
                 break
             fi
         fi
@@ -897,12 +897,12 @@ Start_check(){
         then
             if [[ $(grep "Sim paused" -c "${cavesserverlog_path}") > 0 ]]
             then
-                echo "洞穴服务器开启成功，和小伙伴尽情玩耍吧！"
+                info "洞穴服务器开启成功，和小伙伴尽情玩耍吧！"
                 break
             fi
             if [[ $(grep "Your Server Will Not Start" -c "${cavesserverlog_path}") > 0 ]]
             then
-                echo "洞穴服务器开启未成功，请执行关闭服务器命令后再次尝试，并注意令牌是否成功设置且有效。"
+                tip "洞穴服务器开启未成功，请执行关闭服务器命令后再次尝试，并注意令牌是否成功设置且有效。"
                 break
             fi
         fi
