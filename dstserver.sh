@@ -471,12 +471,20 @@ Start_server(){
     then
         echo -e "\e[92m请输入新建存档名称：（不要包含中文、符号和空格）\e[0m"
         read cluster
-        if [ ! -d "${dst_base_dir}/${cluster}" ]
+        if [ -d "${dst_base_dir}/${cluster}" ]
         then
-            mkdir -p ${dst_base_dir}/${cluster}
-            mkdir -p ${dst_base_dir}/${cluster}/Master
-            mkdir -p ${dst_base_dir}/${cluster}/Caves
+            tip "${cluster}存档已存在！是否删除已有存档：1.是  2.否？ "
+            read ifdel
+            if [[ $ifdel == "2" ]]
+            then
+                rm -rf ${dst_base_dir}/${cluster}
+            else
+                rm -rf ${dst_base_dir}/${cluster}/cluster.ini
+            fi
         fi
+        mkdir -p ${dst_base_dir}/${cluster}
+        mkdir -p ${dst_base_dir}/${cluster}/Master
+        mkdir -p ${dst_base_dir}/${cluster}/Caves
         Set_cluster
         Set_token
         Set_serverini
