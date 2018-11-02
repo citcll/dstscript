@@ -619,7 +619,7 @@ Set_cluster(){
                 read changestr
                 # 处理空格
                 changestr=$(echo ${changestr} | sed 's/ /#/g')
-                changelist[1]="\"${changestr}\""
+                changelist[1]=${changestr}
             fi
             changestr="${changelist[@]}"
             sed -i "${cmd}c ${changestr}" ${dst_cluster_file}
