@@ -572,11 +572,12 @@ Set_cluster(){
                     do
                         if [ "${ss[$i]}" == "${ss[1]}" ]
                         then
-                            value=$(echo ${ss[$i+1]} | sed 's/#/ /g')
+                            value=${ss[$i+1]}
                         fi
                     done
                 else
-                    value=${ss[1]}
+                    # 处理替代空格的#号
+                    value=$(echo ${ss[1]} | sed 's/#/ /g')
                 fi
                 echo -e "\e[33m[${index}] ${ss[2]}：${value}\e[0m"
             fi
