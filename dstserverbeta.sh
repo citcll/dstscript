@@ -206,14 +206,14 @@ Addmodtoshard(){
     then
         if [[ $(grep "${moddir}" "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua") > 0 ]]
         then
-            echo "${shard}世界该Mod(${moddir})已添加"
+            info "${shard}世界该Mod(${moddir})已添加"
         else
             sed -i '1d' ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
             cat ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua > ${data_dir}/modconftemp.txt
             echo "return {" > ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
             cat ${data_dir}/modconfwrite.lua >> ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
             cat ${data_dir}/modconftemp.txt >> ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
-            echo "${shard}世界Mod(${moddir})添加完成"
+            info "${shard}世界Mod(${moddir})添加完成"
         fi
     else
         tip "${shard} MOD配置文件未由脚本初始化，无法操作！如你已自行配置请忽略本提示！"
@@ -248,9 +248,9 @@ Delmodfromshard(){
             upnum=$((${up} - 1))
             downnum=$((${down} - 2))
             sed -i "${upnum},${downnum}d" "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua"
-            echo "${shard}世界该Mod(${moddir})已停用！"
+            info "${shard}世界该Mod(${moddir})已停用！"
         else
-            echo "${shard}世界该Mod(${moddir})未启用！"
+            info "${shard}世界该Mod(${moddir})未启用！"
         fi
     else
         tip "${shard} MOD配置文件未由脚本初始化，无法操作！如你已自行配置请忽略本提示！"
@@ -509,7 +509,10 @@ Choose_exit_cluster(){
         then
             cluster_name_str=$(cat ${dst_base_dir}/${dirlist}/cluster.ini | grep ^cluster_name= | cut -d "=" -f2)
         fi
-        [ -z $cluster_name_str ] && cluster_name_str="不完整或已损坏的存档"
+        if [[ $cluster_name_str == "" ]]
+        then
+            cluster_name_str="不完整或已损坏的存档"
+        fi
         echo "${index}. ${dirlist}：${cluster_name_str}"
         let index++
     done

@@ -21,5 +21,5 @@ console_enabled true 控制台 [MISC] readonly
 shard_enabled true 多世界 [SHARD] readonly
 bind_ip 0.0.0.0 绑定IP [SHARD] readonly
 master_port 10888 游戏端口 [SHARD] readonly
-cluster_key GoforFun 多世界通信秘钥 [SHARD] readonly
-script_ver="1.2.2"
+cluster_key Ariwori 多世界通信秘钥 [SHARD] readonly
+script_ver="1.2.3"

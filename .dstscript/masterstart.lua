@@ -1,4 +1,4 @@
--- script_ver="1.2.0"
+-- script_ver="1.2.1"
 return {
   desc="由最好用的脚本dstserver.sh创建！",
   hideminimap=false,

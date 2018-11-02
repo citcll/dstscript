@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.8.9"
+script_ver="1.9.0"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -206,14 +206,14 @@ Addmodtoshard(){
     then
         if [[ $(grep "${moddir}" "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua") > 0 ]]
         then
-            echo "${shard}世界该Mod(${moddir})已添加"
+            info "${shard}世界该Mod(${moddir})已添加"
         else
             sed -i '1d' ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
             cat ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua > ${data_dir}/modconftemp.txt
             echo "return {" > ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
             cat ${data_dir}/modconfwrite.lua >> ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
             cat ${data_dir}/modconftemp.txt >> ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
-            echo "${shard}世界Mod(${moddir})添加完成"
+            info "${shard}世界Mod(${moddir})添加完成"
         fi
     else
         tip "${shard} MOD配置文件未由脚本初始化，无法操作！如你已自行配置请忽略本提示！"
@@ -248,9 +248,9 @@ Delmodfromshard(){
             upnum=$((${up} - 1))
             downnum=$((${down} - 2))
             sed -i "${upnum},${downnum}d" "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua"
-            echo "${shard}世界该Mod(${moddir})已停用！"
+            info "${shard}世界该Mod(${moddir})已停用！"
         else
-            echo "${shard}世界该Mod(${moddir})未启用！"
+            info "${shard}世界该Mod(${moddir})未启用！"
         fi
     else
         tip "${shard} MOD配置文件未由脚本初始化，无法操作！如你已自行配置请忽略本提示！"
@@ -442,10 +442,7 @@ Run_server(){
     cluster=$(cat ${server_conf_file} | grep "^cluster" | cut -d "=" -f2)
     shard=$(cat ${server_conf_file} | grep "^shard" | cut -d "=" -f2)
     exchangestatus true
-    if [ ! -f ${dst_base_dir}/${cluster}/Master/modoverrides.lua ]
-    then
-        Default_mod
-    fi
+    Default_mod
     Set_list
     Start_shard
     info "服务器开启中。。。请稍候。。。"
@@ -508,7 +505,15 @@ Choose_exit_cluster(){
     index=1
     for dirlist in $(cat /tmp/dirlist.txt)
     do
-        echo "${index}. ${dirlist}"
+        if [ -f ${dst_base_dir}/${dirlist}/cluster.ini ]
+        then
+            cluster_name_str=$(cat ${dst_base_dir}/${dirlist}/cluster.ini | grep ^cluster_name= | cut -d "=" -f2)
+        fi
+        if [[ $cluster_name_str == "" ]]
+        then
+            cluster_name_str="不完整或已损坏的存档"
+        fi
+        echo "${index}. ${dirlist}：${cluster_name_str}"
         let index++
     done
     echo -e "\e[92m请输入你要${cluster_str}的存档${Red_font_prefix}[编号]${Font_color_suffix}：\e[0m\c"
@@ -697,7 +702,24 @@ Set_world(){
     else
         cat ${data_dir}/lavaarena.lua > ${dst_base_dir}/${cluster}/Master/leveldataoverride.lua
         info "熔炉世界配置已写入！"
-        tip "!!! 需要添加熔炉MOD后重启服务器才能成功开启熔炉！！！"
+        info "正在检查熔炉MOD是否已下载安装 。。。"
+        if [ -f ${dst_server_dir}/mods/workshop-1531169447/modinfo.lua ]
+        then
+            info "熔炉MOD已安装 。。。"
+        else
+            tip "熔炉MOD未安装 。。。即将下载 。。。"
+            echo "ServerModSetup(\"1531169447\")" > ${dst_server_dir}/mods/dedicated_server_mods_setup.lua
+            Download_MOD
+        fi
+        if [ -f ${dst_server_dir}/mods/workshop-1531169447/modinfo.lua ]
+        then
+            Default_mod
+            modid=1531169447
+            Addmodfunc
+            info "熔炉MOD已启用 。。。"
+        else
+            tip "熔炉MOD启用失败，请自行检查原因 。。。"
+        fi
     fi
 }
 Set_world_config(){
@@ -803,14 +825,17 @@ Write_in(){
     cat "${data_dir}/${1}end.lua" >> ${data_file}
 }
 Default_mod(){
-    echo 'return {
+    if [ ! -f ${dst_base_dir}/${cluster}/Master/modoverrides.lua ]
+    then
+        echo 'return {
 -- 别删这个
 ["DONOTDELETE"]={ configuration_options={  }, enabled=true }
 }' > ${dst_base_dir}/${cluster}/Master/modoverrides.lua
-    echo 'return {
+        echo 'return {
 -- 别删这个
 ["DONOTDELETE"]={ configuration_options={  }, enabled=true }
 }' > ${dst_base_dir}/${cluster}/Caves/modoverrides.lua
+    fi
 }
 Setup_mod(){
     if [ -f ${data_dir}/mods_setup.lua ]
