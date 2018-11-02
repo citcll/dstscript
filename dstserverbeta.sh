@@ -593,27 +593,29 @@ Set_cluster(){
                ;;
             *)
             changelist=($(sed -n "${cmd}p" ${dst_cluster_file}))
-               if [ "${changelist[4]}" = "choose" ]
-               then
-                   echo -e "\e[92m请选择${changelist[2]}： \e[0m\c"
-                   index=1
-                   for ((i=5;i<${#changelist[*]};i=$i+2))
-                   do
-                       echo -e "\e[92m${index}.${changelist[$[$i + 1]]}\e[0m\c"
-                       index=$[${index} + 1]
-                   done
-                   echo -e "\e[92m: \e[0m\c"
-                   read changelistindex
-                   listnum=$[${changelistindex} - 1]*2
-                   changelist[1]=${changelist[$[$listnum + 5]]}
-               else
-                   echo -e "\e[92m请输入${changelist[2]}：\e[0m\c"
-                   read changestr
-                   changelist[1]="\"${changestr}\""
-               fi
-               changestr="${changelist[@]}"
-               sed -i "${cmd}c ${changestr}" ${dst_cluster_file}
-               ;;
+            if [ "${changelist[4]}" = "choose" ]
+            then
+                echo -e "\e[92m请选择${changelist[2]}： \e[0m\c"
+                index=1
+                for ((i=5;i<${#changelist[*]};i=$i+2))
+                do
+                    echo -e "\e[92m${index}.${changelist[$[$i + 1]]}\e[0m\c"
+                    index=$[${index} + 1]
+                done
+                echo -e "\e[92m: \e[0m\c"
+                read changelistindex
+                listnum=$[${changelistindex} - 1]*2
+                changelist[1]=${changelist[$[$listnum + 5]]}
+            else
+                echo -e "\e[92m请输入${changelist[2]}：\e[0m\c"
+                read changestr
+                # 处理空格
+                changestr=$(echo ${changestr} | sed 's/ /#/g')
+                changelist[1]="\"${changestr}\""
+            fi
+            changestr="${changelist[@]}"
+            sed -i "${cmd}c ${changestr}" ${dst_cluster_file}
+            ;;
         esac
     done
     type=([GAMEPLAY] [NETWORK] [MISC] [SHARD])
@@ -629,7 +631,9 @@ Set_cluster(){
                 then
                     lcstr[1]=""
                 fi
-                echo "${lcstr[0]}=${lcstr[1]}" >> ${dst_base_dir}/${cluster}/cluster.ini
+                # 还原空格
+                value_str=$(echo ${lcstr[1]} | sed 's/#/ /g')
+                echo "${lcstr[0]}=${value_str}" >> ${dst_base_dir}/${cluster}/cluster.ini
             fi
         done
         echo "" >> ${dst_base_dir}/${cluster}/cluster.ini
@@ -647,8 +651,9 @@ Set_token(){
     read ch
     if [ $ch -eq 1 ]
     then
-        tip "请输入或粘贴你的令牌到此处，注意最后不要输入空格："
+        tip "请输入或粘贴你的令牌到此处："
         read mytoken
+        mytoken=$(echo ${mytoken} | sed 's/ //g')
         echo ${mytoken} > ${dst_token_file}
         info "已更改服务器默认令牌！"
     else
