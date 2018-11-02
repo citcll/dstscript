@@ -575,7 +575,7 @@ Set_cluster(){
         do
             if [[ ${cmd} == "" ]]
             then
-                echo -e "\e[92m请选择你要更改的选项（请不要包含空格）(修改完毕输入数字 0 确认修改并退出)：\e[0m\c"
+                echo -e "\e[92m请选择你要更改的选项(修改完毕输入数字 0 确认修改并退出)：\e[0m\c"
                 read cmd
             else
                 break
