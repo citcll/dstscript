@@ -508,9 +508,8 @@ Choose_exit_cluster(){
         if [ -f ${dst_base_dir}/${dirlist}/cluster.ini ]
         then
             cluster_name_str=$(cat ${dst_base_dir}/${dirlist}/cluster.ini | grep ^cluster_name= | cut -d "=" -f2)
-        else
-            cluster_name_str="不完整存档"
         fi
+        [ -z $cluster_name_str ] && cluster_name_str="不完整或已损坏的存档"
         echo "${index}. ${dirlist}：${cluster_name_str}"
         let index++
     done
