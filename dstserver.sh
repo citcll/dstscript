@@ -550,6 +550,7 @@ Set_cluster(){
         index=1
         cat ${dst_cluster_file} | grep -v "script_ver" | while read line
         do
+            IFS='#'
             ss=(${line})
             if [ "${ss[4]}" != "readonly" ]
             then
@@ -568,6 +569,7 @@ Set_cluster(){
                 echo -e "\e[33m[${index}] ${ss[2]}：${value}\e[0m"
             fi
             index=$[${index} + 1]
+            unset IFS
         done
         echo -e "\e[92m===============================================\e[0m"
         cmd=""
@@ -581,6 +583,7 @@ Set_cluster(){
                 break
             fi
         done
+        IFS='#'
         case ${cmd} in
             0)
             info "更改已保存！"
@@ -610,10 +613,12 @@ Set_cluster(){
                sed -i "${cmd}c ${changestr}" ${dst_cluster_file}
                ;;
         esac
+        unset IFS
     done
     type=([GAMEPLAY] [NETWORK] [MISC] [SHARD])
     for ((i=0;i<${#type[*]};i++))
     do
+        IFS='#'
         echo "${type[i]}" >> ${dst_base_dir}/${cluster}/cluster.ini
         cat ${dst_cluster_file} | grep -v "script_ver" | while read lc
         do
@@ -628,6 +633,7 @@ Set_cluster(){
             fi
         done
         echo "" >> ${dst_base_dir}/${cluster}/cluster.ini
+        unset IFS
     done
 }
 Set_token(){
