@@ -572,7 +572,7 @@ Set_cluster(){
                     do
                         if [ "${ss[$i]}" == "${ss[1]}" ]
                         then
-                            value=${ss[$i+1]}
+                            value=$(echo ${ss[$i+1]} | sed 's/#/ /g')
                         fi
                     done
                 else
