@@ -908,6 +908,7 @@ Start_check(){
                 then
                     newshardarray="TOKENINVALID"
                     break
+                fi
             else
                 current_time=$(date "+%s")
                 check_time=$[ $current_time - $start_time ]
@@ -936,10 +937,10 @@ Start_check(){
         if [[ ${newshardarray} == "TIME_OUT" ]]
         then
             error "MOD下载超时或端口占用, 请自行检查服务器日志处理问题后重试！"
-        else if [[ ${newshardarray} == "BREAK" ]]
+        elif [[ ${newshardarray} == "BREAK" ]]
         then
             error "开启的MOD存在bug或设置存在问题, 请自行检查服务器日志处理问题后重试！"
-        else if [[ ${newshardarray} == "TOKENINVALID" ]]
+        elif [[ ${newshardarray} == "TOKENINVALID" ]]
         then
             error "服务器令牌无效或未设置！！！请自行检查处理问题后重试！"
         else
