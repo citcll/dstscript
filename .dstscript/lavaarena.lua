@@ -6,7 +6,7 @@ return {
     location="lavaarena",
     max_playlist_position=999,
     min_playlist_position=0,
-    name="熔炉竞技场",
+    name="熔炉竞技场--由脚本dstserver.sh创建！",
     numrandom_set_pieces=0,
     override_level_string=false,
     overrides={

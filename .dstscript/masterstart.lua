@@ -6,7 +6,7 @@ return {
   location="forest",
   max_playlist_position=999,
   min_playlist_position=0,
-  name="地面世界",
+  name="地面世界--由脚本dstserver.sh创建！",
   numrandom_set_pieces=10,
   ordered_story_setpieces={ "Sculptures_1", "Maxwell5" },
   override_level_string=false,

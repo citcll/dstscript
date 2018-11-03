@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.9.3"
+script_ver="1.9.5"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -46,8 +46,8 @@ Menu(){
         echo -e "\e[31m游戏服务端安装目录：${dst_server_dir} (Version: $(cat ${dst_server_dir}/version.txt))\e[33m【${dst_need_update_str}】\e[0m"
         echo -e "\e[35m公告：$(cat /tmp/dstscript/announce.txt)\e[0m"
         echo -e "\e[92m[1]启动服务器           [2]关闭服务器           [3]重启服务器\e[0m"
-        echo -e "\e[92m[4]查看服务器状态       [5]添加或移除MOD        [6]设置管理员和黑名单\e[0m"
-        echo -e "\e[92m[7]控制台               [8]自动更新及异常维护   [9]退出本脚本\e[0m"
+        echo -e "\e[92m[4]修改房间设置         [5]添加或移除MOD        [6]设置管理员和黑名单\e[0m"
+        echo -e "\e[92m[7]主世界服务器后台      [8]自动更新及异常维护   [9]退出本脚本\e[0m"
         echo -e "\e[92m[10]删除存档            [11]更新游戏服务端      [12]更新MOD\e[0m"
         Simple_server_status
         echo -e "\e[33m================================================================================\e[0m"
@@ -65,7 +65,7 @@ Menu(){
             Reboot_server
             ;;
             4)
-            Server_detail
+            Change_cluster
             ;;
             5)
             MOD_manager
@@ -94,19 +94,28 @@ Menu(){
         esac
     done
 }
-###################################################################
-Not_work_now(){
-    info "功能尚未完成，请等待作者更新！"
-}
-###################################################################
-Server_detail(){
-    Not_work_now
+Change_cluster(){
+    Get_current_cluster
+    Set_cluster
 }
 Server_console(){
-    Not_work_now
+    if tmux has-session -t DST_Master > /dev/null 2>&1
+    then
+        info "即将跳转主世界后台。。。退出请按Ctrl + B松开再按D，否则服务器将停止运行！！！"
+        sleep 3
+        tmux attach-session -t DST_Master
+    else
+        tip "主世界未开启或当前服务器只开启了洞穴世界！！！"
+    fi
+}
+Get_current_cluster(){
+    cluster=$(cat ${server_conf_file} | grep "^cluster" | cut -d "=" -f2)
+}
+Get_server_status(){
+    serveropen=$(grep "serveropen" ${server_conf_file} | cut -d "=" -f2)
 }
 MOD_manager(){
-    [ -z ${cluster} ] && cluster=$(cat ${server_conf_file} | grep "^cluster" | cut -d "=" -f2)
+    Get_current_cluster
     echo -e "\e[92m【存档：${cluster}】 你要 1.添加mod  2.删除mod：\e[0m\c"
     read mc
     case ${mc} in
@@ -142,7 +151,7 @@ used = \"${used}\"" > "${data_dir}/modinfo.lua"
         fi
     fi
     cd ${data_dir}
-    lua ${data_dir}/modconf.lua
+    lua ${data_dir}/modconf.lua > /dev/null 2>&1
     cd ${HOME}
 }
 Listallmod(){
@@ -389,7 +398,7 @@ Force_update(){
         Reboot_announce
         Close_server
         Install_Game
-        serveropen=$(grep "serveropen" ${server_conf_file} | cut -d "=" -f2)
+        Get_server_status
         if [[ ${serveropen} == "true" ]]
         then
             Run_server
@@ -401,7 +410,7 @@ Force_update(){
     esac
 }
 Update_DST(){
-    serveropen=$(grep "serveropen" ${server_conf_file} | cut -d "=" -f2)
+    Get_server_status
     Update_DST_Check
     if [[ ${dst_need_update} == "true" ]]
     then
@@ -412,7 +421,7 @@ Update_DST(){
     else
         tip "无可用更新！当前版本（${availablebuild}）"
     fi
-    serveropen=$(grep "serveropen" ${server_conf_file} | cut -d "=" -f2)
+    Get_server_status
     if [[ ${serveropen} == "true" && ${dst_need_update} == "true" ]]
     then
         Run_server
@@ -439,7 +448,7 @@ exchangestatus(){
     fi
 }
 Run_server(){
-    cluster=$(cat ${server_conf_file} | grep "^cluster" | cut -d "=" -f2)
+    Get_current_cluster
     shard=$(cat ${server_conf_file} | grep "^shard" | cut -d "=" -f2)
     exchangestatus true
     Default_mod
@@ -728,7 +737,7 @@ Set_world(){
         if [ -f ${dst_server_dir}/mods/workshop-1531169447/modinfo.lua ]
         then
             Default_mod
-            modid=1531169447
+            modid='1531169447'
             Addmodfunc
             info "熔炉MOD已启用 。。。"
         else
@@ -1099,7 +1108,7 @@ Update_DST_MOD_Check(){
             cd ${data_dir}
             mod_cur_ver=$(lua modconf.lua)
         else
-            mod_cur_ver=${mod_new_ver}
+            mod_cur_ver=000
         fi
         if [[ ${mod_new_ver} != "" && ${mod_new_ver} != "" && ${mod_new_ver} != "nil" && ${mod_new_ver} != ${mod_new_ver} ]]
         then
@@ -1130,7 +1139,7 @@ Status_keep(){
 }
 Simple_server_status(){
     cluster="无"
-    [ -f ${server_conf_file} ] && cluster=$(cat ${server_conf_file} | grep "^cluster" | cut -d "=" -f2)
+    [ -f ${server_conf_file} ] && Get_current_cluster
     if tmux has-session -t DST_Master > /dev/null 2>&1
     then
         master_on="开启"
@@ -1171,7 +1180,7 @@ Fix_Net_hosts(){
     sudo chmod 644 /etc/hosts
 }
 Update_MOD(){
-    cluster=$(cat ${server_conf_file} | grep "^cluster" | cut -d "=" -f2)
+    Get_current_cluster
     Setup_mod
     Update_DST_MOD_Check
     if [[ ${MOD_update} == "true" ]]
@@ -1189,11 +1198,14 @@ Download_MOD(){
     tmux new-session -s DST_MODUPDATE -d "${dst_bin_cmd}"
     while (true)
     do
-        if [[ $(grep "Your Server Will Not Start" -c "${dst_base_dir}/Cluster_1/Master/server_log.txt") > 0 ]]
+        if tmux has-session -t DST_MODUPDATE > /dev/null 2>&1
         then
-            info "新MOD安装/更新完毕！"
-            tmux kill-session -t DST_MODUPDATE
-            break
+            if [[ $(grep "Your Server Will Not Start" -c "${dst_base_dir}/Cluster_1/Master/server_log.txt") > 0 ]]
+            then
+                info "新MOD安装/更新完毕！"
+                tmux kill-session -t DST_MODUPDATE
+                break
+            fi
         fi
     done
 }
