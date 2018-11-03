@@ -91,6 +91,9 @@ Menu(){
             12)
             Update_MOD
             ;;
+            *)
+            error "输入有误！！！"
+            ;;
         esac
     done
 }
