@@ -1,4 +1,4 @@
--- script_ver="1.2.1"
+-- script_ver="1.2.2"
 return {
   background_node_range={ 0, 1 },
   desc="由最好用的脚本dstserver.sh创建！",
