@@ -47,7 +47,7 @@ Menu(){
         echo -e "\e[35m公告：$(cat /tmp/dstscript/announce.txt)\e[0m"
         echo -e "\e[92m[1]启动服务器           [2]关闭服务器           [3]重启服务器\e[0m"
         echo -e "\e[92m[4]修改房间设置         [5]添加或移除MOD        [6]设置管理员和黑名单\e[0m"
-        echo -e "\e[92m[7]主世界服务器后台      [8]自动更新及异常维护   [9]退出本脚本\e[0m"
+        echo -e "\e[92m[7]主世界服务器后台     [8]自动更新及异常维护   [9]退出本脚本\e[0m"
         echo -e "\e[92m[10]删除存档            [11]更新游戏服务端      [12]更新MOD\e[0m"
         Simple_server_status
         echo -e "\e[33m================================================================================\e[0m"
@@ -107,6 +107,9 @@ Server_console(){
     else
         tip "主世界未开启或当前服务器只开启了洞穴世界！！！"
     fi
+}
+Get_shard_array(){
+    shardarray=$(grep "shardarray" ${server_conf_file} | cut -d "=" -f2)
 }
 Get_current_cluster(){
     cluster=$(cat ${server_conf_file} | grep "^cluster" | cut -d "=" -f2)
@@ -211,23 +214,26 @@ Addmod(){
     clear
 }
 Addmodtoshard(){
-    if [ -f ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua ]
-    then
-        if [[ $(grep "${moddir}" "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua") > 0 ]]
+    Get_shard_array
+    for shard in ${shardarray}
+    do
+        if [ -f ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua ]
         then
-            info "${shard}世界该Mod(${moddir})已添加"
+            if [[ $(grep "${moddir}" "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua") > 0 ]]
+            then
+                info "${shard}世界该Mod(${moddir})已添加"
+            else
+                sed -i '1d' ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
+                cat ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua > ${data_dir}/modconftemp.txt
+                echo "return {" > ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
+                cat ${data_dir}/modconfwrite.lua >> ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
+                cat ${data_dir}/modconftemp.txt >> ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
+                info "${shard}世界Mod(${moddir})添加完成"
+            fi
         else
-            sed -i '1d' ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
-            cat ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua > ${data_dir}/modconftemp.txt
-            echo "return {" > ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
-            cat ${data_dir}/modconfwrite.lua >> ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
-            cat ${data_dir}/modconftemp.txt >> ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
-            info "${shard}世界Mod(${moddir})添加完成"
+            tip "${shard} MOD配置文件未由脚本初始化，无法操作！如你已自行配置请忽略本提示！"
         fi
-    else
-        tip "${shard} MOD配置文件未由脚本初始化，无法操作！如你已自行配置请忽略本提示！"
-    fi
-    
+    done
 }
 Truemodid(){
     if [ ${modid} -lt 1000 ]
@@ -241,29 +247,29 @@ Addmodfunc(){
     Truemodid
     fuc="writein"
     MOD_conf
-    for shard in "Master" "Caves"
-    do
-        Addmodtoshard
-    done
+    Addmodtoshard
 }
 Delmodfromshard(){
-    if [ -f ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua ]
-    then
-        if [[ $(grep "${moddir}" -c "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua") > 0 ]]
+    for shard in ${shardarray}
+    do
+        if [ -f ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua ]
         then
-            grep -n "^\[" "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua" > ${data_dir}/modidlist.txt
-            up=$(grep "${moddir}" "${data_dir}/modidlist.txt" | cut -d ":" -f1)
-            down=$(grep -A 1 "${moddir}" "${data_dir}/modidlist.txt" | tail -1 |cut -d ":" -f1)
-            upnum=$((${up} - 1))
-            downnum=$((${down} - 2))
-            sed -i "${upnum},${downnum}d" "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua"
-            info "${shard}世界该Mod(${moddir})已停用！"
+            if [[ $(grep "${moddir}" -c "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua") > 0 ]]
+            then
+                grep -n "^\[" "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua" > ${data_dir}/modidlist.txt
+                up=$(grep "${moddir}" "${data_dir}/modidlist.txt" | cut -d ":" -f1)
+                down=$(grep -A 1 "${moddir}" "${data_dir}/modidlist.txt" | tail -1 |cut -d ":" -f1)
+                upnum=$((${up} - 1))
+                downnum=$((${down} - 2))
+                sed -i "${upnum},${downnum}d" "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua"
+                info "${shard}世界该Mod(${moddir})已停用！"
+            else
+                info "${shard}世界该Mod(${moddir})未启用！"
+            fi
         else
-            info "${shard}世界该Mod(${moddir})未启用！"
+            tip "${shard} MOD配置文件未由脚本初始化，无法操作！如你已自行配置请忽略本提示！"
         fi
-    else
-        tip "${shard} MOD配置文件未由脚本初始化，无法操作！如你已自行配置请忽略本提示！"
-    fi
+    done
 }
 Delmod(){
     info "请从以上列表选择你要停用的MOD${Red_font_prefix}[编号]${Font_color_suffix},非脚本添加的MOD不要使用本功能,完毕请输数字 0 ！"
@@ -276,10 +282,7 @@ Delmod(){
             break
         else
             Truemodid
-            for shard in "Master" "Caves"
-            do
-                Delmodfromshard
-            done
+            Delmodfromshard
         fi
     done
 }
@@ -504,16 +507,16 @@ Start_server(){
     fi
     echo "cluster=${cluster}" > ${server_conf_file}
     echo -e "\e[92m请选择要启动的世界：1.仅地上（熔炉MOD选我）  2.仅洞穴  3.地上 + 洞穴 ? \e[0m\c"
-    read shard
-    case ${shard} in
+    read shardop
+    case ${shardop} in
         1)
-        shard="Master";;
+        shardarray="Master";;
         2)
-        shard="Caves";;
+        shardarray="Caves";;
         *)
-        shard="Master Caves";;
+        shardarray="Master Caves";;
     esac
-    echo "shard=${shard}" >> ${server_conf_file}
+    echo "shardarray=${shardarray}" >> ${server_conf_file}
     Run_server
 }
 Choose_exit_cluster(){
@@ -738,6 +741,7 @@ Set_world(){
         then
             Default_mod
             modid='1531169447'
+            Get_shard_array
             Addmodfunc
             info "熔炉MOD已启用 。。。"
         else
@@ -1121,7 +1125,8 @@ Update_DST_MOD_Check(){
     done
 }
 Status_keep(){
-    for shard in $(grep "shard" ${server_conf_file} | cut -d "=" -f2)
+    Get_shard_array
+    for shard in $shardarray
     do
         if ! tmux has-session -t DST_${shard} > /dev/null 2>&1
         then
