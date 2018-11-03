@@ -452,7 +452,7 @@ exchangestatus(){
 }
 Run_server(){
     Get_current_cluster
-    shard=$(cat ${server_conf_file} | grep "^shard" | cut -d "=" -f2)
+    Get_shard_array
     exchangestatus true
     Default_mod
     Set_list
@@ -883,7 +883,7 @@ Setup_mod(){
 Start_shard(){
     Setup_mod
     cd "${dst_server_dir}/bin"
-    for s in ${shard}
+    for s in ${shardarray}
     do
         tmux new-session -s DST_${s} -d "${dst_bin_cmd} -cluster ${cluster} -shard ${s}"
     done
