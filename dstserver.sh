@@ -889,37 +889,63 @@ Start_shard(){
     done
 }
 Start_check(){
-    masterserverlog_path="${dst_base_dir}/${cluster}/Master/server_log.txt"
-    cavesserverlog_path="${dst_base_dir}/${cluster}/Caves/server_log.txt"
-    while (true)
+    Get_shard_array
+    newshardarray=""
+    for shard in ${shardarray}
     do
-        if tmux has-session -t DST_Master > /dev/null 2>&1
-        then
-            if [[ $(grep "Sim paused" -c "${masterserverlog_path}") > 0 ]]
+        serverlog_path="${dst_base_dir}/${cluster}/Master/server_log.txt"
+        start_time=$(date "+%s")
+        while (true)
+        do
+            if tmux has-session -t DST_${shard} > /dev/null 2>&1
             then
-                info "地上服务器开启成功，和小伙伴尽情玩耍吧！"
+                if [[ $(grep "Sim paused" -c "${serverlog_path}") > 0 ]]
+                then
+                    newshardarray="${newshardarray}${shard}"
+                    break
+                fi
+                if [[ $(grep "Your Server Will Not Start" -c "${serverlog_path}") > 0 ]]
+                then
+                    newshardarray="TOKENINVALID"
+                    break
+            else
+                current_time=$(date "+%s")
+                check_time=$[ $current_time - $start_time ]
+                # 一分钟超时 MOD bug 或者设置问题
+                if [ ${check_time} > 60 ]
+                then
+                    newshardarray="BREAK"
+                    break
+                fi
+            fi
+            current_time=$(date "+%s")
+            check_time=$[ ${current_time} - ${start_time} ]
+            # 十分钟超时 MOD下载超时或端口占用
+            if [ ${check_time} -gt 600 ]
+            then
+                newshardarray="TIME_OUT"
                 break
             fi
-            if [[ $(grep "Your Server Will Not Start" -c "${masterserverlog_path}") > 0 ]]
-            then
-                tip "地上服务器开启未成功，请执行关闭服务器命令后再次尝试，并注意令牌是否成功设置且有效。"
-                break
-            fi
-        fi
-        if tmux has-session -t DST_Caves > /dev/null 2>&1
-        then
-            if [[ $(grep "Sim paused" -c "${cavesserverlog_path}") > 0 ]]
-            then
-                info "洞穴服务器开启成功，和小伙伴尽情玩耍吧！"
-                break
-            fi
-            if [[ $(grep "Your Server Will Not Start" -c "${cavesserverlog_path}") > 0 ]]
-            then
-                tip "洞穴服务器开启未成功，请执行关闭服务器命令后再次尝试，并注意令牌是否成功设置且有效。"
-                break
-            fi
-        fi
+        done
     done
+    shardarray=$(echo ${shardarray} | sed 's/ //g')
+    if [[ ${shardarray} == ${newshardarray} ]]
+    then
+        info "服务器开启成功，和小伙伴尽情玩耍吧！"
+    else
+        if [[ ${newshardarray} == "TIME_OUT" ]]
+        then
+            error "MOD下载超时或端口占用, 请自行检查服务器日志处理问题后重试！"
+        else if [[ ${newshardarray} == "BREAK" ]]
+        then
+            error "开启的MOD存在bug或设置存在问题, 请自行检查服务器日志处理问题后重试！"
+        else if [[ ${newshardarray} == "TOKENINVALID" ]]
+        then
+            error "服务器令牌无效或未设置！！！请自行检查处理问题后重试！"
+        else
+            error "未知错误！！！请反顾给作者！！！谢谢！"
+        fi
+    fi
 }
 #############################################################################
 First_run_check(){
