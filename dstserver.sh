@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.9.6"
+script_ver="1.9.7"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -102,17 +102,22 @@ Change_cluster(){
     Set_cluster
 }
 Server_console(){
-    if tmux has-session -t DST_Master > /dev/null 2>&1
+    Get_single_shard
+    if tmux has-session -t DST_${shard} > /dev/null 2>&1
     then
-        info "即将跳转主世界后台。。。退出请按Ctrl + B松开再按D，否则服务器将停止运行！！！"
+        info "即将跳转${shard}世界后台。。。退出请按Ctrl + B松开再按D，否则服务器将停止运行！！！"
         sleep 3
-        tmux attach-session -t DST_Master
+        tmux attach-session -t DST_${shard}
     else
-        tip "主世界未开启或当前服务器只开启了洞穴世界！！！"
+        tip "${shard}世界未开启或已异常退出！！！"
     fi
 }
 Get_shard_array(){
     shardarray=$(grep "shardarray" ${server_conf_file} | cut -d "=" -f2)
+}
+Get_single_shard(){
+    Get_shard_array
+    shard=$(echo $shardarray | cut -d ' ' -f1)
 }
 Get_current_cluster(){
     cluster=$(cat ${server_conf_file} | grep "^cluster" | cut -d "=" -f2)
@@ -166,9 +171,10 @@ Listallmod(){
         touch ${data_dir}/mods_setup.lua
     fi
     rm -f ${data_dir}/modconflist.lua
+    Get_single_shard
     for moddir in $(ls -F "${dst_server_dir}/mods" | grep "/$" | cut -d '/' -f1)
     do
-        if [ $(grep "${moddir}" -c "${dst_base_dir}/${cluster}/Master/modoverrides.lua") -gt 0 ]
+        if [ $(grep "${moddir}" -c "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua") -gt 0 ]
         then
             used="true"
         else
@@ -184,7 +190,8 @@ Listallmod(){
 }
 Listusedmod(){
     rm -f ${data_dir}/modconflist.lua
-    for moddir in $(grep "^\[" "${dst_base_dir}/${cluster}/Master/modoverrides.lua" | cut -d '"' -f2)
+    Get_single_shard
+    for moddir in $(grep "^\[" "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua" | cut -d '"' -f2)
     do
         if [[ "${moddir}" != "" ]]
         then
@@ -211,8 +218,7 @@ Addmod(){
         fi
     done
     info "要修改具体参数配置请手动打开***更改："
-    info "${dst_base_dir}/${cluster}/Master/modoverrides.lua"
-    info "${dst_base_dir}/${cluster}/Caves/modoverrides.lua"
+    info "${dst_base_dir}/${cluster}/${shardarray}/modoverrides.lua"
     sleep 3
     clear
 }
@@ -465,15 +471,15 @@ Run_server(){
     Start_check
 }
 Reboot_announce(){
-    if tmux has-session -t DST_Master > /dev/null 2>&1
-    then
-        tmux send-keys -t DST_Master "c_announce(\"服务器因改动或更新需要重启，预计耗时三分钟，给你带来的不便还请谅解！\")" C-m
-    fi
-    if tmux has-session -t DST_Caves > /dev/null 2>&1
-    then
-        tmux send-keys -t DST_Caves "c_announce(\"服务器设因改动或更新需要重启，预计耗时三分钟，给你带来的不便还请谅解！\")" C-m
-    fi
-    sleep 5
+    Get_shard_array
+    for shard in ${shardarray}
+    do
+        if tmux has-session -t DST_${shard} > /dev/null 2>&1
+        then
+            tmux send-keys -t DST_${shard} "c_announce(\"${shard}世界服务器因改动或更新需要重启，预计耗时三分钟，给你带来的不便还请谅解！\")" C-m
+        fi
+        sleep 5
+    done
 }
 Start_server(){
     info "本操作将会关闭已开启的服务器 ..."
@@ -482,6 +488,7 @@ Start_server(){
     echo -e "\e[92m是否新建存档: [y|n] (默认: y): \e[0m\c"
     read yn
     [[ -z "${yn}" ]] && yn="y"
+    new_cluster=""
     if [[ ${yn} == [Yy] ]]
     then
         echo -e "\e[92m请输入新建存档名称：（不要包含中文、符号和空格）\e[0m"
@@ -498,18 +505,15 @@ Start_server(){
             fi
         fi
         mkdir -p ${dst_base_dir}/${cluster}
-        mkdir -p ${dst_base_dir}/${cluster}/Master
-        mkdir -p ${dst_base_dir}/${cluster}/Caves
         Set_cluster
         Set_token
-        Set_serverini
-        Set_world
+        new_cluster="true"
     else
         cluster_str="开启"
         Choose_exit_cluster
     fi
     echo "cluster=${cluster}" > ${server_conf_file}
-    echo -e "\e[92m请选择要启动的世界：1.仅地上（熔炉MOD选我）  2.仅洞穴  3.地上 + 洞穴 ? \e[0m\c"
+    echo -e "\e[92m请选择要创建的世界：1.仅地上（熔炉MOD选我）  2.仅洞穴  3.地上 + 洞穴 ? \e[0m\c"
     read shardop
     case ${shardop} in
         1)
@@ -520,6 +524,15 @@ Start_server(){
         shardarray="Master Caves";;
     esac
     echo "shardarray=${shardarray}" >> ${server_conf_file}
+    if [[ ${new_cluster} == "true" ]]
+    then
+        for shard in ${shardarray}
+        do
+            mkdir -p ${dst_base_dir}/${cluster}/${shard}
+            Set_serverini
+            Set_world
+        done
+    fi
     Run_server
 }
 Choose_exit_cluster(){
@@ -545,23 +558,18 @@ Choose_exit_cluster(){
 }
 Close_server(){
     tip "正在关闭已开启的服务器（有的话） ..."
-    if tmux has-session -t DST_Master > /dev/null 2>&1 || tmux has-session -t DST_Caves > /dev/null 2>&1; then
-        if tmux has-session -t DST_Master > /dev/null 2>&1
+    for shard in ${shardarray}
+    do
+        if tmux has-session -t DST_${shard} > /dev/null 2>&1
         then
-            tmux send-keys -t DST_Master "c_shutdown(true)" C-m
-        fi
-        sleep 3
-        if tmux has-session -t DST_Caves > /dev/null 2>&1
-        then
-            tmux send-keys -t DST_Caves "c_shutdown(true)" C-m
+            tmux send-keys -t DST_${shard} "c_shutdown(true)" C-m
+            info "${shard}世界服务器已关闭！"
+            exchangestatus false
+        else
+            info "${shard}世界服务器未开启！"
         fi
         sleep 5
-        info "服务器已关闭！"
-    else
-        sleep 5
-        info "服务器未开启！"
-    fi
-    exchangestatus false
+    done
 }
 Exit_auto_update(){
     if tmux has-session -t Auto_update > /dev/null 2>&1
@@ -703,33 +711,23 @@ Set_list(){
     cat ${data_dir}/wlist.txt > ${dst_base_dir}/${cluster}/whitelist.txt
 }
 Set_serverini(){
-    cat ${data_dir}/masterini.ini > ${dst_base_dir}/${cluster}/Master/server.ini
-    cat ${data_dir}/cavesini.ini > ${dst_base_dir}/${cluster}/Caves/server.ini
+    cat ${data_dir}/${shard}ini.ini > ${dst_base_dir}/${cluster}/${shard}/server.ini
 }
 Set_world(){
     game_mode=$(cat ${dst_base_dir}/${cluster}/cluster.ini | grep ^game_mode= | cut -d "=" -f2)
     if [[ ${game_mode} != "lavaarena" ]]
     then
-        info "是否修改地上世界配置？：1.是 2.否（默认为上次配置）"
+        info "是否修改${shard}世界配置？：1.是 2.否（默认为上次配置）"
         read wc
-        configure_file="${data_dir}/masterleveldata.txt"
-        data_file="${dst_base_dir}/${cluster}/Master/leveldataoverride.lua"
+        configure_file="${data_dir}/${shard}leveldata.txt"
+        data_file="${dst_base_dir}/${cluster}/${shard}/leveldataoverride.lua"
         if [ ${wc} -ne 2 ]
         then
             Set_world_config
         fi
-        Write_in master
-        info "是否修改洞穴世界配置？：1.是 2.否（同上）"
-        read cw
-        configure_file="${data_dir}/cavesleveldata.txt"
-        data_file="${dst_base_dir}/${cluster}/Caves/leveldataoverride.lua"
-        if [ ${cw} -ne 2 ]
-        then
-            Set_world_config
-        fi
-        Write_in caves
+        Write_in ${shard}
     else
-        cat ${data_dir}/lavaarena.lua > ${dst_base_dir}/${cluster}/Master/leveldataoverride.lua
+        cat ${data_dir}/lavaarena.lua > ${dst_base_dir}/${cluster}/${shard}/leveldataoverride.lua
         info "熔炉世界配置已写入！"
         info "正在检查熔炉MOD是否已下载安装 。。。"
         if [ -f ${dst_server_dir}/mods/workshop-1531169447/modinfo.lua ]
@@ -855,16 +853,16 @@ Write_in(){
     cat "${data_dir}/${1}end.lua" >> ${data_file}
 }
 Default_mod(){
-    if [ ! -f ${dst_base_dir}/${cluster}/Master/modoverrides.lua ]
+    if [ ! -f ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua ]
     then
         echo 'return {
 -- 别删这个
 ["DONOTDELETE"]={ configuration_options={  }, enabled=true }
-}' > ${dst_base_dir}/${cluster}/Master/modoverrides.lua
+}' > ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
         echo 'return {
 -- 别删这个
 ["DONOTDELETE"]={ configuration_options={  }, enabled=true }
-}' > ${dst_base_dir}/${cluster}/Caves/modoverrides.lua
+}' > ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
     fi
 }
 Setup_mod(){
@@ -873,7 +871,8 @@ Setup_mod(){
         rm -rf ${data_dir}/mods_setup.lua
     fi
     touch ${data_dir}/mods_setup.lua
-    dir=$(cat ${dst_base_dir}/${cluster}/Master/modoverrides.lua | grep "workshop" | cut -f2 -d '"' | cut -d "-" -f2)
+    Get_single_shard
+    dir=$(cat ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua | grep "workshop" | cut -f2 -d '"' | cut -d "-" -f2)
     for moddir in ${dir}
     do
         if [[ $(grep "${moddir}" -c "${data_dir}/mods_setup.lua") = 0 ]]
@@ -886,9 +885,9 @@ Setup_mod(){
 Start_shard(){
     Setup_mod
     cd "${dst_server_dir}/bin"
-    for s in ${shardarray}
+    for shard in ${shardarray}
     do
-        tmux new-session -s DST_${s} -d "${dst_bin_cmd} -cluster ${cluster} -shard ${s}"
+        tmux new-session -s DST_${shard} -d "${dst_bin_cmd} -cluster ${cluster} -shard ${shard}"
     done
 }
 Start_check(){
@@ -896,7 +895,7 @@ Start_check(){
     newshardarray=""
     for shard in ${shardarray}
     do
-        serverlog_path="${dst_base_dir}/${cluster}/Master/server_log.txt"
+        serverlog_path="${dst_base_dir}/${cluster}/${shard}/server_log.txt"
         start_time=$(date "+%s")
         while (true)
         do
@@ -1174,19 +1173,16 @@ Status_keep(){
 }
 Simple_server_status(){
     cluster="无"
+    server_on=""
     [ -f ${server_conf_file} ] && Get_current_cluster
-    if tmux has-session -t DST_Master > /dev/null 2>&1
-    then
-        master_on="开启"
-    else
-        master_on="关闭"
-    fi
-    if tmux has-session -t DST_Caves > /dev/null 2>&1
-    then
-        caves_on="开启"
-    else
-        caves_on="关闭"
-    fi
+    Get_shard_array
+    for shard in ${shardarray}
+    do
+        if tmux has-session -t DST_${shard} > /dev/null 2>&1
+        then
+            server_on="${server_on}${shard}"
+        fi
+    done
     if tmux has-session -t Auto_update > /dev/null 2>&1
     then
         auto_on="开启"
@@ -1194,8 +1190,12 @@ Simple_server_status(){
         auto_on="关闭"
     fi
     cluster_name="无"
+    if [[ ${server_on} == "" ]]
+    then
+        server_on="无"
+    fi
     [ -f ${dst_base_dir}/${cluster}/cluster.ini ] && cluster_name=$(cat ${dst_base_dir}/${cluster}/cluster.ini | grep "^cluster_name" | cut -d "=" -f2)
-    echo -e "\e[33m存档: ${cluster}   地面: ${master_on}   洞穴: ${caves_on}   名称: ${cluster_name}\e[0m"
+    echo -e "\e[33m存档: ${cluster}   开启的世界：${server_on}   名称: ${cluster_name}\e[0m"
     echo -e "\e[33m自动更新维护：${auto_on}\e[0m"
 }
 Fix_Net_hosts(){
