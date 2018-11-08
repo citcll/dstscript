@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.0.0"
+script_ver="2.0.1"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -1112,7 +1112,7 @@ Update_script(){
             then
                 need_exit="true"
             fi
-            if [[ ${file} != ".dstscript/updatelib.txt" ]]
+            if [[ ${file} == ".dstscript/updatelib.txt" ]]
             then
                 Install_Dependency
             fi
