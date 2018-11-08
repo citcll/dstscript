@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.9.8"
+script_ver="1.9.9"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -1260,7 +1260,7 @@ Get_IP(){
 Send_md5_ip(){
     Get_IP
     send_str=$(echo -n ${ip} | openssl md5 | cut -d " " -f2)
-    curl -s "${my_api_link}?type=tongji&ipmd5string=${send_str}"
+    curl -s "${my_api_link}?type=tongji&ipmd5string=${send_str}" > /dev/null 2>&1
 }
 ####################################################################################
 if [[ $1 == "au" ]]; then
@@ -1288,5 +1288,6 @@ First_run_check
 Fix_Net_hosts
 Update_script
 Update_DST_Check
+Send_md5_ip
 clear
 Menu
