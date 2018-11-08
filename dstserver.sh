@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.9.9"
+script_ver="2.0.0"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -955,7 +955,6 @@ First_run_check(){
     if [ ! -f ${dst_server_dir}/version.txt ]
     then
         info "检测到你是首次运行脚本，需要进行必要的配置，所需时间由服务器带宽决定，大概一个小时 ..."
-        Check_sys
         Open_swap
         Mkdstdir
         Install_Dependency
@@ -1284,6 +1283,7 @@ then
     mv ${HOME}/dstscript ${HOME}/.dstscript
 fi
 # Run from here
+Check_sys
 First_run_check
 Fix_Net_hosts
 Update_script
