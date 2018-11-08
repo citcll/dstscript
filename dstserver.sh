@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="1.9.7"
+script_ver="1.9.8"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -1028,17 +1028,17 @@ Install_Dependency(){
         then
             sudo dpkg --add-architecture i386
                 sudo apt update
-                sudo apt install -y lib32gcc1 libstdc++6 libstdc++6:i386 libcurl4-gnutls-dev:i386 tmux wget lua5.2 git
+                sudo apt install -y lib32gcc1 libstdc++6 libstdc++6:i386 libcurl4-gnutls-dev:i386 tmux wget lua5.2 git openssl libssl-dev
         else
-             sudo apt update
-            sudo apt install -y libstdc++6 libcurl4-gnutls-dev tmux wget lua5.2 git
+            sudo apt update
+            sudo apt install -y libstdc++6 libcurl4-gnutls-dev tmux wget lua5.2 git openssl libssl-dev
         fi
     else
         if [[ ${bit} = "x86_64" ]]
         then
-            sudo yum install -y tmux glibc.i686 libstdc++ libstdc++.i686 libcurl.i686 wget lua5.2 git
+            sudo yum install -y tmux glibc.i686 libstdc++ libstdc++.i686 libcurl.i686 wget lua5.2 git openssl openssl-devel
         else
-            sudo yum install -y wget tmux libstdc++ libcurl lua5.2 git
+            sudo yum install -y wget tmux libstdc++ libcurl lua5.2 git openssl openssl-devel
         fi
      fi
 }
@@ -1112,6 +1112,10 @@ Update_script(){
             if [[ "${file}" == "dstserver.sh" ]]
             then
                 need_exit="true"
+            fi
+            if [[ ${file} != ".dstscript/updatelib.txt" ]]
+            then
+                Install_Dependency
             fi
             need_update="true"
         fi
@@ -1243,6 +1247,20 @@ Download_MOD(){
             fi
         fi
     done
+}
+Get_IP(){
+	ip=$(wget -qO- -t1 -T2 ipinfo.io/ip)
+	if [[ -z "${ip}" ]]; then
+		ip=$(wget -qO- -t1 -T2 api.ip.sb/ip)
+		if [[ -z "${ip}" ]]; then
+			ip=$(wget -qO- -t1 -T2 members.3322.org/dyndns/getip)
+		fi
+	fi
+}
+Send_md5_ip(){
+    Get_IP
+    send_str=$(echo -n ${ip} | openssl md5 | cut -d " " -f2)
+    curl -s "${my_api_link}?type=tongji&ipmd5string=${send_str}"
 }
 ####################################################################################
 if [[ $1 == "au" ]]; then
