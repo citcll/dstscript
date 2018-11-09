@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.0.2"
+script_ver="2.0.3"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -407,11 +407,12 @@ Force_update(){
     read force
     case $force in
         1)
+        Get_server_status
+        cur_serveropen=${serveropen}
         Reboot_announce
         Close_server
         Install_Game
-        Get_server_status
-        if [[ ${serveropen} == "true" ]]
+        if [[ ${cur_serveropen} == "true" ]]
         then
             Run_server
         fi
@@ -423,6 +424,7 @@ Force_update(){
 }
 Update_DST(){
     Get_server_status
+    cur_serveropen=${serveropen}
     Update_DST_Check
     if [[ ${dst_need_update} == "true" ]]
     then
@@ -433,8 +435,7 @@ Update_DST(){
     else
         tip "无可用更新！当前版本（${availablebuild}）"
     fi
-    Get_server_status
-    if [[ ${serveropen} == "true" && ${dst_need_update} == "true" ]]
+    if [[ ${cur_serveropen} == "true" && ${dst_need_update} == "true" ]]
     then
         Run_server
     fi
@@ -1257,10 +1258,27 @@ Get_IP(){
 		fi
 	fi
 }
-Send_md5_ip(){
+Post_ipmd5(){
     Get_IP
     send_str=$(echo -n ${ip} | openssl md5 | cut -d " " -f2)
     curl -s "${my_api_link}?type=tongji&ipmd5string=${send_str}" > /dev/null 2>&1
+    echo "$(date +%s)" > ${data_dir}/ipmd5.txt
+}
+# 仅发送md5值做统计，尊重隐私，周期内只发送一次，保证流畅性
+Send_md5_ip(){
+    if [ ! -f ${data_dir}/ipmd5.txt ]
+    then
+        Post_ipmd5
+    else
+        cur_time=$(date +%s)
+        old_time=$(cat ${data_dir}/ipmd5.txt)
+        cycle=$[ ${cur_time} - ${old_time} ]
+        # 周期为七天
+        if [ $cycle -gt 604800 ]
+        then
+            Post_ipmd5
+        fi
+    fi
 }
 ####################################################################################
 if [[ $1 == "au" ]]; then
