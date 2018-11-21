@@ -1,11 +1,11 @@
 #!/bin/bash
 #===============================================================================
-#    System Required: Ubuntu12+/Debian7+
+#    System Required: Ubuntu12+/Debian7+/CentOS7+
 #    Description: Install and manager the Don't Starve Together Dedicated Server
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.0.3"
+script_ver="2.0.6"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -47,7 +47,7 @@ Menu(){
         echo -e "\e[35m公告：$(cat /tmp/dstscript/announce.txt)\e[0m"
         echo -e "\e[92m[1]启动服务器           [2]关闭服务器           [3]重启服务器\e[0m"
         echo -e "\e[92m[4]修改房间设置         [5]添加或移除MOD        [6]设置管理员和黑名单\e[0m"
-        echo -e "\e[92m[7]游戏服务端控制台      [8]自动更新及异常维护   [9]退出本脚本\e[0m"
+        echo -e "\e[92m[7]游戏服务端控制台     [8]自动更新及异常维护   [9]退出本脚本\e[0m"
         echo -e "\e[92m[10]删除存档            [11]更新游戏服务端      [12]更新MOD\e[0m"
         Simple_server_status
         echo -e "\e[33m================================================================================\e[0m"
@@ -113,17 +113,17 @@ Server_console(){
     fi
 }
 Get_shard_array(){
-    shardarray=$(grep "shardarray" ${server_conf_file} | cut -d "=" -f2)
+    [ -f ${server_conf_file} ] && shardarray=$(grep "shardarray" ${server_conf_file} | cut -d "=" -f2)
 }
 Get_single_shard(){
     Get_shard_array
     shard=$(echo $shardarray | cut -d ' ' -f1)
 }
 Get_current_cluster(){
-    cluster=$(cat ${server_conf_file} | grep "^cluster" | cut -d "=" -f2)
+    [ -f ${server_conf_file} ] && cluster=$(cat ${server_conf_file} | grep "^cluster" | cut -d "=" -f2)
 }
 Get_server_status(){
-    serveropen=$(grep "serveropen" ${server_conf_file} | cut -d "=" -f2)
+    [ -f ${server_conf_file} ] && serveropen=$(grep "serveropen" ${server_conf_file} | cut -d "=" -f2)
 }
 MOD_manager(){
     Get_current_cluster
@@ -854,17 +854,16 @@ Write_in(){
     cat "${data_dir}/${1}end.lua" >> ${data_file}
 }
 Default_mod(){
-    if [ ! -f ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua ]
-    then
-        echo 'return {
+    for shard in ${shardarray}
+    do
+        if [ ! -f ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua ]
+        then
+            echo 'return {
 -- 别删这个
 ["DONOTDELETE"]={ configuration_options={  }, enabled=true }
 }' > ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
-        echo 'return {
--- 别删这个
-["DONOTDELETE"]={ configuration_options={  }, enabled=true }
-}' > ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
-    fi
+        fi
+    done
 }
 Setup_mod(){
     if [ -f ${data_dir}/mods_setup.lua ]
@@ -888,6 +887,7 @@ Start_shard(){
     cd "${dst_server_dir}/bin"
     for shard in ${shardarray}
     do
+        unset TMUX
         tmux new-session -s DST_${shard} -d "${dst_bin_cmd} -cluster ${cluster} -shard ${shard}"
     done
 }
@@ -1300,6 +1300,11 @@ fi
 if [ -d ${HOME}/dstscript ]
 then
     mv ${HOME}/dstscript ${HOME}/.dstscript
+fi
+# 卸载重装
+if [ ! -d ${data_dir} ]
+then
+    mkdir -p ${data_dir}
 fi
 # Run from here
 Check_sys
