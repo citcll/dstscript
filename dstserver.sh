@@ -16,10 +16,8 @@ dst_token_file="${data_dir}/clustertoken.txt"
 server_conf_file="${data_dir}/server.conf"
 dst_cluster_file="${data_dir}/clusterdata.txt"
 feedback_link="https://blog.wqlin.com/dstscript.html"
-#repo_link="https://git.dev.tencent.com/ariwori/dstscript.git"
-repo_link="https://github.com/ariwori/dstscript.git"
-#update_link="https://qcloud.coding.net/u/ariwori/p/dstscript/git/raw/master"
-my_api_link="https://api.wqlin.com/dst/"
+my_api_link="https://api.wqlin.com/dst"
+update_link="${my_api_link}/dstscript"
 # 屏幕输出
 Green_font_prefix="\033[32m"
 Red_font_prefix="\033[31m"
@@ -389,7 +387,7 @@ Update_DST_Check(){
     #availablebuild=$(curl -s ${my_api_link} | sed 's/[ \t]*$//g')
     #respond=$(echo ${availablebuild} | tr -cd [0-9])
 	#if [ ${respond} != "" ] && ["${currentbuild}" != "${availablebuild}" ]
-    availablebuild=$(curl -s ${my_api_link} | sed 's/[ \t]*$//g' | tr -cd [0-9])
+    availablebuild=$(curl -s "${my_api_link}/" | sed 's/[ \t]*$//g' | tr -cd [0-9])
     # Gets availablebuild info
 	#cd "${steamcmddir}" || exit
 	#availablebuild=$(./steamcmd.sh +login "${steamuser}" "${steampass}" +app_info_update 1 +app_info_print "${appid}" +app_info_print "${appid}" +quit | sed -n '/branch/,$p' | grep -m 1 buildid | tr -cd '[:digit:]')
@@ -1071,8 +1069,8 @@ Fix_steamcmd(){
 # Show change log
 Show_changelog(){
     echo -e "\e[33m==============================脚本更新说明======================================\e[0m"
-    cat /tmp/dstscript/.dstscript/changelog.txt > /tmp/changelog.txt
-    # wget ${update_link}/.dstscript/changelog.txt -O /tmp/changelog.txt
+    #cat /tmp/dstscript/.dstscript/changelog.txt > /tmp/changelog.txt
+    wget ${update_link}/.dstscript/changelog.txt -O /tmp/changelog.txt > /dev/null 2>&1
     datelog=$(cat /tmp/changelog.txt | head -n 1)
     cat /tmp/changelog.txt | grep -A 20 "更新日志 ${datelog}"
     echo -e "\e[33m================================================================================\e[0m"
@@ -1081,14 +1079,14 @@ Show_changelog(){
 # 脚本更新
 Update_script(){
     info "正在检查脚本是否有更新 。。。 请稍后 。。。"
-    if [ ! -d /tmp/dstscript ]
-    then
-        git clone ${repo_link} /tmp/dstscript > /dev/null 2>&1
-    else
-        cd /tmp/dstscript && git pull > /dev/null 2>&1 && cd
-    fi
-    # wget ${update_link}/.dstscript/filelist.txt -O /tmp/filelist.txt
-    cat /tmp/dstscript/.dstscript/filelist.txt > /tmp/filelist.txt
+    #if [ ! -d /tmp/dstscript ]
+    #then
+    #    git clone ${repo_link} /tmp/dstscript > /dev/null 2>&1
+    #else
+    #    cd /tmp/dstscript && git pull > /dev/null 2>&1 && cd
+    #fi
+    wget ${update_link}/.dstscript/filelist.txt -O /tmp/filelist.txt > /dev/null 2>&1
+    #cat /tmp/dstscript/.dstscript/filelist.txt > /tmp/filelist.txt
     for file in $(cat /tmp/filelist.txt | cut -d ":" -f1)
     do
         new_ver=$(cat /tmp/filelist.txt | grep "${file}" | cut -d ":" -f2)
@@ -1106,8 +1104,8 @@ Update_script(){
         if [[ ${new_ver} != ${cur_ver} ]]
         then
             info "${file} 发现新版本[ ${new_ver} ]，更新中..."
-            cp -rf /tmp/dstscript/${file} ${HOME}/${file}
-            # wget ${update_link}/${file} -O ${HOME}/${file}
+            #cp -rf /tmp/dstscript/${file} ${HOME}/${file}
+            wget ${update_link}/${file} -O ${HOME}/${file} > /dev/null 2>&1
             chmod +x ${HOME}/dstserver.sh
             info "${file} 已更新为最新版本[ ${new_ver} ] !"
             if [[ "${file}" == "dstserver.sh" ]]
@@ -1139,7 +1137,7 @@ Update_DST_MOD_Check(){
     MOD_update="false"
     for modid in $(cat ${data_dir}/mods_setup.lua | grep "ServerModSetup" | cut -d '"' -f2)
     do
-        mod_new_ver=$(curl -s ${my_api_link}?type=mod&modid=${modid} | sed 's/[ \t]*$//g')
+        mod_new_ver=$(curl -s "${my_api_link}/?type=mod&modid=${modid}" | sed 's/[ \t]*$//g')
         if [ -f ${dst_server_dir}/mods/workshop-${modid}/modinfo.lua ]
         then
             echo "fuc=\"getver\"" > ${data_dir}/modinfo.lua
@@ -1262,7 +1260,7 @@ Get_IP(){
 Post_ipmd5(){
     Get_IP
     send_str=$(echo -n ${ip} | openssl md5 | cut -d " " -f2)
-    curl -s "${my_api_link}?type=tongji&ipmd5string=${send_str}" > /dev/null 2>&1
+    curl -s "${my_api_link}/?type=tongji&ipmd5string=${send_str}" > /dev/null 2>&1
     echo "$(date +%s)" > ${data_dir}/ipmd5.txt
 }
 # 仅发送md5值做统计，尊重隐私，周期内只发送一次，保证流畅性
