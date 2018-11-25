@@ -1,4 +1,4 @@
-dstserver.sh:2.0.7
+dstserver.sh:2.0.8
 modconf.lua:1.2.4
 Cavesleveldata.txt:1.2.5
 Masterleveldata.txt:1.2.5
@@ -11,3 +11,4 @@ Masterini.ini:1.1.9
 Cavesini.ini:1.1.9
 lavaarena.lua:1.0.2
 updatelib.txt:1.0.6
+announce.txt:1.0.0
