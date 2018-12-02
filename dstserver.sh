@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.1.1"
+script_ver="2.1.2"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -1267,12 +1267,17 @@ Update_MOD(){
 }
 Download_MOD(){
     info "正在安装/更新新添加的MOD，请稍候 。。。"
+    if [ ! -d ${dst_base_dir}/downloadmod/Master ]
+    then
+        mkdir -p ${dst_base_dir}/downloadmod/Master
+    fi
     if tmux has-session -t DST_MODUPDATE > /dev/null 2>&1
     then
         tmux kill-session -t DST_MODUPDATE
     fi
     cd ${dst_server_dir}/bin || exit 1
     tmux new-session -s DST_MODUPDATE -d "${dst_bin_cmd} -cluster downloadmod -shard Master"
+    sleep 5
     while (true)
     do
         if tmux has-session -t DST_MODUPDATE > /dev/null 2>&1
