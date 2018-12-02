@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.0.9"
+script_ver="2.1.0"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -524,6 +524,7 @@ Start_server(){
         shardarray="Master Caves";;
     esac
     echo "shardarray=${shardarray}" >> ${server_conf_file}
+    Import_cluster
     if [[ ${new_cluster} == "true" ]]
     then
         for shard in ${shardarray}
@@ -535,9 +536,42 @@ Start_server(){
     fi
     Run_server
 }
+# 导入存档
+Import_cluster(){
+    Default_mod
+    for shard in ${shardarray}
+    do
+        if [ $(grep "DONOTDELETE" -c ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua) -eq 0 ]
+        then
+            info "非脚本生成存档，正在转换 。。。"
+            if [ -f ${data_dir}/enabled_mod.txt ]
+            then
+                rm -rf ${data_dir}/enabled_mod.txt
+            fi
+            touch ${data_dir}/enabled_mod.txt
+            cat ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua) | grep '^  \[' | cut -d '"' -f2 > ${data_dir}/enabled_mod.txt
+            echo 'return {
+-- 别删这个
+["DONOTDELETE"]={ configuration_options={  }, enabled=true }
+}' > ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
+            cat ${data_dir}/enabled_mod.txt | while read line
+            do 
+                moddir=$line
+                fuc="writein"
+                MOD_conf
+                Addmodtoshard
+            done
+            info "存档转换完成！"
+        fi
+    done
+    if [ ! -f ${dst_base_dir}/${cluster}/cluster_token.txt ]
+    then
+        Set_token
+    fi
+}
 Choose_exit_cluster(){
     echo -e "\e[92m已有存档：\e[0m"
-    ls -l ${dst_base_dir} | awk '/^d/ {print $NF}' | grep -v Cluster_1 > /tmp/dirlist.txt
+    ls -l ${dst_base_dir} | awk '/^d/ {print $NF}' | grep -v downloadmod > /tmp/dirlist.txt
     index=1
     for dirlist in $(cat /tmp/dirlist.txt)
     do
@@ -691,7 +725,7 @@ Set_token(){
     else
         echo ${default_token} >${dst_token_file}
     fi
-    cat ${dst_token_file} > ${dst_base_dir}/${cluster}/cluster_token.txt
+    cat ${dst_token_file} > 
 }
 Set_list(){
     if [ ! -f ${data_dir}/alist.txt ]
@@ -746,7 +780,7 @@ Set_world(){
             Addmodfunc
             info "熔炉MOD已启用 。。。"
         else
-            tip "熔炉MOD启用失败，请自行检查原因 。。。"
+            tip "熔炉MOD启用失败，请自行检查原因或反馈 。。。"
         fi
     fi
 }
@@ -1234,12 +1268,12 @@ Download_MOD(){
         tmux kill-session -t DST_MODUPDATE
     fi
     cd ${dst_server_dir}/bin || exit 1
-    tmux new-session -s DST_MODUPDATE -d "${dst_bin_cmd}"
+    tmux new-session -s DST_MODUPDATE -d "${dst_bin_cmd} -cluster downloadmod -shard Master"
     while (true)
     do
         if tmux has-session -t DST_MODUPDATE > /dev/null 2>&1
         then
-            if [[ $(grep "Your Server Will Not Start" -c "${dst_base_dir}/Cluster_1/Master/server_log.txt") > 0 ]]
+            if [[ $(grep "Your Server Will Not Start" -c "${dst_base_dir}/downloadmod/Master/server_log.txt") > 0 ]]
             then
                 info "新MOD安装/更新完毕！"
                 tmux kill-session -t DST_MODUPDATE
