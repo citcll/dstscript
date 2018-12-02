@@ -549,7 +549,7 @@ Import_cluster(){
                 rm -rf ${data_dir}/enabled_mod.txt
             fi
             touch ${data_dir}/enabled_mod.txt
-            cat ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua) | grep '^  \[' | cut -d '"' -f2 > ${data_dir}/enabled_mod.txt
+            cat ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua | grep '^  \[' | cut -d '"' -f2 > ${data_dir}/enabled_mod.txt
             echo 'return {
 -- 别删这个
 ["DONOTDELETE"]={ configuration_options={  }, enabled=true }
@@ -725,7 +725,7 @@ Set_token(){
     else
         echo ${default_token} >${dst_token_file}
     fi
-    cat ${dst_token_file} > 
+    cat ${dst_token_file} > ${dst_base_dir}/${cluster}/cluster_token.txt
 }
 Set_list(){
     if [ ! -f ${data_dir}/alist.txt ]
