@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.1.0"
+script_ver="2.1.1"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -613,6 +613,10 @@ Exit_auto_update(){
     info "自动更新进程已停止运行 ..."
 }
 Set_cluster(){
+    if [ -f ${dst_base_dir}/${cluster}/cluster.ini ]
+    then
+        rm -rf ${dst_base_dir}/${cluster}/cluster.ini
+    fi
     while (true)
     do
         clear
