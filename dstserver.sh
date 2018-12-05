@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.1.2"
+script_ver="2.1.3"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -524,7 +524,6 @@ Start_server(){
         shardarray="Master Caves";;
     esac
     echo "shardarray=${shardarray}" >> ${server_conf_file}
-    Import_cluster
     if [[ ${new_cluster} == "true" ]]
     then
         for shard in ${shardarray}
@@ -534,6 +533,7 @@ Start_server(){
             Set_world
         done
     fi
+    Import_cluster
     Run_server
 }
 # 导入存档
