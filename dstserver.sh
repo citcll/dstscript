@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.1.3"
+script_ver="2.1.4"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -884,7 +884,7 @@ Write_in(){
         then
             str="${ss[0]}=\"highly random\"${char}"
         else
-            str="${ss[0]}=\"${ss[1]}\"${char}"
+            str="[\"${ss[0]}\"]=\"${ss[1]}\"${char}"
         fi
         echo "    ${str}" >> ${data_file}
     done
@@ -897,7 +897,7 @@ Default_mod(){
         then
             echo 'return {
 -- 别删这个
-["DONOTDELETE"]={ configuration_options={  }, enabled=true }
+["DONOTDELETE"]={ configuration_options={  }, ["enabled"]=true }
 }' > ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
         fi
     done

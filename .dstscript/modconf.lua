@@ -1,4 +1,4 @@
--- script_ver="1.2.4"
+-- script_ver="1.2.5"
 require "modinfo"
 
 -- Addon function
@@ -117,10 +117,10 @@ function writein()
             end
         end
         f:write("    },\n")
-        f:write("    enabled=true\n")
+        f:write('    ["enabled"]=true\n')
         f:write("},\n")
     else
-        f:write('["', modid, '"]={ configuration_options={ }, enabled=true },\n')
+        f:write('["', modid, '"]={ configuration_options={ }, ["enabled"]=true },\n')
     end
     f:close()
 end
