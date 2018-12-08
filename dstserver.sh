@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.1.5"
+script_ver="2.1.6"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -105,7 +105,7 @@ Global_settings(){
     read global
     case global in
         1)
-        globals="override_settings"
+        global="override_settings"
         ;;
         *)
         error "输入有误！！！"
@@ -1391,7 +1391,7 @@ if [ ! -f $data_dir/global_settings.conf ]
 then
     touch $data_dir/global_settings.conf
     echo "override_settings=true" >> $data_dir/global_settings.conf
-    tip "为适应脚本格式，已开启重写本地上传的存档MOD设置，如不需要\n    请在全局设置中修改，建议只上传本地的MOD设置文件，即modsoverride.lua"
+    tip "为适应脚本格式，已开启重写本地上传的存档MOD设置，如不需要\n       请在全局设置中修改，建议只上传本地的MOD设置文件，即modsoverride.lua"
     sleep 2
 fi
 # Run from here
