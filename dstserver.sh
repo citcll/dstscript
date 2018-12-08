@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.1.6"
+script_ver="2.1.7"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -105,30 +105,29 @@ Global_settings(){
     read global
     case global in
         1)
-        global="override_settings"
+        Change_override
         ;;
         *)
         error "输入有误！！！"
         ;;
     esac
-    if [[ $global == "override_settings" ]]
-    then
-        info "重写（覆盖）? 1. 是   2.否"
-        read override
-        case override in
-            1)
-            sed -i 's/override_settings=false/override_settings=true/g' $data_dir/global_settings.conf
-            tip "已开启重写（覆盖）本地上传的存档为脚本配置格式"
-            ;;
-            2)
-            sed -i 's/override_settings=true/override_settings=false/g' $data_dir/global_settings.conf
-            tip "已关闭重写（覆盖）本地上传的存档为脚本配置格式，上传的存档请勿使用脚本的mod增删功能"
-            ;;
-            *)
-            error "输入有误！！！"
-            ;;
-        esac
-    fi
+}
+Change_override(){
+    info "重写（覆盖）? 1. 是   2.否"
+    read override
+    case override in
+        1)
+        sed -i 's/override_settings=false/override_settings=true/g' $data_dir/global_settings.conf
+        tip "已开启重写（覆盖）本地上传的存档为脚本配置格式"
+        ;;
+        2)
+        sed -i 's/override_settings=true/override_settings=false/g' $data_dir/global_settings.conf
+        tip "已关闭重写（覆盖）本地上传的存档为脚本配置格式，上传的存档请勿使用脚本的mod增删功能"
+        ;;
+        *)
+        error "输入有误！！！"
+        ;;
+    esac
 }
 Change_cluster(){
     Get_current_cluster
