@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.1.8"
+script_ver="2.2.0"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -118,10 +118,12 @@ Change_override(){
     case $override in
         1)
         sed -i 's/override_settings=false/override_settings=true/g' $data_dir/global_settings.conf
+        clear
         tip "已开启重写（覆盖）本地上传的存档为脚本配置格式"
         ;;
         2)
         sed -i 's/override_settings=true/override_settings=false/g' $data_dir/global_settings.conf
+        clear
         tip "已关闭重写（覆盖）本地上传的存档为脚本配置格式，上传的存档请勿使用脚本的mod增删功能"
         ;;
         *)
