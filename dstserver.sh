@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.1.4"
+script_ver="2.1.5"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -48,6 +48,7 @@ Menu(){
         echo -e "\e[92m[4]修改房间设置         [5]添加或移除MOD        [6]设置管理员和黑名单\e[0m"
         echo -e "\e[92m[7]游戏服务端控制台     [8]自动更新及异常维护   [9]退出本脚本\e[0m"
         echo -e "\e[92m[10]删除存档            [11]更新游戏服务端      [12]更新MOD\e[0m"
+        echo -e "\e[92m[13]全局设置\e[0m"
         Simple_server_status
         echo -e "\e[33m================================================================================\e[0m"
         echo -e "\e[92m（如需中断任何操作请直接按Ctrl+C）请输入命令代号：\e[0m\c"
@@ -90,11 +91,47 @@ Menu(){
             12)
             Update_MOD
             ;;
+            13）
+            Global_settings
+            ;;
             *)
             error "输入有误！！！"
             ;;
         esac
     done
+}
+Global_settings(){
+    info "请选择你要修改的全局配置：\n    1. 重写（覆盖）本地上传的存档为脚本配置格式"
+    read global
+    case global in
+        1)
+        globals="override_settings"
+        ;;
+        *)
+        error "输入有误！！！"
+        ;;
+    esac
+    case globals in
+        "override_settings")
+        info "重写（覆盖）? 1. 是   2.否"
+        read override
+        case override in
+            1)
+            sed -i 's/override_settings=false/override_settings=true/g' $data_dir/global_settings.conf
+            tip "已开启重写（覆盖）本地上传的存档为脚本配置格式"
+            ;;
+            2)
+            sed -i 's/override_settings=true/override_settings=false/g' $data_dir/global_settings.conf
+            tip "已关闭重写（覆盖）本地上传的存档为脚本配置格式，上传的存档请勿使用脚本的mod增删功能"
+            ;;
+            *)
+            error "输入有误！！！"
+            ;;
+        esac
+        *)
+        error "输入有误！！！"
+        ;;
+    esac
 }
 Change_cluster(){
     Get_current_cluster
@@ -539,31 +576,35 @@ Start_server(){
 # 导入存档
 Import_cluster(){
     Default_mod
-    for shard in ${shardarray}
-    do
-        if [ $(grep "DONOTDELETE" -c ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua) -eq 0 ]
-        then
-            info "非脚本生成存档，正在转换 。。。"
-            if [ -f ${data_dir}/enabled_mod.txt ]
+    override_settings=$(cat $data_dir/global_settings.conf | grep "override_settings" | cut -d '=' -f2)
+    if [[ $override_settings == "true" ]]
+    then
+        for shard in ${shardarray}
+        do
+            if [ $(grep "DONOTDELETE" -c ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua) -eq 0 ]
             then
-                rm -rf ${data_dir}/enabled_mod.txt
-            fi
-            touch ${data_dir}/enabled_mod.txt
-            cat ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua | grep '^  \[' | cut -d '"' -f2 > ${data_dir}/enabled_mod.txt
-            echo 'return {
+                info "非脚本生成存档，正在转换 。。。"
+                if [ -f ${data_dir}/enabled_mod.txt ]
+                then
+                    rm -rf ${data_dir}/enabled_mod.txt
+                fi
+                touch ${data_dir}/enabled_mod.txt
+                cat ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua | grep '^  \[' | cut -d '"' -f2 > ${data_dir}/enabled_mod.txt
+                echo 'return {
 -- 别删这个
 ["DONOTDELETE"]={ configuration_options={  }, enabled=true }
 }' > ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
-            cat ${data_dir}/enabled_mod.txt | while read line
-            do 
-                moddir=$line
-                fuc="writein"
-                MOD_conf
-                Addmodtoshard
-            done
-            info "存档转换完成！"
-        fi
-    done
+                cat ${data_dir}/enabled_mod.txt | while read line
+                do 
+                    moddir=$line
+                    fuc="writein"
+                    MOD_conf
+                    Addmodtoshard
+                done
+                info "存档转换完成！"
+            fi
+        done
+    fi
     if [ ! -f ${dst_base_dir}/${cluster}/cluster_token.txt ]
     then
         Set_token
@@ -1347,6 +1388,14 @@ fi
 if [ ! -d ${data_dir} ]
 then
     mkdir -p ${data_dir}
+fi
+# Global Settings
+if [ ! -f $data_dir/global_settings.conf ]
+then
+    touch $data_dir/global_settings.conf
+    echo "override_settings=true" >> $data_dir/global_settings.conf
+    tip "为适应脚本格式，已开启重写本地上传的存档MOD设置，如不需要\n    请在全局设置中修改，建议只上传本地的MOD设置文件，即modsoverride.lua"
+    sleep 2
 fi
 # Run from here
 Check_sys
