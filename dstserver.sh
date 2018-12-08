@@ -91,7 +91,7 @@ Menu(){
             12)
             Update_MOD
             ;;
-            13）
+            13)
             Global_settings
             ;;
             *)
@@ -111,8 +111,8 @@ Global_settings(){
         error "输入有误！！！"
         ;;
     esac
-    case globals in
-        "override_settings")
+    if [[ $global == "override_settings" ]]
+    then
         info "重写（覆盖）? 1. 是   2.否"
         read override
         case override in
@@ -128,10 +128,7 @@ Global_settings(){
             error "输入有误！！！"
             ;;
         esac
-        *)
-        error "输入有误！！！"
-        ;;
-    esac
+    fi
 }
 Change_cluster(){
     Get_current_cluster
