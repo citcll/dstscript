@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.2.0"
+script_ver="2.2.1"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -541,7 +541,7 @@ Start_server(){
         Choose_exit_cluster
     fi
     echo "cluster=${cluster}" > ${server_conf_file}
-    echo -e "\e[92mChoose what you want to run：1.Only Forest（OR Forge MOD）  2.Only Caves(Need a Forest first)  3.Forest and Caves ? \e[0m\c"
+    echo -e "\e[92mChoose what you want to run：\n        1.Only Forest（OR Forge MOD）\n        2.Only Caves(Need a Forest first)\n        3.Forest and Caves ? \e[0m\c"
     read shardop
     case ${shardop} in
         1)
@@ -1179,7 +1179,7 @@ Update_script(){
         [[ -z ${new_ver} ]] && new_ver=${cur_ver}
         if [[ ${new_ver} != ${cur_ver} ]]
         then
-            info "${file}: new version available[ ${new_ver} ]，updating ..."
+            info "${file}: new version available[${new_ver}]，updating ..."
             #cp -rf /tmp/dstscript/${file} ${HOME}/${file}
             wget ${update_link}/${file} -O ${HOME}/${file} > /dev/null 2>&1
             #chmod +x ${HOME}/dstserver.sh
