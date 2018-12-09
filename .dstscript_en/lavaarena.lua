@@ -1,12 +1,12 @@
 return {
     background_node_range={ 0, 1 },
-    desc="由最好用的脚本dstserver.sh创建！",
+    desc="create by dstserver.sh!",
     hideminimap=false,
     id="LAVAARENA",
     location="lavaarena",
     max_playlist_position=999,
     min_playlist_position=0,
-    name="熔炉竞技场--由脚本dstserver.sh创建！",
+    name="Forge MOD--create by dstserver.sh!",
     numrandom_set_pieces=0,
     override_level_string=false,
     overrides={
