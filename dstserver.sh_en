@@ -32,7 +32,7 @@ error(){
 Menu(){
     while (true)
     do
-        echo -e "\e[33m==============DST Dedicated Server Manager Script [Linux-Steam](${script_ver})==============\e[0m"
+        echo -e "\e[33m============DST Dedicated Server Manager Script [Linux-Steam](${script_ver})============\e[0m"
         echo -e "\e[33mAuthor：Ariwori        Bug Feed back：${feedback_link}\e[0m"
         echo -e "\e[33mAll rights reserved\e[0m"
         echo -e "\e[31mGame Server Installed In：${dst_server_dir} (Version: $(cat ${dst_server_dir}/version.txt))\e[33m【${dst_need_update_str}】\e[0m"
@@ -828,11 +828,11 @@ Set_world_config(){
         linenum=1
         list=(environment source food animal monster)
         liststr=(
-        ================================environment================================
-        ==================================source==================================
+        ================================environment=============================
+        ==================================source================================
         ==================================food==================================
-        ==================================animal==================================
-        ==================================monster==================================
+        ==================================animal================================
+        ==================================monster===============================
         )
         for ((j=0;j<${#list[*]};j++))
         do
@@ -1142,7 +1142,7 @@ Fix_steamcmd(){
 Show_changelog(){
     echo -e "\e[33m==============================Change log======================================\e[0m"
     #cat /tmp/dstscript/.dstscript/changelog.txt > /tmp/changelog.txt
-    wget ${update_link}/.dstscript/changelog.txt -O /tmp/changelog.txt > /dev/null 2>&1
+    wget ${update_link}/.dstscript_en/changelog.txt -O /tmp/changelog.txt > /dev/null 2>&1
     datelog=$(cat /tmp/changelog.txt | head -n 1)
     cat /tmp/changelog.txt | grep -A 20 "updatelog ${datelog}"
     echo -e "\e[33m================================================================================\e[0m"
@@ -1363,7 +1363,7 @@ Send_md5_ip(){
 if [[ $1 == "au" ]]; then
     while (true)
     do
-        echo -e "\e[33m==============DST Dedicated Server Manager Script [Linux-Steam](${script_ver})==============\e[0m"
+        echo -e "\e[33m============DST Dedicated Server Manager Script [Linux-Steam](${script_ver})============\e[0m"
         Update_DST
         Update_DST_MOD_Check
         if [[ ${MOD_update} == "true" ]]
