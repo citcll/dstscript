@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.2.0"
+script_ver="2.2.1"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -405,6 +405,7 @@ Cluster_manager(){
     info "存档 ${cluster} 已删除！"
 }
 Auto_update(){
+    unset TMUX
     if tmux has-session -t Auto_update > /dev/null 2>&1
     then
         info "自动更新进程已在运行，即将跳转。。。退出请按Ctrl + B松开再按D"

@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.2.7"
+script_ver="2.2.8"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -399,6 +399,7 @@ Cluster_manager(){
     info "Cluster ${cluster} has been deleted now!"
 }
 Auto_update(){
+    unset TMUX
     if tmux has-session -t Auto_update > /dev/null 2>&1
     then
         info "Going to AUTO UPDATE SCREEN ... Press Ctrl + B and then press D to exit."
