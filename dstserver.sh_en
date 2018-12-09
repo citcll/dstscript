@@ -632,7 +632,7 @@ Close_server(){
             info "${shard} Server has been closed now!"
             exchangestatus false
         else
-            info "${shard}Server is not running!"
+            info "${shard} Server is not running!"
         fi
         sleep 5
     done
