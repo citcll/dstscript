@@ -1,2 +1,2 @@
-script_ver="1.0.0"
+script_ver="1.0.1"
 if "auto update" not works,please exit the script and try again!
