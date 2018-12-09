@@ -1168,14 +1168,13 @@ Update_script(){
         fi
         if [ -f ${HOME}/${file} ]
         then
-            if [[ "${file}" == "dstserver.sh_en" ]]
-            then
-                cur_ver=$script_ver
-            else
-                cur_ver=$(cat ${HOME}/${file} | grep "script_ver=" | head -n 1 | cut -d '"' -f2)
-            fi
+            cur_ver=$(cat ${HOME}/${file} | grep "script_ver=" | head -n 1 | cut -d '"' -f2)
         else
             cur_ver="000"
+        fi
+        if [[ "${file}" == "dstserver.sh_en" ]]
+        then
+            cur_ver=$script_ver
         fi
         [[ -z ${new_ver} ]] && new_ver=${cur_ver}
         if [[ ${new_ver} != ${cur_ver} ]]
