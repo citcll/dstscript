@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.2.1"
+script_ver="2.2.2"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -701,7 +701,7 @@ Set_cluster(){
                 index=1
                 for ((i=5;i<${#changelist[*]};i=$i+2))
                 do
-                    echo -e "\e[92m${index}.${changelist[$[$i]]}\e[0m\c"
+                    echo -e "\e[92m${index}.${changelist[$[$i]]}  \e[0m\c"
                     index=$[${index} + 1]
                 done
                 echo -e "\e[92m: \e[0m\c"
@@ -857,7 +857,7 @@ Set_world_config(){
                     value=${ss[1]}
                     if [ "${list[$j]}" == "${ss[2]}" ]
                     then
-                        printf "%-21s\t" "[${linenum}]${ss[0]}: ${value}"
+                        printf "%-30s\t" "[${linenum}]${ss[0]}: ${value}"
                         index=$[${index} + 1]
                     fi
                 fi
@@ -887,7 +887,7 @@ Set_world_config(){
             index=1
             for ((i=4;i<${#changelist[*]};i=$i+2))
             do
-                echo -e "\e[92m${index}.${changelist[$[$i]]}\e[0m\c"
+                echo -e "\e[92m${index}.${changelist[$[$i]]}  \e[0m\c"
                 index=$[${index} + 1]
             done
             echo -e "\e[92m: \e[0m\c"
