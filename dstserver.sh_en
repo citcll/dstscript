@@ -541,7 +541,7 @@ Start_server(){
         Choose_exit_cluster
     fi
     echo "cluster=${cluster}" > ${server_conf_file}
-    echo -e "\e[92mChoose what you want to run：\n        1.Only Forest（OR Forge MOD）\n        2.Only Caves(Need a Forest first)\n        3.Forest and Caves ? \e[0m\c"
+    echo -e "\e[92mChoose what you want to run：\n    1.Only Forest（OR Forge MOD）\n    2.Only Caves(Need a Forest first)\n    3.Forest and Caves\n?: \e[0m\c"
     read shardop
     case ${shardop} in
         1)
