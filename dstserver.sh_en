@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.2.5"
+script_ver="2.2.6"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -308,7 +308,8 @@ Delmodfromshard(){
     done
 }
 Delmod(){
-    info "Please choose the MOD's \031[33m[Index number]\033[0m form list above，OR Type MODID here."
+    info "Please choose the MOD's \031[33m[Index number]\033[0m form list above."
+    info "All done to exit that type number '0' here!"
     while (true)
     do
         read modid
