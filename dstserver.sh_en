@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.2.4"
+script_ver="2.2.5"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -1168,7 +1168,7 @@ Update_script(){
         fi
         if [ -f ${HOME}/${file} ]
         then
-            cur_ver=$(cat ${HOME}/${file} | grep "script_ver=" | head -n 1 | cut -d '"' -f2)
+            cur_ver=$(cat ${HOME}/${file} | grep "script_ver=" | head -n 1 | cut -d '"' -f2) >/dev/null 2>&1
         else
             cur_ver="000"
         fi
