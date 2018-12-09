@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.2.3"
+script_ver="2.2.4"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -35,7 +35,7 @@ Menu(){
         echo -e "\e[33m============DST Dedicated Server Manager Script [Linux-Steam](${script_ver})============\e[0m"
         echo -e "\e[33mAuthor：Ariwori        Bug Feed back：${feedback_link}\e[0m"
         echo -e "\e[33mAll rights reserved\e[0m"
-        echo -e "\e[31mGame Server Installed In：${dst_server_dir} (Version: $(cat ${dst_server_dir}/version.txt))\e[33m【${dst_need_update_str}】\e[0m"
+        echo -e "\e[31mGame Server Installed In：${dst_server_dir} (Version: $(cat ${dst_server_dir}/version.txt))\e[33m[${dst_need_update_str}]\e[0m"
         echo -e "\e[35mAnnounce：$(cat "${data_dir}/announce.txt" | grep -v script_ver)\e[0m"
         echo -e "\e[92m[1]Start Server           [2]close Server       [3]Reboot Server\e[0m"
         echo -e "\e[92m[4]Modify Cluster         [5]Manager MOD        [6]Manager List\e[0m"
@@ -652,7 +652,7 @@ Set_cluster(){
     while (true)
     do
         clear
-        echo -e "\e[92m=============【Current cluster：${cluster}】===============\e[0m"
+        echo -e "\e[92m=============[Current cluster：${cluster}]===============\e[0m"
         index=1
         cat ${dst_cluster_file} | grep -v "script_ver" | while read line
         do
@@ -828,11 +828,11 @@ Set_world_config(){
         linenum=1
         list=(environment source food animal monster)
         liststr=(
-        =====================================environment==================================
-        =======================================source=====================================
-        =======================================food=======================================
-        =======================================animal=====================================
-        =======================================monster====================================
+        ==========================================environment=======================================
+        ============================================source==========================================
+        ============================================food============================================
+        ============================================animal==========================================
+        ============================================monster=========================================
         )
         for ((j=0;j<${#list[*]};j++))
         do
