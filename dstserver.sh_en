@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.2.6"
+script_ver="2.2.7"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -230,7 +230,7 @@ Listusedmod(){
     grep -n "^" ${data_dir}/modconflist.lua
 }
 Addmod(){
-    info "Please choose the MOD's \031[33m[Index number]\033[0m form list above，OR Type MODID here."
+    info "Please choose the MOD's [Index number] form list above，OR Type MODID here."
     info "Detail configuration writed in modoverride.lua, you can modify it yourself"
     info "All done to exit that type number '0' here!"
     while (true)
@@ -308,7 +308,7 @@ Delmodfromshard(){
     done
 }
 Delmod(){
-    info "Please choose the MOD's \031[33m[Index number]\033[0m form list above."
+    info "Please choose the MOD's [Index number] form list above."
     info "All done to exit that type number '0' here!"
     while (true)
     do
@@ -619,7 +619,7 @@ Choose_exit_cluster(){
         echo "${index}. ${dirlist}：${cluster_name_str}"
         let index++
     done
-    echo -e "\e[92mPlease choose the cluster you want to ${cluster_str}. Input the \031[33m[Index number]\033[0m：\e[0m\c"
+    echo -e "\e[92mPlease choose the cluster you want to ${cluster_str}. Input the [Index number]：\e[0m\c"
     read listnum
     cluster=$(cat /tmp/dirlist.txt | head -n ${listnum} | tail -n 1)
 }
@@ -974,7 +974,7 @@ Start_check(){
         do
             if tmux has-session -t DST_${shard} > /dev/null 2>&1
             then
-                if [[ $(grep "Sim paused" -c "${serverlog_path}") > 0 ]]
+                if [[ $(grep "SteamGameServer_Init success" -c "${serverlog_path}") > 0 ]]
                 then
                     newshardarray="${newshardarray}${shard}"
                     break
