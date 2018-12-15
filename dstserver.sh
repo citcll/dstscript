@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.2.1"
+script_ver="2.2.2"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -205,6 +205,7 @@ Listallmod(){
         touch ${data_dir}/mods_setup.lua
     fi
     rm -f ${data_dir}/modconflist.lua
+    touch ${data_dir}/modconflist.lua
     Get_single_shard
     for moddir in $(ls -F "${dst_server_dir}/mods" | grep "/$" | cut -d '/' -f1)
     do
