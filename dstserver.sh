@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.2.2"
+script_ver="2.2.3"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -48,7 +48,7 @@ Menu(){
         echo -e "\e[92m[4]修改房间设置         [5]添加或移除MOD        [6]设置管理员和黑名单\e[0m"
         echo -e "\e[92m[7]游戏服务端控制台     [8]自动更新及异常维护   [9]退出本脚本\e[0m"
         echo -e "\e[92m[10]删除存档            [11]更新游戏服务端      [12]更新MOD\e[0m"
-        echo -e "\e[92m[13]全局设置\e[0m"
+        #echo -e "\e[92m[13]全局设置\e[0m"
         Simple_server_status
         echo -e "\e[33m================================================================================\e[0m"
         echo -e "\e[92m（如需中断任何操作请直接按Ctrl+C）请输入命令代号：\e[0m\c"
@@ -91,9 +91,9 @@ Menu(){
             12)
             Update_MOD
             ;;
-            13)
-            Global_settings
-            ;;
+            #13)
+            #Global_settings
+            #;;
             *)
             error "输入有误！！！"
             ;;
@@ -161,6 +161,7 @@ Get_server_status(){
 }
 MOD_manager(){
     Get_current_cluster
+    Default_mod
     echo -e "\e[92m【存档：${cluster}】 你要 1.添加mod  2.删除mod：\e[0m\c"
     read mc
     case ${mc} in
@@ -173,6 +174,7 @@ MOD_manager(){
         *)
         break;;
     esac
+    Removelastcomma
 }
 MOD_conf(){
     echo "fuc = \"${fuc}\"
@@ -225,8 +227,9 @@ Listallmod(){
 }
 Listusedmod(){
     rm -f ${data_dir}/modconflist.lua
+    touch ${data_dir}/modconflist.lua
     Get_single_shard
-    for moddir in $(grep "^\[" "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua" | cut -d '"' -f2)
+    for moddir in $(grep "^  \[" "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua" | cut -d '"' -f2)
     do
         if [[ "${moddir}" != "" ]]
         then
@@ -300,11 +303,17 @@ Delmodfromshard(){
         then
             if [[ $(grep "${moddir}" -c "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua") > 0 ]]
             then
-                grep -n "^\[" "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua" > ${data_dir}/modidlist.txt
+                grep -n "^  \[" "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua" > ${data_dir}/modidlist.txt
+                lastmodlinenum=$(cat ${data_dir}/modidlist.txt | tail -n 1 | cut -d ":" -f1)
                 up=$(grep "${moddir}" "${data_dir}/modidlist.txt" | cut -d ":" -f1)
-                down=$(grep -A 1 "${moddir}" "${data_dir}/modidlist.txt" | tail -1 |cut -d ":" -f1)
-                upnum=$((${up} - 1))
-                downnum=$((${down} - 2))
+                if [ ${lastmodlinenum} -eq ${up} ]
+                then
+                    down=$(grep "^" -n ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua | tail -n 1 | cut -d ":" -f1)
+                else
+                    down=$(grep -A 1 "${moddir}" "${data_dir}/modidlist.txt" | tail -1 |cut -d ":" -f1)
+                fi
+                upnum=${up}
+                downnum=$((${down} - 1))
                 sed -i "${upnum},${downnum}d" "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua"
                 info "${shard}世界该Mod(${moddir})已停用！"
             else
@@ -315,8 +324,19 @@ Delmodfromshard(){
         fi
     done
 }
+# 保证最后一个MOD配置结尾不含逗号
+Removelastcomma(){
+    for shard in ${shardarray}
+    do
+        if [ -f ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua ]
+        then
+            checklinenum=$(grep "^" -n ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua | tail -n 2 | head -n 1 | cut -d ":" -f1)
+            sed -i "${checklinenum}s/,//g" ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
+        fi
+    done
+}
 Delmod(){
-    info "请从以上列表选择你要停用的MOD${Red_font_prefix}[编号]${Font_color_suffix},非脚本添加的MOD不要使用本功能,完毕请输数字 0 ！"
+    info "请从以上列表选择你要停用的MOD${Red_font_prefix}[编号]${Font_color_suffix},完毕请输数字 0 ！"
     while (true)
     do
         read modid
@@ -576,35 +596,35 @@ Start_server(){
 # 导入存档
 Import_cluster(){
     Default_mod
-    override_settings=$(cat $data_dir/global_settings.conf | grep "override_settings" | cut -d '=' -f2)
-    if [[ $override_settings == "true" ]]
-    then
-        for shard in ${shardarray}
-        do
-            if [ $(grep "DONOTDELETE" -c ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua) -eq 0 ]
-            then
-                info "非脚本生成存档，正在转换 。。。"
-                if [ -f ${data_dir}/enabled_mod.txt ]
-                then
-                    rm -rf ${data_dir}/enabled_mod.txt
-                fi
-                touch ${data_dir}/enabled_mod.txt
-                cat ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua | grep '^  \[' | cut -d '"' -f2 > ${data_dir}/enabled_mod.txt
-                echo 'return {
--- 别删这个
-["DONOTDELETE"]={ configuration_options={  }, enabled=true }
-}' > ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
-                cat ${data_dir}/enabled_mod.txt | while read line
-                do 
-                    moddir=$line
-                    fuc="writein"
-                    MOD_conf
-                    Addmodtoshard
-                done
-                info "存档转换完成！"
-            fi
-        done
-    fi
+#     override_settings=$(cat $data_dir/global_settings.conf | grep "override_settings" | cut -d '=' -f2)
+#     if [[ $override_settings == "true" ]]
+#     then
+#         for shard in ${shardarray}
+#         do
+#             if [ $(grep "DONOTDELETE" -c ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua) -eq 0 ]
+#             then
+#                 info "非脚本生成存档，正在转换 。。。"
+#                 if [ -f ${data_dir}/enabled_mod.txt ]
+#                 then
+#                     rm -rf ${data_dir}/enabled_mod.txt
+#                 fi
+#                 touch ${data_dir}/enabled_mod.txt
+#                 cat ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua | grep '^  \[' | cut -d '"' -f2 > ${data_dir}/enabled_mod.txt
+#                 echo 'return {
+# -- 别删这个
+# ["DONOTDELETE"]={ configuration_options={  }, enabled=true }
+# }' > ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
+#                 cat ${data_dir}/enabled_mod.txt | while read line
+#                 do 
+#                     moddir=$line
+#                     fuc="writein"
+#                     MOD_conf
+#                     Addmodtoshard
+#                 done
+#                 info "存档转换完成！"
+#             fi
+#         done
+#     fi
     if [ ! -f ${dst_base_dir}/${cluster}/cluster_token.txt ]
     then
         Set_token
@@ -932,13 +952,12 @@ Write_in(){
     cat "${data_dir}/${1}end.lua" >> ${data_file}
 }
 Default_mod(){
+    Get_shard_array
     for shard in ${shardarray}
     do
         if [ ! -f ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua ]
         then
             echo 'return {
--- 别删这个
-["DONOTDELETE"]={ configuration_options={  }, ["enabled"]=true }
 }' > ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
         fi
     done
@@ -1390,13 +1409,13 @@ then
     mkdir -p ${data_dir}
 fi
 # Global Settings
-if [ ! -f $data_dir/global_settings.conf ]
-then
-    touch $data_dir/global_settings.conf
-    echo "override_settings=true" >> $data_dir/global_settings.conf
-    tip "为适应脚本格式，已开启重写本地上传的存档MOD设置，如不需要\n       请在全局设置中修改，建议只上传本地的MOD设置文件，即modsoverride.lua"
-    sleep 2
-fi
+# if [ ! -f $data_dir/global_settings.conf ]
+# then
+#     touch $data_dir/global_settings.conf
+#     echo "override_settings=true" >> $data_dir/global_settings.conf
+#     tip "为适应脚本格式，已开启重写本地上传的存档MOD设置，如不需要\n       请在全局设置中修改，建议只上传本地的MOD设置文件，即modsoverride.lua"
+#     sleep 2
+# fi
 # Run from here
 Check_sys
 First_run_check

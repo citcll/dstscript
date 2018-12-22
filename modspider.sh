@@ -20,5 +20,6 @@ while(true); do
         let i++
     done
     echo "`date` 每五小时进行一次数据更新 ..."
-    sleep 18000
+    ddd 18000
+    ddd 18000}
 done

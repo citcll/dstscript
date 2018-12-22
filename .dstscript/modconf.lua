@@ -1,4 +1,4 @@
--- script_ver="1.2.7"
+-- script_ver="1.2.8"
 require "modinfo"
 
 -- Addon function
@@ -57,21 +57,21 @@ function writein()
     if name ~= nil then
         name = trim(name)
         name = LuaReomve(name, "\n")
-        f:write("--", name, "\n")
+        --f:write("--", name, "\n")
     end
     if configuration_options ~= nil and #configuration_options > 0 then
-        f:write('["', modid, '"]={\n')
+        f:write('  ["', modid, '"]={    --[[', name, "]]\n")
         f:write("    configuration_options={\n")
         for i, j in pairs(configuration_options) do
             if j.default ~= nil then
                 if type(j.default) == "string" then
-                    f:write('        ["', j.name, '"]="', j.default, '"')
+                    f:write('      ["', j.name, '"]="', j.default, '"')
                 else
                     if type(j.default) == "table" then
-                        f:write('        ["', j.name, '"]= {\n')
+                        f:write('      ["', j.name, '"]= {\n')
                         for m, n in pairs(j.default) do
                             if type(n) == "table" then
-                                f:write('            {')
+                                f:write('        {')
                                 for g, h in pairs(n) do
                                     if type(h) == "string" then
                                         f:write('"', h, '"')
@@ -89,9 +89,9 @@ function writein()
                                 end
                             end
                         end
-                        f:write('        }')
+                        f:write('      }')
                     else
-                        f:write('        ["', j.name, '"]=', tostring(j.default))
+                        f:write('      ["', j.name, '"]=', tostring(j.default))
                     end
                 end
                 if i ~= #configuration_options then
@@ -113,7 +113,7 @@ function writein()
                     f:write("     --[[ ", j.label or j.name, " ]]\n")
                 end
             else
-                f:write('        ["', j.name, '"]=""')
+                f:write('      ["', j.name, '"]=""')
                 if i ~= #configuration_options then
                     f:write(',')
                 end
@@ -122,9 +122,9 @@ function writein()
         end
         f:write("    },\n")
         f:write('    ["enabled"]=true\n')
-        f:write("},\n")
+        f:write("  },\n")
     else
-        f:write('["', modid, '"]={ configuration_options={ }, ["enabled"]=true },\n')
+        f:write('  ["', modid, '"]={ ["enabled"]=true },    --[[', name, "]]\n")
     end
     f:close()
 end
