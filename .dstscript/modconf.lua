@@ -1,4 +1,4 @@
--- script_ver="1.2.6"
+-- script_ver="1.2.7"
 require "modinfo"
 
 -- Addon function
@@ -65,7 +65,7 @@ function writein()
         for i, j in pairs(configuration_options) do
             if j.default ~= nil then
                 if type(j.default) == "string" then
-                    f:write('        ["', j.name, '"]="', string.format("%s", j.default), '"')
+                    f:write('        ["', j.name, '"]="', j.default, '"')
                 else
                     if type(j.default) == "table" then
                         f:write('        ["', j.name, '"]= {\n')
@@ -74,9 +74,9 @@ function writein()
                                 f:write('            {')
                                 for g, h in pairs(n) do
                                     if type(h) == "string" then
-                                        f:write('"', string.format("%s", h), '"')
+                                        f:write('"', h, '"')
                                     else
-                                        f:write(string.format("%s", h))
+                                        f:write(tostring(h))
                                     end
                                     if g ~= #n then
                                         f:write(", ")
@@ -91,7 +91,7 @@ function writein()
                         end
                         f:write('        }')
                     else
-                        f:write('        ["', j.name, '"]=', string.format("%s", j.default))
+                        f:write('        ["', j.name, '"]=', tostring(j.default))
                     end
                 end
                 if i ~= #configuration_options then
@@ -101,7 +101,11 @@ function writein()
                     f:write("     --[[ ", j.label or j.name, ": ")
                     for k, v in pairs(j.options) do
                         if type(v.data) ~= "table" then
-                            f:write(string.format("%s", v.data), "(", v.description, ") ")
+                            local vd = v.data
+                            if type(v.data) ~= "string" then
+                                vd = tostring(vd)
+                            end    
+                            f:write(vd, "(", v.description, ") ")
                         end
                     end
                     f:write("]]\n")
