@@ -1369,7 +1369,7 @@ if [[ $1 == "au" ]]; then
             Reboot_server
         fi
         Status_keep
-        info $(date)
+        info "$(date)"
         info "每半小时进行一次更新检测。。。"
         sleep 1800
     done
