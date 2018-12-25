@@ -222,7 +222,7 @@ Addmod(){
         fi
     done
     info "要修改具体参数配置请手动打开***更改："
-    info "${dst_base_dir}/${cluster}/${shardarray}/modoverrides.lua"
+    info "${dst_base_dir}/${cluster}/***/modoverrides.lua"
     sleep 3
     clear
 }
@@ -555,7 +555,7 @@ Addshard(){
     done
 }
 Shardconfig(){
-    info "已创建${shardtype}[$sharddir]，这是一个：1. 主世界 2. 附从世界？ "
+    info "已创建${shardtype}[$sharddir]，这是一个：1. 主世界   2. 附从世界？ "
     read ismaster
     if [ ${ismaster} -eq 1 ]
     then
@@ -838,12 +838,12 @@ Set_world_config(){
     do
         clear
         index=1
-        linenum=1shard
-        list=(environmeshardnt source food animal monster)
-        liststr=(shard
-        ===============shard=================世界环境================================
-        ===============shard===================资源==================================
-        ===============shard===================食物==================================
+        linenum=1
+        list=(environment source food animal monster)
+        liststr=(
+        ================================世界环境================================
+        ==================================资源==================================
+        ==================================食物==================================
         ==================================动物==================================
         ==================================怪物==================================
         )
