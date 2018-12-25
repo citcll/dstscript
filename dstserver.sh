@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.2.7"
+script_ver="2.2.8"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -394,13 +394,12 @@ Cluster_manager(){
 Auto_update(){
     if tmux has-session -t Auto_update > /dev/null 2>&1
     then
-        info "自动更新进程已在运行，即将跳转。。。退出请按Ctrl + B松开再按D"
-        sleep 3
-        tmux attach-session -t Auto_update
+        tmux kill-session -t Auto_update
+        info "自动更新进程已在运行，即将跳转。。。退出请按Ctrl + B松开再按D！"
     else
-        unset TMUX
-        tmux new-session -s Auto_update -d "./dstserver.sh au"
-        info "自动更新已开启！"
+        tmux new-session -s Auto_update -d "bash $HOME/dstserver.sh au"
+        info "自动更新已开启！即将跳转。。。退出请按Ctrl + B松开再按D!"
+        tmux attach-session -t Auto_update
     fi
 }
 Update_DST_Check(){
@@ -642,12 +641,12 @@ Close_server(){
         if tmux has-session -t DST_${shard} > /dev/null 2>&1
         then
             tmux send-keys -t DST_${shard} "c_shutdown(true)" C-m
+            sleep 5
             info "${shard}世界服务器已关闭！"
             exchangestatus false
         else
             info "${shard}世界服务器未开启！"
         fi
-        sleep 5
     done
 }
 Exit_auto_update(){
