@@ -1360,6 +1360,7 @@ Send_md5_ip(){
 if [[ $1 == "au" ]]; then
     while (true)
     do
+        clear
         echo -e "\e[33m==============欢迎使用饥荒联机版独立服务器脚本[Linux-Steam](${script_ver})==============\e[0m"
         Update_DST
         Update_DST_MOD_Check
@@ -1368,6 +1369,7 @@ if [[ $1 == "au" ]]; then
             Reboot_server
         fi
         Status_keep
+        info $(date)
         info "每半小时进行一次更新检测。。。"
         sleep 1800
     done
