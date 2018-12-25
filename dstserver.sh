@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.2.5"
+script_ver="2.2.6"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -117,7 +117,7 @@ Get_shard_array(){
 }
 Get_single_shard(){
     Get_shard_array
-    shard=$(echo $shardarray | cut -d ' ' -f1)
+    shard=$(echo $shardarray | head -n 1)
 }
 Get_current_cluster(){
     [ -f ${server_conf_file} ] && cluster=$(cat ${server_conf_file} | grep "^cluster" | cut -d "=" -f2)
@@ -587,7 +587,7 @@ Getidnum(){
     idnum=$[ $(ls -l ${dst_base_dir}/${cluster} | grep ^d | awk '{print $9}' | grep -c ^) + 1 ]
 }
 Createsharddir(){
-    sharddir="Shard${idnum}"
+    sharddir="${shardname}${idnum}"
     mkdir -p ${dst_base_dir}/${cluster}/$sharddir
 }
 Addcaves(){
@@ -600,7 +600,7 @@ Addcaves(){
 }
 Addforest(){
     shardtype="地面世界"
-    shardname="Master"
+    shardname="Forest"
     Getidnum
     Createsharddir
     Shardconfig
@@ -792,9 +792,6 @@ Set_list(){
     cat ${data_dir}/alist.txt > ${dst_base_dir}/${cluster}/adminlist.txt
     cat ${data_dir}/blist.txt > ${dst_base_dir}/${cluster}/blocklist.txt
     cat ${data_dir}/wlist.txt > ${dst_base_dir}/${cluster}/whitelist.txt
-}
-Set_serverini(){
-    cat ${data_dir}/${shard}ini.ini > ${dst_base_dir}/${cluster}/${shard}/server.ini
 }
 Set_world(){
     game_mode=$(cat ${dst_base_dir}/${cluster}/cluster.ini | grep ^game_mode= | cut -d "=" -f2)

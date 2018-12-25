@@ -1,2 +1,0 @@
-script_ver="1.0.6"
-false
