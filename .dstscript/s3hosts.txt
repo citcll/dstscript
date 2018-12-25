@@ -1,3 +1,0 @@
-52.216.136.5 s3.amazonaws.com
-#s3-1.amazonaws.com (52.216.21.77)
-72.246.103.17 steamusercontent-a.akamaihd.net

@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.2.6"
+script_ver="2.2.7"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -1164,11 +1164,13 @@ Update_script(){
         new_ver=$(cat /tmp/filelist.txt | grep "${file}" | cut -d ":" -f2)
         if [[ "${file}" != "dstserver.sh" ]]
         then
-            file=".dstscript/${file}"
+            truefile=".dstscript/${file}"
+        else
+            truefile=${file}
         fi
-        if [ -f ${HOME}/${file} ]
+        if [ -f ${HOME}/${truefile} ]
         then
-            cur_ver=$(cat ${HOME}/${file} | grep "script_ver=" | head -n 1 | cut -d '"' -f2)
+            cur_ver=$(cat ${HOME}/${truefile} | grep "script_ver=" | head -n 1 | cut -d '"' -f2)
         else
             cur_ver="000"
         fi
@@ -1176,14 +1178,14 @@ Update_script(){
         if [[ ${new_ver} != ${cur_ver} ]]
         then
             info "${file} 发现新版本[ ${new_ver} ]，更新中..."
-            wget ${update_link}/${file} -O ${HOME}/${file} > /dev/null 2>&1
+            wget ${update_link}/${truefile} -O ${HOME}/${truefile} > /dev/null 2>&1
             chmod +x ${HOME}/dstserver.sh
             info "${file} 已更新为最新版本[ ${new_ver} ] !"
             if [[ "${file}" == "dstserver.sh" ]]
             then
                 need_exit="true"
             fi
-            if [[ ${file} == ".dstscript/updatelib.txt" ]]
+            if [[ ${file} == "updatelib.txt" ]]
             then
                 tip "本次更新需要更新依赖 。。。请稍候 。。。"
                 Install_Dependency >/dev/null 2>&1
