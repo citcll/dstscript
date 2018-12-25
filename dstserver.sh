@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.2.3"
+script_ver="2.2.4"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -48,7 +48,6 @@ Menu(){
         echo -e "\e[92m[4]修改房间设置         [5]添加或移除MOD        [6]设置管理员和黑名单\e[0m"
         echo -e "\e[92m[7]游戏服务端控制台     [8]自动更新及异常维护   [9]退出本脚本\e[0m"
         echo -e "\e[92m[10]删除存档            [11]更新游戏服务端      [12]更新MOD\e[0m"
-        #echo -e "\e[92m[13]全局设置\e[0m"
         Simple_server_status
         echo -e "\e[33m================================================================================\e[0m"
         echo -e "\e[92m（如需中断任何操作请直接按Ctrl+C）请输入命令代号：\e[0m\c"
@@ -91,45 +90,11 @@ Menu(){
             12)
             Update_MOD
             ;;
-            #13)
-            #Global_settings
-            #;;
             *)
             error "输入有误！！！"
             ;;
         esac
     done
-}
-Global_settings(){
-    info "请选择你要修改的全局配置：\n    1. 重写（覆盖）本地上传的存档为脚本配置格式"
-    read global
-    case $global in
-        1)
-        Change_override
-        ;;
-        *)
-        error "输入有误！！！"
-        ;;
-    esac
-}
-Change_override(){
-    info "重写（覆盖）? 1. 是   2.否"
-    read override
-    case $override in
-        1)
-        sed -i 's/override_settings=false/override_settings=true/g' $data_dir/global_settings.conf
-        clear
-        tip "已开启重写（覆盖）本地上传的存档为脚本配置格式"
-        ;;
-        2)
-        sed -i 's/override_settings=true/override_settings=false/g' $data_dir/global_settings.conf
-        clear
-        tip "已关闭重写（覆盖）本地上传的存档为脚本配置格式，上传的存档请勿使用脚本的mod增删功能"
-        ;;
-        *)
-        error "输入有误！！！"
-        ;;
-    esac
 }
 Change_cluster(){
     Get_current_cluster
@@ -147,7 +112,8 @@ Server_console(){
     fi
 }
 Get_shard_array(){
-    [ -f ${server_conf_file} ] && shardarray=$(grep "shardarray" ${server_conf_file} | cut -d "=" -f2)
+    Get_current_cluster
+    shardarray=$(ls -l $dst_base_dir/${cluster} | grep ^d | awk '{print $9}')
 }
 Get_single_shard(){
     Get_shard_array
@@ -426,13 +392,13 @@ Cluster_manager(){
     info "存档 ${cluster} 已删除！"
 }
 Auto_update(){
-    unset TMUX
     if tmux has-session -t Auto_update > /dev/null 2>&1
     then
         info "自动更新进程已在运行，即将跳转。。。退出请按Ctrl + B松开再按D"
         sleep 3
         tmux attach-session -t Auto_update
     else
+        unset TMUX
         tmux new-session -s Auto_update -d "./dstserver.sh au"
         info "自动更新已开启！"
     fi
@@ -441,14 +407,7 @@ Update_DST_Check(){
     # data from klei forums
     info "正在检查游戏服务端是否有更新 。。。 请稍后 。。。"
     currentbuild=$(cat ${dst_server_dir}/version.txt)
-    #availablebuild=$(curl -s ${my_api_link} | sed 's/[ \t]*$//g')
-    #respond=$(echo ${availablebuild} | tr -cd [0-9])
-	#if [ ${respond} != "" ] && ["${currentbuild}" != "${availablebuild}" ]
     availablebuild=$(curl -s "${my_api_link}/" | sed 's/[ \t]*$//g' | tr -cd [0-9])
-    # Gets availablebuild info
-	#cd "${steamcmddir}" || exit
-	#availablebuild=$(./steamcmd.sh +login "${steamuser}" "${steampass}" +app_info_update 1 +app_info_print "${appid}" +app_info_print "${appid}" +quit | sed -n '/branch/,$p' | grep -m 1 buildid | tr -cd '[:digit:]')
-    #availablebuild=$(curl -s https://forums.kleientertainment.com/game-updates/dst/ | grep 'data-releaseID=' | cut -d '/' -f6 | cut -d "-" -f1 | sort | tail -n 1 | tr -cd [0-9])
     if [[ "${currentbuild}" != "${availablebuild}" && "${availablebuild}" != "" ]]
     then
         dst_need_update=true
@@ -570,61 +529,86 @@ Start_server(){
         Choose_exit_cluster
     fi
     echo "cluster=${cluster}" > ${server_conf_file}
-    echo -e "\e[92m请选择要创建的世界：1.仅地上（熔炉MOD选我）  2.仅洞穴  3.地上 + 洞穴 ? \e[0m\c"
-    read shardop
-    case ${shardop} in
-        1)
-        shardarray="Master";;
-        2)
-        shardarray="Caves";;
-        *)
-        shardarray="Master Caves";;
-    esac
     echo "shardarray=${shardarray}" >> ${server_conf_file}
     if [[ ${new_cluster} == "true" ]]
     then
-        for shard in ${shardarray}
-        do
-            mkdir -p ${dst_base_dir}/${cluster}/${shard}
-            Set_serverini
-            Set_world
-        done
+        Addshard
     fi
     Import_cluster
     Run_server
 }
+Addshard(){
+    while (true)
+    do
+        echo -e "\e[92m请选择要添加的世界：1.地面世界  2.洞穴世界  3.添加完成选我? \e[0m\c"
+        read shardop
+        case ${shardop} in
+            1)
+            Addforest;;
+            2)
+            Addcaves;;
+            3)
+            break;;
+            *)
+            error "输入有误，请输入[1-3]！！！";;
+        esac
+    done
+}
+Shardconfig(){
+    info "已创建${shardtype}[$sharddir]，这是一个：1. 主世界 2. 附从世界？ "
+    read ismaster
+    if [ ${ismaster} -eq 1 ]
+    then
+        shardmaster="true"
+    else
+        shardmaster="false"
+    fi
+    cat > ${dst_base_dir}/${cluster}/$sharddir/server.ini<<-EOF
+[NETWORK]
+server_port = $[ 10997 + $idnum ]
+
+
+[SHARD]
+is_master = $shardmaster
+name = ${shardname}${idnum}
+id = $idnum
+
+
+[ACCOUNT]
+encode_user_path = true
+
+
+[STEAM]
+master_server_port = $[ 27016 + $idnum ]
+authentication_port = $[ 8766 + $idnum ]
+EOF
+}
+Getidnum(){
+    idnum=$[ $(ls -l ${dst_base_dir}/${cluster} | grep ^d | awk '{print $9}' | grep -c ^) + 1 ]
+}
+Createsharddir(){
+    sharddir="Shard${idnum}"
+    mkdir -p ${dst_base_dir}/${cluster}/$sharddir
+}
+Addcaves(){
+    shardtype="洞穴世界"
+    shardname="Caves"
+    Getidnum
+    Createsharddir
+    Shardconfig
+    Set_world
+}
+Addforest(){
+    shardtype="地面世界"
+    shardname="Master"
+    Getidnum
+    Createsharddir
+    Shardconfig
+    Set_world
+}
 # 导入存档
 Import_cluster(){
     Default_mod
-#     override_settings=$(cat $data_dir/global_settings.conf | grep "override_settings" | cut -d '=' -f2)
-#     if [[ $override_settings == "true" ]]
-#     then
-#         for shard in ${shardarray}
-#         do
-#             if [ $(grep "DONOTDELETE" -c ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua) -eq 0 ]
-#             then
-#                 info "非脚本生成存档，正在转换 。。。"
-#                 if [ -f ${data_dir}/enabled_mod.txt ]
-#                 then
-#                     rm -rf ${data_dir}/enabled_mod.txt
-#                 fi
-#                 touch ${data_dir}/enabled_mod.txt
-#                 cat ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua | grep '^  \[' | cut -d '"' -f2 > ${data_dir}/enabled_mod.txt
-#                 echo 'return {
-# -- 别删这个
-# ["DONOTDELETE"]={ configuration_options={  }, enabled=true }
-# }' > ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
-#                 cat ${data_dir}/enabled_mod.txt | while read line
-#                 do 
-#                     moddir=$line
-#                     fuc="writein"
-#                     MOD_conf
-#                     Addmodtoshard
-#                 done
-#                 info "存档转换完成！"
-#             fi
-#         done
-#     fi
     if [ ! -f ${dst_base_dir}/${cluster}/cluster_token.txt ]
     then
         Set_token
@@ -816,17 +800,17 @@ Set_world(){
     game_mode=$(cat ${dst_base_dir}/${cluster}/cluster.ini | grep ^game_mode= | cut -d "=" -f2)
     if [[ ${game_mode} != "lavaarena" ]]
     then
-        info "是否修改${shard}世界配置？：1.是 2.否（默认为上次配置）"
+        info "是否修改${shardtype}[${sharddir}]配置？：1.是 2.否（默认为上次配置）"
         read wc
-        configure_file="${data_dir}/${shard}leveldata.txt"
-        data_file="${dst_base_dir}/${cluster}/${shard}/leveldataoverride.lua"
+        configure_file="${data_dir}/${shardname}leveldata.txt"
+        data_file="${dst_base_dir}/${cluster}/${sharddir}/leveldataoverride.lua"
         if [ ${wc} -ne 2 ]
         then
             Set_world_config
         fi
-        Write_in ${shard}
+        Write_in ${shardname}
     else
-        cat ${data_dir}/lavaarena.lua > ${dst_base_dir}/${cluster}/${shard}/leveldataoverride.lua
+        cat ${data_dir}/lavaarena.lua > ${dst_base_dir}/${cluster}/${sharddir}/leveldataoverride.lua
         info "熔炉世界配置已写入！"
         info "正在检查熔炉MOD是否已下载安装 。。。"
         if [ -f ${dst_server_dir}/mods/workshop-1531169447/modinfo.lua ]
@@ -854,12 +838,12 @@ Set_world_config(){
     do
         clear
         index=1
-        linenum=1
-        list=(environment source food animal monster)
-        liststr=(
-        ================================世界环境================================
-        ==================================资源==================================
-        ==================================食物==================================
+        linenum=1shard
+        list=(environmeshardnt source food animal monster)
+        liststr=(shard
+        ===============shard=================世界环境================================
+        ===============shard===================资源==================================
+        ===============shard===================食物==================================
         ==================================动物==================================
         ==================================怪物==================================
         )
@@ -1177,14 +1161,7 @@ Show_changelog(){
 # 脚本更新
 Update_script(){
     info "正在检查脚本是否有更新 。。。 请稍后 。。。"
-    #if [ ! -d /tmp/dstscript ]
-    #then
-    #    git clone ${repo_link} /tmp/dstscript > /dev/null 2>&1
-    #else
-    #    cd /tmp/dstscript && git pull > /dev/null 2>&1 && cd
-    #fi
     wget ${update_link}/.dstscript/filelist.txt -O /tmp/filelist.txt > /dev/null 2>&1
-    #cat /tmp/dstscript/.dstscript/filelist.txt > /tmp/filelist.txt
     for file in $(cat /tmp/filelist.txt | cut -d ":" -f1)
     do
         new_ver=$(cat /tmp/filelist.txt | grep "${file}" | cut -d ":" -f2)
@@ -1202,7 +1179,6 @@ Update_script(){
         if [[ ${new_ver} != ${cur_ver} ]]
         then
             info "${file} 发现新版本[ ${new_ver} ]，更新中..."
-            #cp -rf /tmp/dstscript/${file} ${HOME}/${file}
             wget ${update_link}/${file} -O ${HOME}/${file} > /dev/null 2>&1
             chmod +x ${HOME}/dstserver.sh
             info "${file} 已更新为最新版本[ ${new_ver} ] !"
@@ -1408,14 +1384,6 @@ if [ ! -d ${data_dir} ]
 then
     mkdir -p ${data_dir}
 fi
-# Global Settings
-# if [ ! -f $data_dir/global_settings.conf ]
-# then
-#     touch $data_dir/global_settings.conf
-#     echo "override_settings=true" >> $data_dir/global_settings.conf
-#     tip "为适应脚本格式，已开启重写本地上传的存档MOD设置，如不需要\n       请在全局设置中修改，建议只上传本地的MOD设置文件，即modsoverride.lua"
-#     sleep 2
-# fi
 # Run from here
 Check_sys
 First_run_check
