@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.3.0"
+script_ver="2.3.1"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -113,7 +113,7 @@ Server_console(){
 }
 Get_shard_array(){
     Get_current_cluster
-    shardarray=$(ls -l $dst_base_dir/${cluster} | grep ^d | awk '{print $9}')
+    [ $cluster != "无" ] && shardarray=$(ls -l $dst_base_dir/${cluster} | grep ^d | awk '{print $9}')
 }
 Get_single_shard(){
     Get_shard_array
@@ -1252,7 +1252,7 @@ Status_keep(){
 Simple_server_status(){
     cluster="无"
     server_on=""
-    [ -f ${server_conf_file} ] && Get_current_cluster
+    Get_current_cluster
     Get_shard_array
     for shard in ${shardarray}
     do
