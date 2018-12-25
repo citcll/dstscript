@@ -394,11 +394,13 @@ Cluster_manager(){
 Auto_update(){
     if tmux has-session -t Auto_update > /dev/null 2>&1
     then
-        tmux kill-session -t Auto_update
         info "自动更新进程已在运行，即将跳转。。。退出请按Ctrl + B松开再按D！"
+        tmux attach-session -t Auto_update
+        sleep 1
     else
         tmux new-session -s Auto_update -d "bash $HOME/dstserver.sh au"
         info "自动更新已开启！即将跳转。。。退出请按Ctrl + B松开再按D!"
+        sleep 1
         tmux attach-session -t Auto_update
     fi
 }
@@ -1361,7 +1363,7 @@ if [[ $1 == "au" ]]; then
     while (true)
     do
         clear
-        echo -e "\e[33m==============欢迎使用饥荒联机版独立服务器脚本[Linux-Steam](${script_ver})==============\e[0m"
+        echo -e "\e[33m===========饥荒联机版独立服务器脚本自动更新及异常维护进程[Linux-Steam](${script_ver})===========\e[0m"
         Update_DST
         Update_DST_MOD_Check
         if [[ ${MOD_update} == "true" ]]
