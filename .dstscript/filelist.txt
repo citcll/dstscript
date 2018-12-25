@@ -7,6 +7,6 @@ Forestend.lua:1.1.9
 Foreststart.lua:1.2.2
 Cavesstart.lua:1.2.2
 Cavesend.lua:1.1.9
-lavaarena.lua:1.0.2
+lavaarena.lua:1.0.3
 updatelib.txt:1.0.6
 announce.txt:1.0.4
