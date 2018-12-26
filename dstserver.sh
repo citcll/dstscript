@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.3.1"
+script_ver="2.3.1.1"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -561,8 +561,11 @@ Shardconfig(){
     if [ ${ismaster} -eq 1 ]
     then
         shardmaster="true"
+		shardid=1
     else
         shardmaster="false"
+		# 非主世界采用随机数，防止冲突
+		shardid=$RANDOM
     fi
     cat > ${dst_base_dir}/${cluster}/$sharddir/server.ini<<-EOF
 [NETWORK]
@@ -572,7 +575,7 @@ server_port = $[ 10997 + $idnum ]
 [SHARD]
 is_master = $shardmaster
 name = ${shardname}${idnum}
-id = $idnum
+id = $shardid
 
 
 [ACCOUNT]
