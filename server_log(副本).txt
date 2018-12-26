@@ -1,0 +1,851 @@
+[00:00:00]: PersistRootStorage is now /home/ariwori/.klei//DoNotStarveTogether/Cluster_2/Master/ 
+[00:00:00]: Starting Up
+[00:00:00]: Version: 298000
+[00:00:00]: Current time: Wed Dec 26 19:22:17 2018
+
+[00:00:00]: System Name: Linux
+[00:00:00]: Host Name: archlinux
+[00:00:00]: Release(Kernel) Version: 4.19.12-arch1-1-ARCH
+[00:00:00]: Kernel Build Timestamp: #1 SMP PREEMPT Fri Dec 21 13:56:54 UTC 2018
+[00:00:00]: Machine Arch: x86_64
+[00:00:00]: Don't Starve Together: 298000 LINUX
+[00:00:00]: Build Date: 4532
+[00:00:00]: Parsing command line
+[00:00:00]: Command Line Arguments: -monitor_parent_process 12100 -persistent_storage_root /home/ariwori/.klei/ -conf_dir DoNotStarveTogether -cluster Cluster_2 -ownernetid 76561198311311669 -backup_log_count 10 -backup_log_period 0 -shard Master -sigprefix DST_Master -region Sing 
+[00:00:00]: Initializing distribution platform
+[00:00:00]: ....Done
+[00:00:00]: THREAD - started 'GAClient' (4114336576)
+[00:00:00]: CurlRequestManager::ClientThread::Main()
+[00:00:00]: Mounting file system databundles/klump.zip successful.
+[00:00:00]: Mounting file system databundles/shaders.zip successful.
+[00:00:00]: Mounting file system databundles/fonts.zip successful.
+[00:00:00]: Mounting file system databundles/anim_dynamic.zip successful.
+[00:00:00]: Mounting file system databundles/bigportraits.zip successful.
+[00:00:00]: Mounting file system databundles/images.zip successful.
+[00:00:00]: Mounting file system databundles/scripts.zip successful.
+[00:00:00]: ProfileIndex:4.79
+[00:00:00]: [Connect] PendingConnection::Reset(true)
+[00:00:00]: Platform: 1
+[00:00:00]: Network tick rate: U=15(2), D=0
+[00:00:00]: THREAD - started 'Ping Job Thread' (4107270976)
+[00:00:00]: Network tick rate: U=15(2), D=0
+[00:00:00]: Overriding region to Sing
+[00:00:00]: OnLoadPermissionList: /home/ariwori/.klei//DoNotStarveTogether/client_save/blocklist.txt (Failure)
+[00:00:00]: OnLoadPermissionList: /home/ariwori/.klei//DoNotStarveTogether/client_save/adminlist.txt (Failure)
+[00:00:00]: OnLoadUserIdList: /home/ariwori/.klei//DoNotStarveTogether/client_save/whitelist.txt (Failure)
+[00:00:00]: Offline user ID: OU_76561198311311669
+[00:00:00]: Token retrieved from: /home/ariwori/.klei//DoNotStarveTogether/Cluster_2/cluster_token.txt
+[00:00:00]: Token retrieved from: /home/ariwori/.klei//DoNotStarveTogether/Cluster_2/cluster_token.txt
+[00:00:00]: THREAD - started 'StreamInput' (4103076672)
+[00:00:00]: cGame::InitializeOnMainThread
+[00:00:00]: Renderer initialize: Okay
+[00:00:00]: AnimManager initialize: Okay
+[00:00:00]: Buffers initialize: Okay
+[00:00:00]: cDontStarveGame::DoGameSpecificInitialize()
+[00:00:00]: GameSpecific initialize: Okay
+[00:00:00]: cGame::StartPlaying
+[00:00:00]: LOADING LUA
+[00:00:00]: DoLuaFile scripts/main.lua
+[00:00:00]: DoLuaFile loading buffer scripts/main.lua
+[00:00:00]:   taskgrouplist:	default	Together	
+[00:00:00]:   taskgrouplist:	classic	Classic	
+[00:00:00]:   taskgrouplist:	cave_default	Underground	
+[00:00:00]:   taskgrouplist:	lavaarena_taskset	The Forge	
+[00:00:00]:   taskgrouplist:	quagmire_taskset	The Gorge	
+[00:00:00]: running main.lua
+	
+[00:00:00]: Could not load modindex	
+[00:00:00]: ModIndex: Beginning normal load sequence for dedicated server.
+	
+[00:00:00]: DownloadMods(0)
+[00:00:00]: modoverrides.lua enabling workshop-1309401477	
+[00:00:00]: modoverrides.lua enabling workshop-1591364636	
+[00:00:00]: modoverrides.lua enabling workshop-661253977	
+[00:00:00]: modoverrides.lua enabling workshop-1418746242	
+[00:00:00]: modoverrides.lua enabling workshop-367546858	
+[00:00:00]: ModIndex:GetModsToLoad inserting moddir, 	workshop-661253977	
+[00:00:00]: ModIndex:GetModsToLoad inserting moddir, 	workshop-367546858	
+[00:00:00]: ModIndex:GetModsToLoad inserting moddir, 	workshop-1591364636	
+[00:00:00]: ModIndex:GetModsToLoad inserting moddir, 	workshop-1309401477	
+[00:00:00]: ModIndex:GetModsToLoad inserting moddir, 	workshop-1418746242	
+[00:00:00]: Could not load mod_config_data/modconfiguration_workshop-661253977_CLIENT	
+[00:00:00]: applying configuration_options from modoverrides.lua to mod workshop-1309401477	
+[00:00:00]: applying configuration_options from modoverrides.lua to mod workshop-1591364636	
+[00:00:00]: applying configuration_options from modoverrides.lua to mod workshop-661253977	
+[00:00:00]: Overriding mod workshop-661253977's option baodiao with value 1	
+[00:00:00]: Overriding mod workshop-661253977's option amudiao with value true	
+[00:00:00]: Overriding mod workshop-661253977's option zbdiao with value true	
+[00:00:00]: Overriding mod workshop-661253977's option kong with value 0	
+[00:00:00]: Overriding mod workshop-661253977's option rendiao with value 2	
+[00:00:00]: applying configuration_options from modoverrides.lua to mod workshop-1418746242	
+[00:00:00]: Overriding mod workshop-1418746242's option clearfont with value true	
+[00:00:00]: Overriding mod workshop-1418746242's option extratrans with value true	
+[00:00:00]: Overriding mod workshop-1418746242's option eventplus with value true	
+[00:00:00]: applying configuration_options from modoverrides.lua to mod workshop-367546858	
+[00:00:00]: Overriding mod workshop-367546858's option SMALL_TEXTURES with value true	
+[00:00:00]: Overriding mod workshop-367546858's option LANG with value auto	
+[00:00:00]: Loading mod: workshop-661253977 ( Don't Drop Everything) Version:170403.21:59	
+[00:00:00]: Could not load mod_config_data/modconfiguration_workshop-367546858	
+[00:00:00]: applying configuration_options from modoverrides.lua to mod workshop-1309401477	
+[00:00:00]: applying configuration_options from modoverrides.lua to mod workshop-1591364636	
+[00:00:00]: applying configuration_options from modoverrides.lua to mod workshop-661253977	
+[00:00:00]: Overriding mod workshop-661253977's option baodiao with value 1	
+[00:00:00]: Overriding mod workshop-661253977's option amudiao with value true	
+[00:00:00]: Overriding mod workshop-661253977's option zbdiao with value true	
+[00:00:00]: Overriding mod workshop-661253977's option kong with value 0	
+[00:00:00]: Overriding mod workshop-661253977's option rendiao with value 2	
+[00:00:00]: applying configuration_options from modoverrides.lua to mod workshop-1418746242	
+[00:00:00]: Overriding mod workshop-1418746242's option clearfont with value true	
+[00:00:00]: Overriding mod workshop-1418746242's option extratrans with value true	
+[00:00:00]: Overriding mod workshop-1418746242's option eventplus with value true	
+[00:00:00]: applying configuration_options from modoverrides.lua to mod workshop-367546858	
+[00:00:00]: Overriding mod workshop-367546858's option SMALL_TEXTURES with value true	
+[00:00:00]: Overriding mod workshop-367546858's option LANG with value auto	
+[00:00:00]: Loading mod: workshop-367546858 (中文语言包) Version:3.5.3	
+[00:00:00]: Could not load mod_config_data/modconfiguration_workshop-1591364636_CLIENT	
+[00:00:00]: applying configuration_options from modoverrides.lua to mod workshop-1309401477	
+[00:00:00]: applying configuration_options from modoverrides.lua to mod workshop-1591364636	
+[00:00:00]: applying configuration_options from modoverrides.lua to mod workshop-661253977	
+[00:00:00]: Overriding mod workshop-661253977's option baodiao with value 1	
+[00:00:00]: Overriding mod workshop-661253977's option amudiao with value true	
+[00:00:00]: Overriding mod workshop-661253977's option zbdiao with value true	
+[00:00:00]: Overriding mod workshop-661253977's option kong with value 0	
+[00:00:00]: Overriding mod workshop-661253977's option rendiao with value 2	
+[00:00:00]: applying configuration_options from modoverrides.lua to mod workshop-1418746242	
+[00:00:00]: Overriding mod workshop-1418746242's option clearfont with value true	
+[00:00:00]: Overriding mod workshop-1418746242's option extratrans with value true	
+[00:00:00]: Overriding mod workshop-1418746242's option eventplus with value true	
+[00:00:00]: applying configuration_options from modoverrides.lua to mod workshop-367546858	
+[00:00:00]: Overriding mod workshop-367546858's option SMALL_TEXTURES with value true	
+[00:00:00]: Overriding mod workshop-367546858's option LANG with value auto	
+[00:00:00]: Loading mod: workshop-1591364636 (Auto Place MiniSign) Version:1.7.0	
+[00:00:00]: Could not load mod_config_data/modconfiguration_workshop-1309401477_CLIENT	
+[00:00:00]: applying configuration_options from modoverrides.lua to mod workshop-1309401477	
+[00:00:00]: applying configuration_options from modoverrides.lua to mod workshop-1591364636	
+[00:00:00]: applying configuration_options from modoverrides.lua to mod workshop-661253977	
+[00:00:00]: Overriding mod workshop-661253977's option baodiao with value 1	
+[00:00:00]: Overriding mod workshop-661253977's option amudiao with value true	
+[00:00:00]: Overriding mod workshop-661253977's option zbdiao with value true	
+[00:00:00]: Overriding mod workshop-661253977's option kong with value 0	
+[00:00:00]: Overriding mod workshop-661253977's option rendiao with value 2	
+[00:00:00]: applying configuration_options from modoverrides.lua to mod workshop-1418746242	
+[00:00:00]: Overriding mod workshop-1418746242's option clearfont with value true	
+[00:00:00]: Overriding mod workshop-1418746242's option extratrans with value true	
+[00:00:00]: Overriding mod workshop-1418746242's option eventplus with value true	
+[00:00:00]: applying configuration_options from modoverrides.lua to mod workshop-367546858	
+[00:00:00]: Overriding mod workshop-367546858's option SMALL_TEXTURES with value true	
+[00:00:00]: Overriding mod workshop-367546858's option LANG with value auto	
+[00:00:00]: Loading mod: workshop-1309401477 (auto_open_gift(自动挂机开礼物)) Version:0.7	
+[00:00:00]: Could not load mod_config_data/modconfiguration_workshop-1418746242	
+[00:00:00]: applying configuration_options from modoverrides.lua to mod workshop-1309401477	
+[00:00:00]: applying configuration_options from modoverrides.lua to mod workshop-1591364636	
+[00:00:00]: applying configuration_options from modoverrides.lua to mod workshop-661253977	
+[00:00:00]: Overriding mod workshop-661253977's option baodiao with value 1	
+[00:00:00]: Overriding mod workshop-661253977's option amudiao with value true	
+[00:00:00]: Overriding mod workshop-661253977's option zbdiao with value true	
+[00:00:00]: Overriding mod workshop-661253977's option kong with value 0	
+[00:00:00]: Overriding mod workshop-661253977's option rendiao with value 2	
+[00:00:00]: applying configuration_options from modoverrides.lua to mod workshop-1418746242	
+[00:00:00]: Overriding mod workshop-1418746242's option clearfont with value true	
+[00:00:00]: Overriding mod workshop-1418746242's option extratrans with value true	
+[00:00:00]: Overriding mod workshop-1418746242's option eventplus with value true	
+[00:00:00]: applying configuration_options from modoverrides.lua to mod workshop-367546858	
+[00:00:00]: Overriding mod workshop-367546858's option SMALL_TEXTURES with value true	
+[00:00:00]: Overriding mod workshop-367546858's option LANG with value auto	
+[00:00:00]: Loading mod: workshop-1418746242 (Chinese++) Version:1.2.1	
+[00:00:00]: Mod: workshop-367546858 (中文语言包)	Loading modworldgenmain.lua	
+[00:00:00]: Mod: workshop-367546858 (中文语言包)	  Mod had no modworldgenmain.lua. Skipping.	
+[00:00:00]: Mod: workshop-367546858 (中文语言包)	Loading modmain.lua	
+[00:00:00]: [Chinses] 加载贴图翻译！	
+[00:00:00]: Translator:LoadPOFile - loading file: ../mods/workshop-367546858/DST_chs.po	
+[00:00:00]: [Chinses] 所选语言不存在或无法加载，默认加载简体翻译成功！	
+[00:00:00]: [Chinese] 检测到小型纹理功能！	
+[00:00:00]: Mod: workshop-1309401477 (auto_open_gift(自动挂机开礼物))	Loading modworldgenmain.lua	
+[00:00:00]: Mod: workshop-1309401477 (auto_open_gift(自动挂机开礼物))	  Mod had no modworldgenmain.lua. Skipping.	
+[00:00:00]: Mod: workshop-1309401477 (auto_open_gift(自动挂机开礼物))	Loading modmain.lua	
+[00:00:00]: Mod: workshop-1591364636 (Auto Place MiniSign)	Loading modworldgenmain.lua	
+[00:00:00]: Mod: workshop-1591364636 (Auto Place MiniSign)	  Mod had no modworldgenmain.lua. Skipping.	
+[00:00:00]: Mod: workshop-1591364636 (Auto Place MiniSign)	Loading modmain.lua	
+[00:00:00]: Mod: workshop-661253977 ( Don't Drop Everything)	Loading modworldgenmain.lua	
+[00:00:00]: Mod: workshop-661253977 ( Don't Drop Everything)	  Mod had no modworldgenmain.lua. Skipping.	
+[00:00:00]: Mod: workshop-661253977 ( Don't Drop Everything)	Loading modmain.lua	
+[00:00:00]: Mod: workshop-1418746242 (Chinese++)	Loading modworldgenmain.lua	
+[00:00:00]: Mod: workshop-1418746242 (Chinese++)	  Mod had no modworldgenmain.lua. Skipping.	
+[00:00:00]: Mod: workshop-1418746242 (Chinese++)	Loading modmain.lua	
+[00:00:00]: Could not load mod_config_data/modconfiguration_workshop-1418746242	
+[00:00:00]: ModIndex:GetModsToLoad inserting moddir, 	workshop-661253977	
+[00:00:00]: ModIndex:GetModsToLoad inserting moddir, 	workshop-367546858	
+[00:00:00]: ModIndex:GetModsToLoad inserting moddir, 	workshop-1591364636	
+[00:00:00]: ModIndex:GetModsToLoad inserting moddir, 	workshop-1309401477	
+[00:00:00]: ModIndex:GetModsToLoad inserting moddir, 	workshop-1418746242	
+[00:00:01]: Event data unavailable: lavaarena_event_server/lavaarena_achievement_quest_defs
+[00:00:01]: LOADING LUA SUCCESS
+[00:00:01]: Registering mod namespace "choose_skin0"
+[00:00:01]: Registering mod namespace "choose_skin1"
+[00:00:01]: Registering mod namespace "wilson"
+[00:00:01]: PlayerDeaths could not load morgue	
+[00:00:01]: PlayerHistory could not load player_history	
+[00:00:01]: ServerPreferences could not load server_preferences	
+[00:00:01]: bloom_enabled	false	
+[00:00:01]: Could not load saveindex	
+[00:00:01]: OnFilesLoaded()	
+[00:00:01]: OnUpdatePurchaseStateComplete	
+[00:00:01]: Klump load on boot started.	
+[00:00:01]: Klump files loaded: 	0	
+[00:00:02]: Mod: workshop-367546858 (中文语言包)	Registering prefabs	
+[00:00:02]: Mod: workshop-367546858 (中文语言包)	  Registering default mod prefab	
+[00:00:02]: Mod: workshop-1309401477 (auto_open_gift(自动挂机开礼物))	Registering prefabs	
+[00:00:02]: Mod: workshop-1309401477 (auto_open_gift(自动挂机开礼物))	  Registering default mod prefab	
+[00:00:02]: Mod: workshop-1591364636 (Auto Place MiniSign)	Registering prefabs	
+[00:00:02]: Mod: workshop-1591364636 (Auto Place MiniSign)	  Registering default mod prefab	
+[00:00:02]: Mod: workshop-661253977 ( Don't Drop Everything)	Registering prefabs	
+[00:00:02]: Mod: workshop-661253977 ( Don't Drop Everything)	  Registering default mod prefab	
+[00:00:02]: Mod: workshop-1418746242 (Chinese++)	Registering prefabs	
+[00:00:02]: Mod: workshop-1418746242 (Chinese++)	  Registering default mod prefab	
+[00:00:02]: 	Load FE	
+[00:00:03]: 	Load FE: done	
+[00:00:03]: THREAD - started 'FilesExistAsyncThread' (4063587136)
+[00:00:03]: FilesExistAsyncThread started (19651 files)...
+[00:00:03]: ModIndex: Load sequence finished successfully.	
+[00:00:03]: Reset() returning
+[00:00:03]: [IPC] Signal created '/DST_Master_Kill'  #0xf7f5c000
+[00:00:03]: [IPC] Registering handler for signal #0xf7f5c000
+[00:00:03]: [IPC] Signal created '/DST_Master_Starting'  #0xf4e03000
+[00:00:03]: [IPC] Sending signal.... #0xf4e03000
+[00:00:03]: ... FilesExistAsyncThread complete
+[00:00:04]: [200] Account Communication Success (6)
+[00:00:04]: Received (KU_6yNrwFkC) from TokenPurpose
+[00:00:04]: Starting Dedicated Server Game	
+[00:00:04]: Network tick rate: U=15(2), D=0
+[00:00:04]: About to start a server with the following settings:
+[00:00:04]:   Dedicated: true
+[00:00:04]:   Online: true
+[00:00:04]:   Passworded: false
+[00:00:04]:   ServerPort: 10999
+[00:00:04]:   SteamAuthPort: 8766
+[00:00:04]:   SteamMasterServerPort: 27016
+[00:00:04]:   ClanID: false
+[00:00:04]:   ClanOnly: false
+[00:00:04]:   ClanAdmin: false
+[00:00:04]:   LanOnly: false
+[00:00:04]:   FriendsOnly: false
+[00:00:04]:   EnableAutosaver: true
+[00:00:04]:   EncodeUserPath: true
+[00:00:04]:   PVP: false
+[00:00:04]:   MaxPlayers: 6
+[00:00:04]:   GameMode: survival
+[00:00:04]:   OverridenDNS: 
+[00:00:04]:   PauseWhenEmpty: true
+[00:00:04]:   IdleTimeout: 1800s
+[00:00:04]:   VoteEnabled: false
+[00:00:04]:   InternetBroadcasting: true
+[00:00:04]:   Intent: social
+[00:00:04]: Could not load mod_config_data/modconfiguration_workshop-1309401477	
+[00:00:04]: Online Server Started on port: 10999
+[00:00:04]: Found a level data override file with these contents:	
+[00:00:04]: 	K: 	desc	 V: 	标准的饥荒联机体验。	
+[00:00:04]: 	K: 	hideminimap	 V: 	false	
+[00:00:04]: 	K: 	id	 V: 	SURVIVAL_TOGETHER	
+[00:00:04]: 	K: 	location	 V: 	forest	
+[00:00:04]: 	K: 	max_playlist_position	 V: 	999	
+[00:00:04]: 	K: 	min_playlist_position	 V: 	0	
+[00:00:04]: 	K: 	name	 V: 	默认	
+[00:00:04]: 	K: 	numrandom_set_pieces	 V: 	4	
+[00:00:04]: 	K: 	ordered_story_setpieces	 V: 	table: 0xac9df10	
+[00:00:04]: 		K: 	1	 V: 	Sculptures_1	
+[00:00:04]: 		K: 	2	 V: 	Maxwell5	
+[00:00:04]: 	K: 	override_level_string	 V: 	false	
+[00:00:04]: 	K: 	overrides	 V: 	table: 0xab0db80	
+[00:00:04]: 		K: 	alternatehunt	 V: 	default	
+[00:00:04]: 		K: 	angrybees	 V: 	default	
+[00:00:04]: 		K: 	antliontribute	 V: 	default	
+[00:00:04]: 		K: 	autumn	 V: 	default	
+[00:00:04]: 		K: 	bearger	 V: 	default	
+[00:00:04]: 		K: 	beefalo	 V: 	default	
+[00:00:04]: 		K: 	beefaloheat	 V: 	default	
+[00:00:04]: 		K: 	bees	 V: 	default	
+[00:00:04]: 		K: 	berrybush	 V: 	default	
+[00:00:04]: 		K: 	birds	 V: 	default	
+[00:00:04]: 		K: 	boons	 V: 	default	
+[00:00:04]: 		K: 	branching	 V: 	default	
+[00:00:04]: 		K: 	butterfly	 V: 	default	
+[00:00:04]: 		K: 	buzzard	 V: 	default	
+[00:00:04]: 		K: 	cactus	 V: 	default	
+[00:00:04]: 		K: 	carrot	 V: 	default	
+[00:00:04]: 		K: 	catcoon	 V: 	default	
+[00:00:04]: 		K: 	chess	 V: 	default	
+[00:00:04]: 		K: 	day	 V: 	default	
+[00:00:04]: 		K: 	deciduousmonster	 V: 	default	
+[00:00:04]: 		K: 	deerclops	 V: 	default	
+[00:00:04]: 		K: 	disease_delay	 V: 	default	
+[00:00:04]: 		K: 	dragonfly	 V: 	default	
+[00:00:04]: 		K: 	flint	 V: 	default	
+[00:00:04]: 		K: 	flowers	 V: 	default	
+[00:00:04]: 		K: 	frograin	 V: 	default	
+[00:00:04]: 		K: 	goosemoose	 V: 	default	
+[00:00:04]: 		K: 	grass	 V: 	default	
+[00:00:04]: 		K: 	houndmound	 V: 	default	
+[00:00:04]: 		K: 	hounds	 V: 	default	
+[00:00:04]: 		K: 	hunt	 V: 	default	
+[00:00:04]: 		K: 	krampus	 V: 	default	
+[00:00:04]: 		K: 	layout_mode	 V: 	LinkNodesByKeys	
+[00:00:04]: 		K: 	liefs	 V: 	default	
+[00:00:04]: 		K: 	lightning	 V: 	default	
+[00:00:04]: 		K: 	lightninggoat	 V: 	default	
+[00:00:04]: 		K: 	loop	 V: 	default	
+[00:00:04]: 		K: 	lureplants	 V: 	default	
+[00:00:04]: 		K: 	marshbush	 V: 	default	
+[00:00:04]: 		K: 	merm	 V: 	default	
+[00:00:04]: 		K: 	meteorshowers	 V: 	default	
+[00:00:04]: 		K: 	meteorspawner	 V: 	default	
+[00:00:04]: 		K: 	moles	 V: 	default	
+[00:00:04]: 		K: 	mushroom	 V: 	default	
+[00:00:04]: 		K: 	penguins	 V: 	default	
+[00:00:04]: 		K: 	perd	 V: 	default	
+[00:00:04]: 		K: 	petrification	 V: 	default	
+[00:00:04]: 		K: 	pigs	 V: 	default	
+[00:00:04]: 		K: 	ponds	 V: 	default	
+[00:00:04]: 		K: 	prefabswaps_start	 V: 	default	
+[00:00:04]: 		K: 	rabbits	 V: 	default	
+[00:00:04]: 		K: 	reeds	 V: 	default	
+[00:00:04]: 		K: 	regrowth	 V: 	default	
+[00:00:04]: 		K: 	roads	 V: 	default	
+[00:00:04]: 		K: 	rock	 V: 	default	
+[00:00:04]: 		K: 	rock_ice	 V: 	default	
+[00:00:04]: 		K: 	sapling	 V: 	default	
+[00:00:04]: 		K: 	season_start	 V: 	default	
+[00:00:04]: 		K: 	specialevent	 V: 	default	
+[00:00:04]: 		K: 	spiders	 V: 	default	
+[00:00:04]: 		K: 	spring	 V: 	default	
+[00:00:04]: 		K: 	start_location	 V: 	default	
+[00:00:04]: 		K: 	summer	 V: 	default	
+[00:00:04]: 		K: 	tallbirds	 V: 	default	
+[00:00:04]: 		K: 	task_set	 V: 	default	
+[00:00:04]: 		K: 	tentacles	 V: 	default	
+[00:00:04]: 		K: 	touchstone	 V: 	default	
+[00:00:04]: 		K: 	trees	 V: 	default	
+[00:00:04]: 		K: 	tumbleweed	 V: 	default	
+[00:00:04]: 		K: 	walrus	 V: 	default	
+[00:00:04]: 		K: 	weather	 V: 	default	
+[00:00:04]: 		K: 	wildfires	 V: 	default	
+[00:00:04]: 		K: 	winter	 V: 	default	
+[00:00:04]: 		K: 	world_size	 V: 	small	
+[00:00:04]: 		K: 	wormhole_prefab	 V: 	wormhole	
+[00:00:04]: 	K: 	random_set_pieces	 V: 	table: 0xa156040	
+[00:00:04]: 		K: 	1	 V: 	Sculptures_2	
+[00:00:04]: 		K: 	2	 V: 	Sculptures_3	
+[00:00:04]: 		K: 	3	 V: 	Sculptures_4	
+[00:00:04]: 		K: 	4	 V: 	Sculptures_5	
+[00:00:04]: 		K: 	5	 V: 	Chessy_1	
+[00:00:04]: 		K: 	6	 V: 	Chessy_2	
+[00:00:04]: 		K: 	7	 V: 	Chessy_3	
+[00:00:04]: 		K: 	8	 V: 	Chessy_4	
+[00:00:04]: 		K: 	9	 V: 	Chessy_5	
+[00:00:04]: 		K: 	10	 V: 	Chessy_6	
+[00:00:04]: 		K: 	11	 V: 	Maxwell1	
+[00:00:04]: 		K: 	12	 V: 	Maxwell2	
+[00:00:04]: 		K: 	13	 V: 	Maxwell3	
+[00:00:04]: 		K: 	14	 V: 	Maxwell4	
+[00:00:04]: 		K: 	15	 V: 	Maxwell6	
+[00:00:04]: 		K: 	16	 V: 	Maxwell7	
+[00:00:04]: 		K: 	17	 V: 	Warzone_1	
+[00:00:04]: 		K: 	18	 V: 	Warzone_2	
+[00:00:04]: 		K: 	19	 V: 	Warzone_3	
+[00:00:04]: 	K: 	required_prefabs	 V: 	table: 0xa44d6a0	
+[00:00:04]: 		K: 	1	 V: 	multiplayer_portal	
+[00:00:04]: 	K: 	substitutes	 V: 	table: 0xb1c8f20	
+[00:00:04]: 	K: 	version	 V: 	3	
+[00:00:04]: Loaded and applied level data override from ../leveldataoverride.lua	
+[00:00:04]: Overwriting savedata with level data file.	
+[00:00:04]: Not applying world gen overrides.	
+[00:00:04]: Collecting garbage...
+[00:00:04]: lua_gc took 0.08 seconds
+[00:00:04]: ~ShardLuaProxy()
+[00:00:04]: ~cEventLeaderboardProxy()
+[00:00:04]: ~ItemServerLuaProxy()
+[00:00:04]: ~InventoryLuaProxy()
+[00:00:04]: ~NetworkLuaProxy()
+[00:00:04]: ~SimLuaProxy()
+[00:00:05]: lua_close took 0.08 seconds
+[00:00:05]: ReleaseAll
+[00:00:05]: ReleaseAll Finished
+[00:00:05]: cGame::StartPlaying
+[00:00:05]: LOADING LUA
+[00:00:05]: DoLuaFile scripts/main.lua
+[00:00:05]: DoLuaFile loading buffer scripts/main.lua
+[00:00:05]:   taskgrouplist:	default	Together	
+[00:00:05]:   taskgrouplist:	classic	Classic	
+[00:00:05]:   taskgrouplist:	cave_default	Underground	
+[00:00:05]:   taskgrouplist:	lavaarena_taskset	The Forge	
+[00:00:05]:   taskgrouplist:	quagmire_taskset	The Gorge	
+[00:00:05]: running main.lua
+	
+[00:00:05]: unloading prefabs for mod MOD_workshop-367546858	
+[00:00:05]: unloading prefabs for mod MOD_workshop-1309401477	
+[00:00:05]: unloading prefabs for mod MOD_workshop-1591364636	
+[00:00:05]: unloading prefabs for mod MOD_workshop-661253977	
+[00:00:05]: unloading prefabs for mod MOD_workshop-1418746242	
+[00:00:05]: loaded modindex	
+[00:00:05]: ModIndex: Beginning normal load sequence for dedicated server.
+	
+[00:00:05]: modoverrides.lua enabling workshop-1309401477	
+[00:00:05]: modoverrides.lua enabling workshop-1591364636	
+[00:00:05]: modoverrides.lua enabling workshop-661253977	
+[00:00:05]: modoverrides.lua enabling workshop-1418746242	
+[00:00:05]: modoverrides.lua enabling workshop-367546858	
+[00:00:05]: ModIndex:GetModsToLoad inserting moddir, 	workshop-661253977	
+[00:00:05]: ModIndex:GetModsToLoad inserting moddir, 	workshop-367546858	
+[00:00:05]: ModIndex:GetModsToLoad inserting moddir, 	workshop-1591364636	
+[00:00:05]: ModIndex:GetModsToLoad inserting moddir, 	workshop-1309401477	
+[00:00:05]: ModIndex:GetModsToLoad inserting moddir, 	workshop-1418746242	
+[00:00:05]: Could not load mod_config_data/modconfiguration_workshop-661253977	
+[00:00:05]: applying configuration_options from modoverrides.lua to mod workshop-1309401477	
+[00:00:05]: applying configuration_options from modoverrides.lua to mod workshop-1591364636	
+[00:00:05]: applying configuration_options from modoverrides.lua to mod workshop-661253977	
+[00:00:05]: Overriding mod workshop-661253977's option baodiao with value 1	
+[00:00:05]: Overriding mod workshop-661253977's option amudiao with value true	
+[00:00:05]: Overriding mod workshop-661253977's option zbdiao with value true	
+[00:00:05]: Overriding mod workshop-661253977's option kong with value 0	
+[00:00:05]: Overriding mod workshop-661253977's option rendiao with value 2	
+[00:00:05]: applying configuration_options from modoverrides.lua to mod workshop-1418746242	
+[00:00:05]: Overriding mod workshop-1418746242's option clearfont with value true	
+[00:00:05]: Overriding mod workshop-1418746242's option extratrans with value true	
+[00:00:05]: Overriding mod workshop-1418746242's option eventplus with value true	
+[00:00:05]: applying configuration_options from modoverrides.lua to mod workshop-367546858	
+[00:00:05]: Overriding mod workshop-367546858's option SMALL_TEXTURES with value true	
+[00:00:05]: Overriding mod workshop-367546858's option LANG with value auto	
+[00:00:05]: Loading mod: workshop-661253977 ( Don't Drop Everything) Version:170403.21:59	
+[00:00:05]: Could not load mod_config_data/modconfiguration_workshop-367546858	
+[00:00:05]: applying configuration_options from modoverrides.lua to mod workshop-1309401477	
+[00:00:05]: applying configuration_options from modoverrides.lua to mod workshop-1591364636	
+[00:00:05]: applying configuration_options from modoverrides.lua to mod workshop-661253977	
+[00:00:05]: Overriding mod workshop-661253977's option baodiao with value 1	
+[00:00:05]: Overriding mod workshop-661253977's option amudiao with value true	
+[00:00:05]: Overriding mod workshop-661253977's option zbdiao with value true	
+[00:00:05]: Overriding mod workshop-661253977's option kong with value 0	
+[00:00:05]: Overriding mod workshop-661253977's option rendiao with value 2	
+[00:00:05]: applying configuration_options from modoverrides.lua to mod workshop-1418746242	
+[00:00:05]: Overriding mod workshop-1418746242's option clearfont with value true	
+[00:00:05]: Overriding mod workshop-1418746242's option extratrans with value true	
+[00:00:05]: Overriding mod workshop-1418746242's option eventplus with value true	
+[00:00:05]: applying configuration_options from modoverrides.lua to mod workshop-367546858	
+[00:00:05]: Overriding mod workshop-367546858's option SMALL_TEXTURES with value true	
+[00:00:05]: Overriding mod workshop-367546858's option LANG with value auto	
+[00:00:05]: Loading mod: workshop-367546858 (中文语言包) Version:3.5.3	
+[00:00:05]: Could not load mod_config_data/modconfiguration_workshop-1591364636	
+[00:00:05]: applying configuration_options from modoverrides.lua to mod workshop-1309401477	
+[00:00:05]: applying configuration_options from modoverrides.lua to mod workshop-1591364636	
+[00:00:05]: applying configuration_options from modoverrides.lua to mod workshop-661253977	
+[00:00:05]: Overriding mod workshop-661253977's option baodiao with value 1	
+[00:00:05]: Overriding mod workshop-661253977's option amudiao with value true	
+[00:00:05]: Overriding mod workshop-661253977's option zbdiao with value true	
+[00:00:05]: Overriding mod workshop-661253977's option kong with value 0	
+[00:00:05]: Overriding mod workshop-661253977's option rendiao with value 2	
+[00:00:05]: applying configuration_options from modoverrides.lua to mod workshop-1418746242	
+[00:00:05]: Overriding mod workshop-1418746242's option clearfont with value true	
+[00:00:05]: Overriding mod workshop-1418746242's option extratrans with value true	
+[00:00:05]: Overriding mod workshop-1418746242's option eventplus with value true	
+[00:00:05]: applying configuration_options from modoverrides.lua to mod workshop-367546858	
+[00:00:05]: Overriding mod workshop-367546858's option SMALL_TEXTURES with value true	
+[00:00:05]: Overriding mod workshop-367546858's option LANG with value auto	
+[00:00:05]: Loading mod: workshop-1591364636 (Auto Place MiniSign) Version:1.7.0	
+[00:00:05]: Could not load mod_config_data/modconfiguration_workshop-1309401477	
+[00:00:05]: applying configuration_options from modoverrides.lua to mod workshop-1309401477	
+[00:00:05]: applying configuration_options from modoverrides.lua to mod workshop-1591364636	
+[00:00:05]: applying configuration_options from modoverrides.lua to mod workshop-661253977	
+[00:00:05]: Overriding mod workshop-661253977's option baodiao with value 1	
+[00:00:05]: Overriding mod workshop-661253977's option amudiao with value true	
+[00:00:05]: Overriding mod workshop-661253977's option zbdiao with value true	
+[00:00:05]: Overriding mod workshop-661253977's option kong with value 0	
+[00:00:05]: Overriding mod workshop-661253977's option rendiao with value 2	
+[00:00:05]: applying configuration_options from modoverrides.lua to mod workshop-1418746242	
+[00:00:05]: Overriding mod workshop-1418746242's option clearfont with value true	
+[00:00:05]: Overriding mod workshop-1418746242's option extratrans with value true	
+[00:00:05]: Overriding mod workshop-1418746242's option eventplus with value true	
+[00:00:05]: applying configuration_options from modoverrides.lua to mod workshop-367546858	
+[00:00:05]: Overriding mod workshop-367546858's option SMALL_TEXTURES with value true	
+[00:00:05]: Overriding mod workshop-367546858's option LANG with value auto	
+[00:00:05]: Loading mod: workshop-1309401477 (auto_open_gift(自动挂机开礼物)) Version:0.7	
+[00:00:05]: Could not load mod_config_data/modconfiguration_workshop-1418746242	
+[00:00:05]: applying configuration_options from modoverrides.lua to mod workshop-1309401477	
+[00:00:05]: applying configuration_options from modoverrides.lua to mod workshop-1591364636	
+[00:00:05]: applying configuration_options from modoverrides.lua to mod workshop-661253977	
+[00:00:05]: Overriding mod workshop-661253977's option baodiao with value 1	
+[00:00:05]: Overriding mod workshop-661253977's option amudiao with value true	
+[00:00:05]: Overriding mod workshop-661253977's option zbdiao with value true	
+[00:00:05]: Overriding mod workshop-661253977's option kong with value 0	
+[00:00:05]: Overriding mod workshop-661253977's option rendiao with value 2	
+[00:00:05]: applying configuration_options from modoverrides.lua to mod workshop-1418746242	
+[00:00:05]: Overriding mod workshop-1418746242's option clearfont with value true	
+[00:00:05]: Overriding mod workshop-1418746242's option extratrans with value true	
+[00:00:05]: Overriding mod workshop-1418746242's option eventplus with value true	
+[00:00:05]: applying configuration_options from modoverrides.lua to mod workshop-367546858	
+[00:00:05]: Overriding mod workshop-367546858's option SMALL_TEXTURES with value true	
+[00:00:05]: Overriding mod workshop-367546858's option LANG with value auto	
+[00:00:05]: Loading mod: workshop-1418746242 (Chinese++) Version:1.2.1	
+[00:00:05]: Mod: workshop-367546858 (中文语言包)	Loading modworldgenmain.lua	
+[00:00:05]: Mod: workshop-367546858 (中文语言包)	  Mod had no modworldgenmain.lua. Skipping.	
+[00:00:05]: Mod: workshop-367546858 (中文语言包)	Loading modmain.lua	
+[00:00:05]: [Chinses] 加载贴图翻译！	
+[00:00:05]: Translator:LoadPOFile - loading file: ../mods/workshop-367546858/DST_chs.po	
+[00:00:05]: [Chinses] 所选语言不存在或无法加载，默认加载简体翻译成功！	
+[00:00:05]: Mod: workshop-1309401477 (auto_open_gift(自动挂机开礼物))	Loading modworldgenmain.lua	
+[00:00:05]: Mod: workshop-1309401477 (auto_open_gift(自动挂机开礼物))	  Mod had no modworldgenmain.lua. Skipping.	
+[00:00:05]: Mod: workshop-1309401477 (auto_open_gift(自动挂机开礼物))	Loading modmain.lua	
+[00:00:05]: Mod: workshop-1591364636 (Auto Place MiniSign)	Loading modworldgenmain.lua	
+[00:00:05]: Mod: workshop-1591364636 (Auto Place MiniSign)	  Mod had no modworldgenmain.lua. Skipping.	
+[00:00:05]: Mod: workshop-1591364636 (Auto Place MiniSign)	Loading modmain.lua	
+[00:00:05]: Mod: workshop-661253977 ( Don't Drop Everything)	Loading modworldgenmain.lua	
+[00:00:05]: Mod: workshop-661253977 ( Don't Drop Everything)	  Mod had no modworldgenmain.lua. Skipping.	
+[00:00:05]: Mod: workshop-661253977 ( Don't Drop Everything)	Loading modmain.lua	
+[00:00:05]: Mod: workshop-1418746242 (Chinese++)	Loading modworldgenmain.lua	
+[00:00:05]: Mod: workshop-1418746242 (Chinese++)	  Mod had no modworldgenmain.lua. Skipping.	
+[00:00:05]: Mod: workshop-1418746242 (Chinese++)	Loading modmain.lua	
+[00:00:05]: Could not load mod_config_data/modconfiguration_workshop-1418746242	
+[00:00:05]: ModIndex:GetModsToLoad inserting moddir, 	workshop-661253977	
+[00:00:05]: ModIndex:GetModsToLoad inserting moddir, 	workshop-367546858	
+[00:00:05]: ModIndex:GetModsToLoad inserting moddir, 	workshop-1591364636	
+[00:00:05]: ModIndex:GetModsToLoad inserting moddir, 	workshop-1309401477	
+[00:00:05]: ModIndex:GetModsToLoad inserting moddir, 	workshop-1418746242	
+[00:00:06]: Event data unavailable: lavaarena_event_server/lavaarena_achievement_quest_defs
+[00:00:06]: LOADING LUA SUCCESS
+[00:00:06]: Registering mod namespace "choose_skin0"
+[00:00:06]: Registering mod namespace "choose_skin1"
+[00:00:06]: Registering mod namespace "wilson"
+[00:00:06]: PlayerDeaths could not load morgue	
+[00:00:06]: PlayerHistory could not load player_history	
+[00:00:06]: ServerPreferences could not load server_preferences	
+[00:00:06]: bloom_enabled	false	
+[00:00:06]: OnLoad slot	2	: World options was nil! Populating with default.	
+[00:00:06]: OnLoad slot	3	: World options was nil! Populating with default.	
+[00:00:06]: OnLoad slot	4	: World options was nil! Populating with default.	
+[00:00:06]: OnLoad slot	5	: World options was nil! Populating with default.	
+[00:00:06]: loaded saveindex	
+[00:00:06]: OnFilesLoaded()	
+[00:00:06]: OnUpdatePurchaseStateComplete	
+[00:00:06]: Load Slot: ... generating new world	
+[00:00:06]: [IPC] Signal created '/DST_Master_WorldGen'  #0xf4e7f000
+[00:00:06]: [IPC] Sending signal.... #0xf4e7f000
+[00:00:06]: WorldSim::SimThread::SimThread()
+[00:00:06]: ABOUT TO INSTALL STACKTRACE
+[00:00:06]: DoLuaFile scripts/stacktrace.lua
+[00:00:06]: DoLuaFile loading buffer scripts/stacktrace.lua
+[00:00:06]: INSTALLED STACKTRACE
+[00:00:06]: WorldSim::SimThread::SimThread() complete
+[00:00:06]: ModIndex: Load sequence finished successfully.	
+[00:00:06]: Reset() returning
+[00:00:06]: THREAD - started 'WorldSim' (4039633728)
+[00:00:06]: WorldSim::SimThread::Main()
+[00:00:06]: DoLuaFile scripts/worldgen_main.lua
+[00:00:06]: DoLuaFile loading buffer scripts/worldgen_main.lua
+[00:00:06]: DLC enabled : 	false	
+[00:00:06]:   taskgrouplist:	default	Together	
+[00:00:06]:   taskgrouplist:	classic	Classic	
+[00:00:06]:   taskgrouplist:	cave_default	Underground	
+[00:00:06]:   taskgrouplist:	lavaarena_taskset	The Forge	
+[00:00:06]:   taskgrouplist:	quagmire_taskset	The Gorge	
+[00:00:06]: ModIndex:GetModsToLoad inserting modname, 	workshop-367546858	
+[00:00:06]: ModIndex:GetModsToLoad inserting modname, 	workshop-1418746242	
+[00:00:06]: ModIndex:GetModsToLoad inserting modname, 	workshop-1309401477	
+[00:00:06]: ModIndex:GetModsToLoad inserting modname, 	workshop-1591364636	
+[00:00:06]: ModIndex:GetModsToLoad inserting modname, 	workshop-661253977	
+[00:00:06]: Loading mod: workshop-367546858 (中文语言包) Version:3.5.3	
+[00:00:06]: Loading mod: workshop-1418746242 (Chinese++) Version:1.2.1	
+[00:00:06]: Loading mod: workshop-1309401477 (auto_open_gift(自动挂机开礼物)) Version:0.7	
+[00:00:06]: Loading mod: workshop-1591364636 (Auto Place MiniSign) Version:1.7.0	
+[00:00:06]: Loading mod: workshop-661253977 ( Don't Drop Everything) Version:170403.21:59	
+[00:00:06]: Mod: workshop-367546858 (中文语言包)	Loading modworldgenmain.lua	
+[00:00:06]: Mod: workshop-367546858 (中文语言包)	  Mod had no modworldgenmain.lua. Skipping.	
+[00:00:06]: Mod: workshop-1309401477 (auto_open_gift(自动挂机开礼物))	Loading modworldgenmain.lua	
+[00:00:06]: Mod: workshop-1309401477 (auto_open_gift(自动挂机开礼物))	  Mod had no modworldgenmain.lua. Skipping.	
+[00:00:06]: Mod: workshop-1591364636 (Auto Place MiniSign)	Loading modworldgenmain.lua	
+[00:00:06]: Mod: workshop-1591364636 (Auto Place MiniSign)	  Mod had no modworldgenmain.lua. Skipping.	
+[00:00:06]: Mod: workshop-661253977 ( Don't Drop Everything)	Loading modworldgenmain.lua	
+[00:00:06]: Mod: workshop-661253977 ( Don't Drop Everything)	  Mod had no modworldgenmain.lua. Skipping.	
+[00:00:06]: Mod: workshop-1418746242 (Chinese++)	Loading modworldgenmain.lua	
+[00:00:06]: Mod: workshop-1418746242 (Chinese++)	  Mod had no modworldgenmain.lua. Skipping.	
+[00:00:06]: running worldgen_main.lua
+	
+[00:00:06]: SEED = 	1545823343	
+[00:00:06]: Generating world with these parameters:	
+[00:00:06]: level_type	SURVIVAL	
+[00:00:06]: level_data:	
+[00:00:06]: 	K: 	1	 V: 	table: 0xefb08330	
+[00:00:06]: 		K: 	desc	 V: 	标准的饥荒联机体验。	
+[00:00:06]: 		K: 	hideminimap	 V: 	false	
+[00:00:06]: 		K: 	id	 V: 	SURVIVAL_TOGETHER	
+[00:00:06]: 		K: 	location	 V: 	forest	
+[00:00:06]: 		K: 	max_playlist_position	 V: 	999	
+[00:00:06]: 		K: 	min_playlist_position	 V: 	0	
+[00:00:06]: 		K: 	name	 V: 	默认	
+[00:00:06]: 		K: 	numrandom_set_pieces	 V: 	4	
+[00:00:06]: 		K: 	ordered_story_setpieces	 V: 	table: 0xefb08360	
+[00:00:06]: 			K: 	1	 V: 	Sculptures_1	
+[00:00:06]: 			K: 	2	 V: 	Maxwell5	
+[00:00:06]: 		K: 	override_level_string	 V: 	false	
+[00:00:06]: 		K: 	overrides	 V: 	table: 0xefb0b130	
+[00:00:06]: 			K: 	alternatehunt	 V: 	default	
+[00:00:06]: 			K: 	angrybees	 V: 	default	
+[00:00:06]: 			K: 	antliontribute	 V: 	default	
+[00:00:06]: 			K: 	autumn	 V: 	default	
+[00:00:06]: 			K: 	bearger	 V: 	default	
+[00:00:06]: 			K: 	beefalo	 V: 	default	
+[00:00:06]: 			K: 	beefaloheat	 V: 	default	
+[00:00:06]: 			K: 	bees	 V: 	default	
+[00:00:06]: 			K: 	berrybush	 V: 	default	
+[00:00:06]: 			K: 	birds	 V: 	default	
+[00:00:06]: 			K: 	boons	 V: 	default	
+[00:00:06]: 			K: 	branching	 V: 	default	
+[00:00:06]: 			K: 	butterfly	 V: 	default	
+[00:00:06]: 			K: 	buzzard	 V: 	default	
+[00:00:06]: 			K: 	cactus	 V: 	default	
+[00:00:06]: 			K: 	carrot	 V: 	default	
+[00:00:06]: 			K: 	catcoon	 V: 	default	
+[00:00:06]: 			K: 	chess	 V: 	default	
+[00:00:06]: 			K: 	day	 V: 	default	
+[00:00:06]: 			K: 	deciduousmonster	 V: 	default	
+[00:00:06]: 			K: 	deerclops	 V: 	default	
+[00:00:06]: 			K: 	disease_delay	 V: 	default	
+[00:00:06]: 			K: 	dragonfly	 V: 	default	
+[00:00:06]: 			K: 	flint	 V: 	default	
+[00:00:06]: 			K: 	flowers	 V: 	default	
+[00:00:06]: 			K: 	frograin	 V: 	default	
+[00:00:06]: 			K: 	goosemoose	 V: 	default	
+[00:00:06]: 			K: 	grass	 V: 	default	
+[00:00:06]: 			K: 	houndmound	 V: 	default	
+[00:00:06]: 			K: 	hounds	 V: 	default	
+[00:00:06]: 			K: 	hunt	 V: 	default	
+[00:00:06]: 			K: 	krampus	 V: 	default	
+[00:00:06]: 			K: 	layout_mode	 V: 	LinkNodesByKeys	
+[00:00:06]: 			K: 	liefs	 V: 	default	
+[00:00:06]: 			K: 	lightning	 V: 	default	
+[00:00:06]: 			K: 	lightninggoat	 V: 	default	
+[00:00:06]: 			K: 	loop	 V: 	default	
+[00:00:06]: 			K: 	lureplants	 V: 	default	
+[00:00:06]: 			K: 	marshbush	 V: 	default	
+[00:00:06]: 			K: 	merm	 V: 	default	
+[00:00:06]: 			K: 	meteorshowers	 V: 	default	
+[00:00:06]: 			K: 	meteorspawner	 V: 	default	
+[00:00:06]: 			K: 	moles	 V: 	default	
+[00:00:06]: 			K: 	mushroom	 V: 	default	
+[00:00:06]: 			K: 	penguins	 V: 	default	
+[00:00:06]: 			K: 	perd	 V: 	default	
+[00:00:06]: 			K: 	petrification	 V: 	default	
+[00:00:06]: 			K: 	pigs	 V: 	default	
+[00:00:06]: 			K: 	ponds	 V: 	default	
+[00:00:06]: 			K: 	prefabswaps_start	 V: 	default	
+[00:00:06]: 			K: 	rabbits	 V: 	default	
+[00:00:06]: 			K: 	reeds	 V: 	default	
+[00:00:06]: 			K: 	regrowth	 V: 	default	
+[00:00:06]: 			K: 	roads	 V: 	default	
+[00:00:06]: 			K: 	rock	 V: 	default	
+[00:00:06]: 			K: 	rock_ice	 V: 	default	
+[00:00:06]: 			K: 	sapling	 V: 	default	
+[00:00:06]: 			K: 	season_start	 V: 	default	
+[00:00:06]: 			K: 	specialevent	 V: 	default	
+[00:00:06]: 			K: 	spiders	 V: 	default	
+[00:00:06]: 			K: 	spring	 V: 	default	
+[00:00:06]: 			K: 	start_location	 V: 	default	
+[00:00:06]: 			K: 	summer	 V: 	default	
+[00:00:06]: 			K: 	tallbirds	 V: 	default	
+[00:00:06]: 			K: 	task_set	 V: 	default	
+[00:00:06]: 			K: 	tentacles	 V: 	default	
+[00:00:06]: 			K: 	touchstone	 V: 	default	
+[00:00:06]: 			K: 	trees	 V: 	default	
+[00:00:06]: 			K: 	tumbleweed	 V: 	default	
+[00:00:06]: 			K: 	walrus	 V: 	default	
+[00:00:06]: 			K: 	weather	 V: 	default	
+[00:00:06]: 			K: 	wildfires	 V: 	default	
+[00:00:06]: 			K: 	winter	 V: 	default	
+[00:00:06]: 			K: 	world_size	 V: 	small	
+[00:00:06]: 			K: 	wormhole_prefab	 V: 	wormhole	
+[00:00:06]: 		K: 	random_set_pieces	 V: 	table: 0xefb08f00	
+[00:00:06]: 			K: 	1	 V: 	Sculptures_2	
+[00:00:06]: 			K: 	2	 V: 	Sculptures_3	
+[00:00:06]: 			K: 	3	 V: 	Sculptures_4	
+[00:00:06]: 			K: 	4	 V: 	Sculptures_5	
+[00:00:06]: 			K: 	5	 V: 	Chessy_1	
+[00:00:06]: 			K: 	6	 V: 	Chessy_2	
+[00:00:06]: 			K: 	7	 V: 	Chessy_3	
+[00:00:06]: 			K: 	8	 V: 	Chessy_4	
+[00:00:06]: 			K: 	9	 V: 	Chessy_5	
+[00:00:06]: 			K: 	10	 V: 	Chessy_6	
+[00:00:06]: 			K: 	11	 V: 	Maxwell1	
+[00:00:06]: 			K: 	12	 V: 	Maxwell2	
+[00:00:06]: 			K: 	13	 V: 	Maxwell3	
+[00:00:06]: 			K: 	14	 V: 	Maxwell4	
+[00:00:06]: 			K: 	15	 V: 	Maxwell6	
+[00:00:06]: 			K: 	16	 V: 	Maxwell7	
+[00:00:06]: 			K: 	17	 V: 	Warzone_1	
+[00:00:06]: 			K: 	18	 V: 	Warzone_2	
+[00:00:06]: 			K: 	19	 V: 	Warzone_3	
+[00:00:06]: 		K: 	required_prefabs	 V: 	table: 0xefb084a0	
+[00:00:06]: 			K: 	1	 V: 	multiplayer_portal	
+[00:00:06]: 		K: 	substitutes	 V: 	table: 0xefb0a990	
+[00:00:06]: 		K: 	version	 V: 	3	
+[00:00:06]: 
+#######
+#
+# Generating SURVIVAL Mode Level
+#
+#######
+	
+[00:00:06]: Prefab Swap Selection: grass gekko	
+[00:00:06]: Prefab Swap Selection: regular twigs	
+[00:00:06]: Prefab Swap Selection: regular berries	
+[00:00:06]: Maxwell4	added to	Make a pick	
+[00:00:06]: Warzone_1	added to	Beeeees!	
+[00:00:06]: Chessy_6	added to	Make a pick	
+[00:00:06]: Maxwell1	added to	Squeltch	
+[00:00:06]: New size:	350	small	
+[00:00:06]: Creating story...	
+[00:00:06]: LinkNodesByKeys	
+[00:00:06]: Finding valid start task...	
+[00:00:06]:    ...picked 	Make a pick	
+[00:00:06]: Has start node	Clearing	
+[00:00:06]: Baking map...	350	
+[00:00:06]: [WorldSimActual::GenerateVoronoiMap]
+[00:00:06]: GenerateVoronoiMap [1]:
+[00:00:06]: ...Done.
+[00:00:06]: [AddEmptyNodes]
+[00:00:06]: GenerateVoronoiMap [100]:
+[00:00:08]: ...Done.
+[00:00:08]: [WorldSimActual::GenerateVoronoiMap] complete [success]
+[00:00:08]: [WorldSimActual::ConvertToTileMap]
+[00:00:08]: [ConvertToTileMap]
+[00:00:08]: [WorldSimActual::ConvertToTileMap] complete
+[00:00:08]: [WorldSimActual::SeparateIslands]
+[00:00:08]: [SeparateIslands]
+[00:00:08]: [WorldSimActual::SeparateIslands] complete
+[00:00:08]: Map Baked!	
+[00:00:08]: [WorldSimActual::ForceConnectivity]
+[00:00:08]: [GenerateLandmasses]
+[00:00:08]: [GenerateLandmasses] islands: 1
+[00:00:08]: [MergeConnectedLandmasses] true
+[00:00:08]: [WorldSimActual::ForceConnectivity] complete
+[00:00:08]: [GetWormholesExtra] connected 0 unconnected 1
+[00:00:08]: [GetWormholesExtra] after: connected 1 unconnected 0
+[00:00:08]: [GetWormholesExtra] pushed 0 wormholes
+[00:00:08]: [WorldSimActual::DrawRoads]
+[00:00:08]: [DrawRoads]
+[00:00:08]: [WorldSimActual::DrawRoads] complete
+[00:00:08]: Encoding...	
+[00:00:08]: Encoding... DONE	
+[00:00:08]: Checking Tags	
+[00:00:08]: Populating voronoi...	
+[00:00:08]: Warning! Could not find a spot for Chessy_6 in node Make a pick:5:Clearing	
+[00:00:08]: disconnected tiles...	0	
+[00:00:08]: Checking Required Prefab multiplayer_portal has at least 1 instances (1 found).	
+[00:00:08]: Checking Required Prefab pigking has at least 1 instances (1 found).	
+[00:00:08]: Done forest map gen!	
+[00:00:08]: Checking map...	
+[00:00:08]: Generation complete	
+[00:00:08]: WorldSim::SimThread::Main() complete
+[00:00:08]: Serializing world: session/FC11658E0B66AA9C/0000000002
+[00:00:08]: Klump load on boot started.	
+[00:00:08]: Klump files loaded: 	0	
+[00:00:09]: 	Unload FE	
+[00:00:09]: 	Unload FE done	
+[00:00:09]: Mod: workshop-367546858 (中文语言包)	Registering prefabs	
+[00:00:09]: Mod: workshop-367546858 (中文语言包)	  Registering default mod prefab	
+[00:00:09]: Mod: workshop-1309401477 (auto_open_gift(自动挂机开礼物))	Registering prefabs	
+[00:00:09]: Mod: workshop-1309401477 (auto_open_gift(自动挂机开礼物))	  Registering default mod prefab	
+[00:00:09]: Mod: workshop-1591364636 (Auto Place MiniSign)	Registering prefabs	
+[00:00:09]: Mod: workshop-1591364636 (Auto Place MiniSign)	  Registering default mod prefab	
+[00:00:09]: Mod: workshop-661253977 ( Don't Drop Everything)	Registering prefabs	
+[00:00:09]: Mod: workshop-661253977 ( Don't Drop Everything)	  Registering default mod prefab	
+[00:00:09]: Mod: workshop-1418746242 (Chinese++)	Registering prefabs	
+[00:00:09]: Mod: workshop-1418746242 (Chinese++)	  Registering default mod prefab	
+[00:00:09]: 	LOAD BE	
+[00:00:14]: 	LOAD BE: done	
+[00:00:14]: Begin Session: FC11658E0B66AA9C
+[00:00:14]: saving to server_temp/server_save	
+[00:00:14]: MiniMapComponent::AddAtlas( minimap/minimap_data.xml )
+[00:00:14]: Loading 12 new character(s)	
+[00:00:15]: Total 12 character(s) loaded	
+[00:00:15]: Loading Nav Grid	
+[00:00:20]: Reconstructing topology	
+[00:00:20]: 	...Sorting points	
+[00:00:20]: 	...Sorting edges	
+[00:00:20]: 	...Connecting nodes	
+[00:00:20]: 	...Validating connections	
+[00:00:20]: 	...Housekeeping	
+[00:00:20]: 	...Done!	
+[00:00:20]: 1 uploads added to server. From server_temp
+[00:00:20]: About to start a shard with these settings:
+[00:00:20]:   ShardName: [SHDMASTER]
+[00:00:20]:   ShardID: 1
+[00:00:20]:   ShardRole: MASTER
+[00:00:20]:   MasterHost: (null)
+[00:00:20]:   MasterBind: 127.0.0.1
+[00:00:20]:   MasterPort: 10888
+[00:00:20]: [Shard] Starting master server
+[00:00:20]: [Shard] Shard server started on port: 10888
+[00:00:20]: [IPC] Signal created '/DST_Master_Ready'  #0xf4e05000
+[00:00:20]: [IPC] Sending signal.... #0xf4e05000
+[00:00:20]: Telling Client our new session identifier: FC11658E0B66AA9C
+[00:00:20]: [Steam] SteamGameServer_Init(8766, 10999, 27016)
+[00:00:20]: [Steam] SteamGameServer_Init success
+[00:00:21]: Validating portal[1] <-> <nil>[1] (inactive)	
+[00:00:21]: Validating portal[2] <-> <nil>[2] (inactive)	
+[00:00:21]: Validating portal[3] <-> <nil>[3] (inactive)	
+[00:00:21]: Validating portal[4] <-> <nil>[4] (inactive)	
+[00:00:21]: Validating portal[5] <-> <nil>[5] (inactive)	
+[00:00:21]: Validating portal[6] <-> <nil>[6] (inactive)	
+[00:00:21]: Validating portal[7] <-> <nil>[7] (inactive)	
+[00:00:21]: Validating portal[8] <-> <nil>[8] (inactive)	
+[00:00:21]: Validating portal[9] <-> <nil>[9] (inactive)	
+[00:00:21]: Validating portal[10] <-> <nil>[10] (inactive)	
+[00:00:21]: Sim paused
+[00:00:21]: Registering master server in Sing lobby
+[00:00:25]: [Shard] Slave Caves(187337597) connected: [LAN] 127.0.0.1
+[00:00:26]: Gameserver logged on to Steam, assigned SteamID [A:1:3164856328:11640]
+[00:00:27]: [Shard] Slave Caves(187337597) ready!
+[00:00:27]: World 187337597 is now connected	
+[00:00:27]: Validating portal[1] <-> 187337597[1] (disabled)	
+[00:00:27]: Validating portal[2] <-> 187337597[2] (disabled)	
+[00:00:27]: Validating portal[3] <-> 187337597[3] (disabled)	
+[00:00:27]: Validating portal[4] <-> 187337597[4] (disabled)	
+[00:00:27]: Validating portal[5] <-> 187337597[5] (disabled)	
+[00:00:27]: Validating portal[6] <-> 187337597[6] (disabled)	
+[00:00:27]: Validating portal[7] <-> 187337597[7] (disabled)	
+[00:00:27]: Validating portal[8] <-> 187337597[8] (disabled)	
+[00:00:27]: Validating portal[9] <-> 187337597[9] (disabled)	
+[00:00:27]: Validating portal[10] <-> 187337597[10] (disabled)	
+[00:00:30]: New incoming connection 127.0.0.1|40980 <12314227891374763189>
+[00:00:30]: Client connected from [LAN] 127.0.0.1|40980 <12314227891374763189>
+[00:00:30]: ValidateGameSessionToken pgs-usc^KU_6yNrwFkC^DontStarveTogether^uweWViV5e/5fwZvraFK1gGKkLPpnHqVZy1xDgDfbTMc= for <12314227891374763189>
+[00:00:30]: Client authenticated: (KU_6yNrwFkC) Ariwori
+[00:00:30]: [Steam] Authenticated host '76561198311311669'
+[00:00:30]: LOCAL_SKIN_DLC_GRANTING reading bits in DeserializeUnverifiedInventory unread bits 8
+[00:00:31]: Registering master server in Sing lobby
+[00:00:33]: There is no active event to validate against.
+[00:00:33]: [Shard] Read save location file for (KU_6yNrwFkC)
+[00:00:40]: Resuming user: session/FC11658E0B66AA9C/A7GRONQUHUSC
+[00:00:41]: Registering master server in Sing lobby
+[00:00:58]: Spawn request: wilson from Ariwori
+[00:00:58]: Skin request: () (body_wendy_ice) () () ()
+[00:00:58]: Spawning player at: [Fixed] (-286.00, 0.00, 258.00)	
+[00:00:58]: Serializing user: session/FC11658E0B66AA9C/A7GRONQUHUSC/0000000003
+[00:00:58]: Sim unpaused
+[00:00:58]: Registering master server in Sing lobby
+[00:01:19]: [Steam] SendUserDisconnect for '76561198311311669'
+[00:01:19]: [Shard] (KU_6yNrwFkC) disconnected from [SHDMASTER](1)
+[00:01:19]: Registering master server in Sing lobby
+[00:01:19]: [IPC] Received shutdown signal.
+[00:01:19]: Serializing user: session/FC11658E0B66AA9C/A7GRONQUHUSC/0000000003
+[00:01:20]: Serializing world: session/FC11658E0B66AA9C/0000000003
+[00:01:20]: Removing server from Sing lobby
+[00:01:20]: [Shard] Stopping shard mode
+[00:01:20]: Collecting garbage...
+[00:01:20]: lua_gc took 0.19 seconds
+[00:01:20]: ~ShardLuaProxy()
+[00:01:20]: ~cEventLeaderboardProxy()
+[00:01:20]: ~ItemServerLuaProxy()
+[00:01:20]: ~InventoryLuaProxy()
+[00:01:20]: ~NetworkLuaProxy()
+[00:01:20]: ~SimLuaProxy()
+[00:01:20]: lua_close took 0.24 seconds
+[00:01:21]: CurlRequestManager::ClientThread::Main() complete
+[00:01:21]: HttpClient2 discarded 1 callbacks.
+[00:01:21]: Shutting down

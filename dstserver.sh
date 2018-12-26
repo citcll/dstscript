@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.3.1.1"
+script_ver="2.3.1.2"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -116,8 +116,8 @@ Get_shard_array(){
     [ $cluster != "无" ] && shardarray=$(ls -l $dst_base_dir/${cluster} | grep ^d | awk '{print $9}')
 }
 Get_single_shard(){
-    Get_shard_array
-    shard=$(echo $shardarray | head -n 1)
+    Get_current_cluster
+    [ $cluster != "无" ] && shard=$(ls -l $dst_base_dir/${cluster} | grep ^d | awk '{print $9}' | head -n 1)
 }
 Get_current_cluster(){
     [ -f ${server_conf_file} ] && cluster=$(cat ${server_conf_file} | grep "^cluster" | cut -d "=" -f2)
