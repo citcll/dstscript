@@ -1,1 +1,1 @@
-### A bash shell script for manangering DST dedicated server.
+### 这里的已不再更新，可能存在问题，最新更新可访问 https://blog.wqlin.com/dstscript.html
