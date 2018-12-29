@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.3.1.3.8.3"
+script_ver="2.3.1.3.8.5"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -40,7 +40,7 @@ error(){
 Menu(){
     while (true)
     do
-        echo -e "\e[33m==============欢迎使用饥荒联机版独立服务器脚本[Linux-Steam](${script_ver})==============\e[0m"
+        echo -e "\e[33m============欢迎使用饥荒联机版独立服务器脚本[Linux-Steam](${script_ver})============\e[0m"
         echo -e "\e[33m作者：Ariwori        Bug反馈：${feedback_link}\e[0m"
         echo -e "\e[33m本脚本一切权利归作者所有。未经许可禁止使用本脚本进行任何的商业活动！\e[0m"
         echo -e "\e[31m游戏服务端安装目录：${dst_server_dir} (Version: $(cat ${dst_server_dir}/version.txt))\e[33m【${dst_need_update_str}】\e[0m"
@@ -1004,12 +1004,13 @@ Start_check(){
             fi
             cat ${log_arr_str} | grep -v script_ver | while read line
             do
-                line_1=$(echo $line | cut -d '@' -f1)
-                line_2=$(echo $line | cut -d '@' -f2)
+                line_0=$(echo $line | cut -d '@' -f1)
+                line_1=$(echo $line | cut -d '@' -f2)
+                line_2=$(echo $line | cut -d '@' -f3)
                 if [[ $line1 =~ $line_1 ]]
                 then
                     info $line_2
-                    if [[ $line_2 == "世界连接成功。。。服务器开启成功！" || $line_2 == "令牌缺失。。。服务器开启失败！" || $line_2 == "世界连接失败。。。服务器开启失败！" ]]
+                    if [ $line_0 -gt 1]
                     then
                         break 2
                     fi
@@ -1189,12 +1190,12 @@ Fix_steamcmd(){
 ##########################################################################
 # Show change log
 Show_changelog(){
-    echo -e "\e[33m==============================脚本更新说明======================================\e[0m"
+    echo -e "\e[33m============================脚本更新说明====================================\e[0m"
     #cat /tmp/dstscript/.dstscript/changelog.txt > /tmp/changelog.txt
     wget ${update_link}/.dstscript/changelog.txt -O /tmp/changelog.txt > /dev/null 2>&1
     datelog=$(cat /tmp/changelog.txt | head -n 1)
     cat /tmp/changelog.txt | grep -A 20 "更新日志 ${datelog}"
-    echo -e "\e[33m================================================================================\e[0m"
+    echo -e "\e[33m============================================================================\e[0m"
     sleep 3
 }
 # 脚本更新
@@ -1404,7 +1405,7 @@ if [[ $1 == "au" ]]; then
     while (true)
     do
         clear
-        echo -e "\e[33m===========饥荒联机版独立服务器脚本自动更新及异常维护进程[Linux-Steam](${script_ver})===========\e[0m"
+        echo -e "\e[33m=========饥荒联机版独立服务器脚本自动更新及异常维护进程[Linux-Steam](${script_ver})=========\e[0m"
         Update_DST
         Update_DST_MOD_Check
         if [[ ${MOD_update} == "true" ]]
