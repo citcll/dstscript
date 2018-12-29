@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.3.1.3.1"
+script_ver="2.3.1.3.2"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -985,7 +985,7 @@ Start_check(){
         do
             line_1=$(echo $line | cut -d '@' -f1)
             line_2=$(echo $line | cut -d '@' -f2)
-            if [[ $log_index_str =~ $line_1 ]]
+            if [[ $line =~ $line_1 ]]
             then
                 info $line_2
                 break
