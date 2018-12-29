@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.3.1.3.8.7"
+script_ver="2.3.1.4"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -1013,7 +1013,7 @@ Start_check(){
                     break
                 fi
             done
-            if [ $line_0 -gt 1 ]
+            if [[ "$line_0" == "1" ]]
             then
                 break
             fi
