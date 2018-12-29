@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.3.1.4"
+script_ver="2.3.2"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -1002,7 +1002,7 @@ Start_check(){
                 log_index=$[$log_index + 1]
                 old_line1=$line1
             fi
-            cat ${log_arr_str} | grep -v script_ver | while read line
+            while read line
             do
                 line_0=$(echo $line | cut -d '@' -f1)
                 line_1=$(echo $line | cut -d '@' -f2)
@@ -1010,10 +1010,9 @@ Start_check(){
                 if [[ $line1 =~ $line_1 ]]
                 then
                     info $line_2
-                    break
                 fi
-            done
-            if [[ "$line_0" == "1" ]]
+            done < ${log_arr_str}
+            if [[ $line_0 == "1" ]]
             then
                 break
             fi
