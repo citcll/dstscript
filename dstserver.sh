@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.3.1.3.3"
+script_ver="2.3.1.3.4"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -987,7 +987,19 @@ Start_check(){
                 info $line_2
                 break
             fi
+            while (true)
+            do
+                if [[ $line1 != "$(cat ${dst_base_dir}/${cluster}/${shard}/server_log.txt | tail -n 1)" ]]
+                then
+                    break
+                fi
+                if [[ $line_2 == "世界连接成功。。。服务器开启成功！" || $line_2 == "令牌缺失。。。服务器开启失败！" ]]
+                then
+                    break 2
+                fi
+            done
         done
+
     done
     #     while (true)
     #     do

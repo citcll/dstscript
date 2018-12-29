@@ -1,7 +1,7 @@
-script_ver="1.0.1"
+script_ver="1.0.2"
 .*Mounting file system databundles/scripts.zip successful.*@加载游戏文件完成。。。
 .*OnLoadUserIdList: .*DoNotStarveTogether.*@加载房间配置完成。。。
-.*cGame::StartPlaying.*@开始运行服务端程序。。。
+.*GameSpecific initialize: Okay.*@开始运行服务端程序。。。
 .*DownloadMods.*@开始下载或更新MOD并加载MOD配置。。。
 .*Online Server Started on port: .*@开始收集服务器配置。。。
 .*Generating SURVIVAL Mode Level.*@正在创建世界。。。
