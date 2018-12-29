@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.3.2"
+script_ver="2.3.3"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -991,11 +991,12 @@ Start_check(){
     log_file=${dst_base_dir}/${cluster}/${shard}/server_log.txt
     if [ -f $log_file ]
     then
-        RES=`flock -x -n $log_file -c "echo ok"`
+        RES="ok"
         log_index=1
         old_line1=""
         while [ "$RES" = "ok" ]
         do
+            RES=`flock -x -n $log_file -c "echo ok"`
             line1=$(sed -n ${log_index}p $log_file)
             if [[ $line1 != $old_line1 ]]
             then
@@ -1004,18 +1005,24 @@ Start_check(){
             fi
             while read line
             do
-                line_0=$(echo $line | cut -d '@' -f1)
-                line_1=$(echo $line | cut -d '@' -f2)
-                line_2=$(echo $line | cut -d '@' -f3)
-                if [[ $line1 =~ $line_1 ]]
+                if [[ $line =~ '.*script_ver.*' ]]
                 then
-                    info $line_2
+                    break
+                else
+                    line_0=$(echo $line | cut -d '@' -f1)
+                    line_1=$(echo $line | cut -d '@' -f2)
+                    line_2=$(echo $line | cut -d '@' -f3)
+                    if [[ $line1 =~ $line_1 ]]
+                    then
+                        info $line_2
+                        if [[ $line_0 == "1" ]]
+                        then
+                            RES="done"
+                        fi
+                        break
+                    fi
                 fi
             done < ${log_arr_str}
-            if [[ $line_0 == "1" ]]
-            then
-                break
-            fi
         done
     fi
     #     while (true)
