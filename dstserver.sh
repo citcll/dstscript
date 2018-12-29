@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.3.1.3"
+script_ver="2.3.1.3.1"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -975,31 +975,22 @@ Start_shard(){
     done
 }
 Start_check(){
-    Get_shard_array
-    newshardarray=""
+    Get_single_shard
     log_index=1
     log_done="false"
     server_done="false"
-    while (true)
+    cat ${dst_base_dir}/${cluster}/${shard}/server_log.txt | while read line1
     do
-        for shard in ${shardarray}
+        cat ${log_arr_str} | grep -v script_ver | while read line
         do
-            if [ -f serverlog_path="${dst_base_dir}/${cluster}/${shard}/server_log.txt" ]
+            line_1=$(echo $line | cut -d '@' -f1)
+            line_2=$(echo $line | cut -d '@' -f2)
+            if [[ $log_index_str =~ $line_1 ]]
             then
-                log_index_str=$(sed -n ${log_index}p ${dst_base_dir}/${cluster}/${shard}/server_log.txt)
-                cat ${log_arr_str} | grep -v script_ver | while read line
-                do
-                    line_1=$(echo $line | cut -d '@' -f1)
-                    line_2=$(echo $line | cut -d '@' -f2)
-                    if [[ $log_index_str =~ $line_1 ]]
-                    then
-                        info $line_2
-                        break
-                    fi
-                done
+                info $line_2
+                break
             fi
         done
-        log_index=$[$log_index + 1]
     done
     #     while (true)
     #     do
