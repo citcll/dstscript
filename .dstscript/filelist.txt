@@ -10,3 +10,4 @@ Cavesend.lua:1.1.9
 lavaarena.lua:1.0.3
 updatelib.txt:1.0.6
 announce.txt:1.0.5
+logarr.txt:1.0.0

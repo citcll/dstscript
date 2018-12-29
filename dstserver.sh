@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.3.1.2"
+script_ver="2.3.1.3"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -15,6 +15,7 @@ data_dir="${HOME}/.dstscript"
 dst_token_file="${data_dir}/clustertoken.txt"
 server_conf_file="${data_dir}/server.conf"
 dst_cluster_file="${data_dir}/clusterdata.txt"
+log_arr_str="${data_dir}/logarr.txt"
 feedback_link="https://blog.wqlin.com/dstscript.html"
 my_api_link="https://api.wqlin.com/dst"
 update_link="${my_api_link}/dstscript"
@@ -976,62 +977,82 @@ Start_shard(){
 Start_check(){
     Get_shard_array
     newshardarray=""
-    for shard in ${shardarray}
+    log_index=1
+    log_done="false"
+    server_done="false"
+    while (true)
     do
-        serverlog_path="${dst_base_dir}/${cluster}/${shard}/server_log.txt"
-        start_time=$(date "+%s")
-        while (true)
+        for shard in ${shardarray}
         do
-            if tmux has-session -t DST_${shard} > /dev/null 2>&1
+            if [ -f serverlog_path="${dst_base_dir}/${cluster}/${shard}/server_log.txt" ]
             then
-                if [[ $(grep "Sim paused" -c "${serverlog_path}") > 0 ]]
-                then
-                    newshardarray="${newshardarray}${shard}"
-                    break
-                fi
-                if [[ $(grep "Your Server Will Not Start" -c "${serverlog_path}") > 0 ]]
-                then
-                    newshardarray="TOKENINVALID"
-                    break
-                fi
-            else
-                current_time=$(date "+%s")
-                check_time=$[ $current_time - $start_time ]
-                # 一分钟超时 MOD bug 或者设置问题
-                if [ ${check_time} > 60 ]
-                then
-                    newshardarray="BREAK"
-                    break
-                fi
-            fi
-            current_time=$(date "+%s")
-            check_time=$[ ${current_time} - ${start_time} ]
-            # 十分钟超时 MOD下载超时或端口占用
-            if [ ${check_time} -gt 600 ]
-            then
-                newshardarray="TIME_OUT"
-                break
+                log_index_str=$(sed -n ${log_index}p ${dst_base_dir}/${cluster}/${shard}/server_log.txt)
+                cat ${log_arr_str} | grep -v script_ver | while read line
+                do
+                    line_1=$(echo $line | cut -d '@' -f1)
+                    line_2=$(echo $line | cut -d '@' -f2)
+                    if [[ $log_index_str =~ $line_1 ]]
+                    then
+                        info $line_2
+                        break
+                    fi
+                done
             fi
         done
+        log_index=$[$log_index + 1]
     done
-    shardarray=$(echo ${shardarray} | sed 's/ //g')
-    if [[ ${shardarray} == ${newshardarray} ]]
-    then
-        info "服务器开启成功，和小伙伴尽情玩耍吧！"
-    else
-        if [[ ${newshardarray} == "TIME_OUT" ]]
-        then
-            error "MOD下载超时或端口占用, 请自行检查服务器日志处理问题后重试！"
-        elif [[ ${newshardarray} == "BREAK" ]]
-        then
-            error "开启的MOD存在bug或设置存在问题, 请自行检查服务器日志处理问题后重试！"
-        elif [[ ${newshardarray} == "TOKENINVALID" ]]
-        then
-            error "服务器令牌无效或未设置！！！请自行检查处理问题后重试！"
-        else
-            error "未知错误！！！请反顾给作者！！！谢谢！"
-        fi
-    fi
+    #     while (true)
+    #     do
+    #         if tmux has-session -t DST_${shard} > /dev/null 2>&1
+    #         then
+    #             if [[ $(grep "Sim paused" -c "${serverlog_path}") > 0 ]]
+    #             then
+    #                 newshardarray="${newshardarray}${shard}"
+    #                 break
+    #             fi
+    #             if [[ $(grep "Your Server Will Not Start" -c "${serverlog_path}") > 0 ]]
+    #             then
+    #                 newshardarray="TOKENINVALID"
+    #                 break
+    #             fi
+    #         else
+    #             current_time=$(date "+%s")
+    #             check_time=$[ $current_time - $start_time ]
+    #             # 一分钟超时 MOD bug 或者设置问题
+    #             if [ ${check_time} > 60 ]
+    #             then
+    #                 newshardarray="BREAK"
+    #                 break
+    #             fi
+    #         fi
+    #         current_time=$(date "+%s")
+    #         check_time=$[ ${current_time} - ${start_time} ]
+    #         # 十分钟超时 MOD下载超时或端口占用
+    #         if [ ${check_time} -gt 600 ]
+    #         then
+    #             newshardarray="TIME_OUT"
+    #             break
+    #         fi
+    #     done
+    # done
+    # shardarray=$(echo ${shardarray} | sed 's/ //g')
+    # if [[ ${shardarray} == ${newshardarray} ]]
+    # then
+    #     info "服务器开启成功，和小伙伴尽情玩耍吧！"
+    # else
+    #     if [[ ${newshardarray} == "TIME_OUT" ]]
+    #     then
+    #         error "MOD下载超时或端口占用, 请自行检查服务器日志处理问题后重试！"
+    #     elif [[ ${newshardarray} == "BREAK" ]]
+    #     then
+    #         error "开启的MOD存在bug或设置存在问题, 请自行检查服务器日志处理问题后重试！"
+    #     elif [[ ${newshardarray} == "TOKENINVALID" ]]
+    #     then
+    #         error "服务器令牌无效或未设置！！！请自行检查处理问题后重试！"
+    #     else
+    #         error "未知错误！！！请反顾给作者！！！谢谢！"
+    #     fi
+    # fi
 }
 #############################################################################
 First_run_check(){
