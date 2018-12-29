@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.3.1.3.7"
+script_ver="2.3.1.3.8"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -984,7 +984,7 @@ Start_check(){
         old_line1=""
         while [ "$RES" = "ok" ]
         do
-            line1=$(sed -n ${log_index}p $$log_file)
+            line1=$(sed -n ${log_index}p $log_file)
             if [[ $line1 != $old_line1 ]]
             then
                 log_index=$[$log_index + 1]
