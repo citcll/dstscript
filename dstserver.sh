@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.3.1.3.5"
+script_ver="2.3.1.3.7"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -976,30 +976,43 @@ Start_shard(){
 }
 Start_check(){
     Get_single_shard
-    cat ${dst_base_dir}/${cluster}/${shard}/server_log.txt | while read line1
-    do
-        cat ${log_arr_str} | grep -v script_ver | while read line
+    log_file=${dst_base_dir}/${cluster}/${shard}/server_log.txt
+    if [ -f $log_file ]
+    then
+        RES=`flock -x -n $log_file -c "echo ok"`
+        log_index=1
+        old_line1=""
+        while [ "$RES" = "ok" ]
         do
-            line_1=$(echo $line | cut -d '@' -f1)
-            line_2=$(echo $line | cut -d '@' -f2)
-            if [[ $line1 =~ $line_1 ]]
+            line1=$(sed -n ${log_index}p $$log_file)
+            if [[ $line1 != $old_line1 ]]
             then
-                info $line_2
-                break
+                log_index=$[$log_index + 1]
+                $old_line1=$line1
             fi
+            cat ${log_arr_str} | grep -v script_ver | while read line
+            do
+                line_1=$(echo $line | cut -d '@' -f1)
+                line_2=$(echo $line | cut -d '@' -f2)
+                if [[ $line1 =~ $line_1 ]]
+                then
+                    info $line_2
+                    break
+                fi
+            done
+            while (true)
+            do
+                if [[ $line1 != "$(cat ${dst_base_dir}/${cluster}/${shard}/server_log.txt | tail -n 1)" ]]
+                then
+                    break
+                fi
+                if [[ $line_2 == "世界连接成功。。。服务器开启成功！" || $line_2 == "令牌缺失。。。服务器开启失败！" ]]
+                then
+                    break 2
+                fi
+            done
         done
-        while (true)
-        do
-            if [[ $line1 != "$(cat ${dst_base_dir}/${cluster}/${shard}/server_log.txt | tail -n 1)" ]]
-            then
-                break
-            fi
-            if [[ $line_2 == "世界连接成功。。。服务器开启成功！" || $line_2 == "令牌缺失。。。服务器开启失败！" ]]
-            then
-                break 2
-            fi
-        done
-    done
+    fi
     #     while (true)
     #     do
     #         if tmux has-session -t DST_${shard} > /dev/null 2>&1
