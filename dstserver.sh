@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.3.1.3.8"
+script_ver="2.3.1.3.8.1"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -647,12 +647,16 @@ Close_server(){
         if tmux has-session -t DST_${shard} > /dev/null 2>&1
         then
             tmux send-keys -t DST_${shard} "c_shutdown(true)" C-m
-            sleep 5
+            sleep 10
             info "${shard}世界服务器已关闭！"
             exchangestatus false
         else
             info "${shard}世界服务器未开启！"
         fi
+    done
+    for shard in ${shardarray}
+    do
+        tmux kill-session -t DST_${shard} > /dev/null 2>&1
     done
 }
 Exit_auto_update(){
@@ -988,7 +992,7 @@ Start_check(){
             if [[ $line1 != $old_line1 ]]
             then
                 log_index=$[$log_index + 1]
-                $old_line1=$line1
+                old_line1=$line1
             fi
             cat ${log_arr_str} | grep -v script_ver | while read line
             do
@@ -1000,17 +1004,10 @@ Start_check(){
                     break
                 fi
             done
-            while (true)
-            do
-                if [[ $line1 != "$(cat ${dst_base_dir}/${cluster}/${shard}/server_log.txt | tail -n 1)" ]]
-                then
-                    break
-                fi
-                if [[ $line_2 == "世界连接成功。。。服务器开启成功！" || $line_2 == "令牌缺失。。。服务器开启失败！" ]]
-                then
-                    break 2
-                fi
-            done
+            if [[ $line_2 == "世界连接成功。。。服务器开启成功！" || $line_2 == "令牌缺失。。。服务器开启失败！" ]]
+            then
+                break 2
+            fi
         done
     fi
     #     while (true)
