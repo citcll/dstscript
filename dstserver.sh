@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.3.1.3.2"
+script_ver="2.3.1.3.3"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -976,16 +976,13 @@ Start_shard(){
 }
 Start_check(){
     Get_single_shard
-    log_index=1
-    log_done="false"
-    server_done="false"
     cat ${dst_base_dir}/${cluster}/${shard}/server_log.txt | while read line1
     do
         cat ${log_arr_str} | grep -v script_ver | while read line
         do
             line_1=$(echo $line | cut -d '@' -f1)
             line_2=$(echo $line | cut -d '@' -f2)
-            if [[ $line =~ $line_1 ]]
+            if [[ $line1 =~ $line_1 ]]
             then
                 info $line_2
                 break
