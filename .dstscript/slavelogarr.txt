@@ -1,0 +1,277 @@
+[00:00:00]: PersistRootStorage is now /root/.klei//DoNotStarveTogether/test5/Caves2/ 
+[00:00:00]: Starting Up
+[00:00:00]: Version: 298000
+[00:00:00]: Current time: Wed Dec 26 20:50:17 2018
+
+[00:00:00]: System Name: Linux
+[00:00:00]: Host Name: host.localdomain
+[00:00:00]: Release(Kernel) Version: 4.19.6-1.el7.elrepo.x86_64
+[00:00:00]: Kernel Build Timestamp: #1 SMP Sat Dec 1 11:58:18 EST 2018
+[00:00:00]: Machine Arch: x86_64
+[00:00:00]: Don't Starve Together: 298000 LINUX
+[00:00:00]: Build Date: 4532
+[00:00:00]: Parsing command line
+[00:00:00]: Command Line Arguments: -cluster test5 -shard Caves2 
+[00:00:00]: Initializing distribution platform
+[00:00:00]: ....Done
+[00:00:00]: THREAD - started 'GAClient' (4139264832)
+[00:00:00]: CurlRequestManager::ClientThread::Main()
+[00:00:00]: Mounting file system databundles/klump.zip successful.
+[00:00:00]: Mounting file system databundles/shaders.zip successful.
+[00:00:00]: Mounting file system databundles/fonts.zip successful.
+[00:00:00]: Mounting file system databundles/anim_dynamic.zip successful.
+[00:00:00]: Mounting file system databundles/bigportraits.zip successful.
+[00:00:00]: Mounting file system databundles/images.zip successful.
+[00:00:00]: Mounting file system databundles/scripts.zip successful.
+[00:00:00]: ProfileIndex:5.05
+[00:00:00]: [Connect] PendingConnection::Reset(true)
+[00:00:00]: Platform: 1
+[00:00:00]: Network tick rate: U=15(2), D=0
+[00:00:00]: Network tick rate: U=15(2), D=0
+[00:00:00]: OnLoadPermissionList: /root/.klei//DoNotStarveTogether/test5/blocklist.txt (Success)
+[00:00:00]: OnLoadPermissionList: /root/.klei//DoNotStarveTogether/test5/adminlist.txt (Success)
+[00:00:00]: OnLoadUserIdList: /root/.klei//DoNotStarveTogether/test5/whitelist.txt (Success)
+[00:00:00]: THREAD - started 'Ping Job Thread' (4132436800)
+[00:00:00]: THREAD - started 'StreamInput' (4130335552)
+[00:00:00]: Token retrieved from: /root/.klei//DoNotStarveTogether/test5/cluster_token.txt
+[00:00:00]: Token retrieved from: /root/.klei//DoNotStarveTogether/test5/cluster_token.txt
+[00:00:00]: cGame::InitializeOnMainThread
+[00:00:00]: Renderer initialize: Okay
+[00:00:00]: AnimManager initialize: Okay
+[00:00:00]: Buffers initialize: Okay
+[00:00:00]: cDontStarveGame::DoGameSpecificInitialize()
+[00:00:00]: GameSpecific initialize: Okay
+[00:00:00]: cGame::StartPlaying
+[00:00:00]: LOADING LUA
+[00:00:00]: DoLuaFile scripts/main.lua
+[00:00:00]: DoLuaFile loading buffer scripts/main.lua
+[00:00:00]:   taskgrouplist:	default	Together	
+[00:00:00]:   taskgrouplist:	classic	Classic	
+[00:00:00]:   taskgrouplist:	cave_default	Underground	
+[00:00:00]:   taskgrouplist:	lavaarena_taskset	The Forge	
+[00:00:00]:   taskgrouplist:	quagmire_taskset	The Gorge	
+[00:00:00]: running main.lua
+	
+[00:00:00]: loaded modindex	
+[00:00:00]: ModIndex: Beginning normal load sequence for dedicated server.
+	
+[00:00:00]: DownloadMods(1)
+[00:00:00]: Download server mod 1570272163
+[00:00:01]: modoverrides.lua enabling workshop-1570272163	
+[00:00:01]: ModIndex:GetModsToLoad inserting moddir, 	workshop-1570272163	
+[00:00:01]: Could not load mod_config_data/modconfiguration_workshop-1570272163_CLIENT	
+[00:00:01]: Loading mod: workshop-1570272163 (Auto Open Gift) Version:1.2.2	
+[00:00:01]: Mod: workshop-1570272163 (Auto Open Gift)	Loading modworldgenmain.lua	
+[00:00:01]: Mod: workshop-1570272163 (Auto Open Gift)	  Mod had no modworldgenmain.lua. Skipping.	
+[00:00:01]: Mod: workshop-1570272163 (Auto Open Gift)	Loading modmain.lua	
+[00:00:01]: Event data unavailable: lavaarena_event_server/lavaarena_achievement_quest_defs
+[00:00:02]: LOADING LUA SUCCESS
+[00:00:02]: PlayerDeaths could not load morgue	
+[00:00:02]: PlayerHistory could not load player_history	
+[00:00:02]: ServerPreferences could not load server_preferences	
+[00:00:02]: bloom_enabled	false	
+[00:00:02]: loaded saveindex	
+[00:00:02]: OnFilesLoaded()	
+[00:00:02]: OnUpdatePurchaseStateComplete	
+[00:00:02]: Klump load on boot started.	
+[00:00:02]: Klump files loaded: 	0	
+[00:00:03]: Mod: workshop-1570272163 (Auto Open Gift)	Registering prefabs	
+[00:00:03]: Mod: workshop-1570272163 (Auto Open Gift)	  Registering default mod prefab	
+[00:00:03]: 	Load FE	
+[00:00:04]: 	Load FE: done	
+[00:00:05]: THREAD - started 'FilesExistAsyncThread' (4112829248)
+[00:00:05]: FilesExistAsyncThread started (19651 files)...
+[00:00:05]: ModIndex: Load sequence finished successfully.	
+[00:00:05]: Reset() returning
+[00:00:07]: ... FilesExistAsyncThread complete
+[00:00:07]: [200] Account Communication Success (6)
+[00:00:07]: Received (KU_6yNrwFkC) from TokenPurpose
+[00:00:07]: Starting Dedicated Server Game	
+[00:00:07]: Network tick rate: U=15(2), D=0
+[00:00:07]: About to start a server with the following settings:
+[00:00:07]:   Dedicated: true
+[00:00:07]:   Online: true
+[00:00:07]:   Passworded: false
+[00:00:07]:   ServerPort: 10999
+[00:00:07]:   SteamAuthPort: 8768
+[00:00:07]:   SteamMasterServerPort: 27018
+[00:00:07]:   ClanID: false
+[00:00:07]:   ClanOnly: false
+[00:00:07]:   ClanAdmin: false
+[00:00:07]:   LanOnly: false
+[00:00:07]:   FriendsOnly: false
+[00:00:07]:   EnableAutosaver: true
+[00:00:07]:   EncodeUserPath: true
+[00:00:07]:   PVP: true
+[00:00:07]:   MaxPlayers: 6
+[00:00:07]:   GameMode: survival
+[00:00:07]:   OverridenDNS: 
+[00:00:07]:   PauseWhenEmpty: true
+[00:00:07]:   IdleTimeout: 1800s
+[00:00:07]:   VoteEnabled: true
+[00:00:07]:   InternetBroadcasting: true
+[00:00:07]:   Intent: madness
+[00:00:07]: Could not load mod_config_data/modconfiguration_workshop-1570272163	
+[00:00:07]: Online Server Started on port: 10999
+[00:00:07]: Collecting garbage...
+[00:00:07]: lua_gc took 0.05 seconds
+[00:00:07]: ~ShardLuaProxy()
+[00:00:07]: ~cEventLeaderboardProxy()
+[00:00:07]: ~ItemServerLuaProxy()
+[00:00:07]: ~InventoryLuaProxy()
+[00:00:07]: ~NetworkLuaProxy()
+[00:00:07]: ~SimLuaProxy()
+[00:00:07]: lua_close took 0.08 seconds
+[00:00:07]: ReleaseAll
+[00:00:07]: ReleaseAll Finished
+[00:00:07]: cGame::StartPlaying
+[00:00:07]: LOADING LUA
+[00:00:07]: DoLuaFile scripts/main.lua
+[00:00:07]: DoLuaFile loading buffer scripts/main.lua
+[00:00:08]:   taskgrouplist:	default	Together	
+[00:00:08]:   taskgrouplist:	classic	Classic	
+[00:00:08]:   taskgrouplist:	cave_default	Underground	
+[00:00:08]:   taskgrouplist:	lavaarena_taskset	The Forge	
+[00:00:08]:   taskgrouplist:	quagmire_taskset	The Gorge	
+[00:00:08]: running main.lua
+	
+[00:00:08]: unloading prefabs for mod MOD_workshop-1570272163	
+[00:00:08]: loaded modindex	
+[00:00:08]: ModIndex: Beginning normal load sequence for dedicated server.
+	
+[00:00:08]: modoverrides.lua enabling workshop-1570272163	
+[00:00:08]: ModIndex:GetModsToLoad inserting moddir, 	workshop-1570272163	
+[00:00:08]: Could not load mod_config_data/modconfiguration_workshop-1570272163	
+[00:00:08]: Loading mod: workshop-1570272163 (Auto Open Gift) Version:1.2.2	
+[00:00:08]: Mod: workshop-1570272163 (Auto Open Gift)	Loading modworldgenmain.lua	
+[00:00:08]: Mod: workshop-1570272163 (Auto Open Gift)	  Mod had no modworldgenmain.lua. Skipping.	
+[00:00:08]: Mod: workshop-1570272163 (Auto Open Gift)	Loading modmain.lua	
+[00:00:08]: Event data unavailable: lavaarena_event_server/lavaarena_achievement_quest_defs
+[00:00:08]: LOADING LUA SUCCESS
+[00:00:08]: PlayerDeaths could not load morgue	
+[00:00:08]: PlayerHistory could not load player_history	
+[00:00:08]: ServerPreferences could not load server_preferences	
+[00:00:08]: bloom_enabled	false	
+[00:00:08]: loaded saveindex	
+[00:00:08]: OnFilesLoaded()	
+[00:00:08]: OnUpdatePurchaseStateComplete	
+[00:00:08]: Loading world: session/750641F2FD8E4383/0000000004	
+[00:00:08]: Save file is at version 4.77	
+[00:00:08]: Klump load on boot started.	
+[00:00:08]: Klump files loaded: 	0	
+[00:00:08]: 	Unload FE	
+[00:00:08]: 	Unload FE done	
+[00:00:09]: Mod: workshop-1570272163 (Auto Open Gift)	Registering prefabs	
+[00:00:09]: Mod: workshop-1570272163 (Auto Open Gift)	  Registering default mod prefab	
+[00:00:09]: 	LOAD BE	
+[00:00:15]: 	LOAD BE: done	
+[00:00:15]: Begin Session: 750641F2FD8E4383
+[00:00:15]: saving to server_temp/server_save	
+[00:00:16]: MiniMapComponent::AddAtlas( minimap/minimap_data.xml )
+[00:00:16]: Loading 12 new character(s)	
+[00:00:21]: Total 12 character(s) loaded	
+[00:00:21]: Loading Nav Grid	
+[00:00:21]: setting 	summerlength	15	
+[00:00:21]: setting 	isnightmaredawn	false	
+[00:00:21]: setting 	elapseddaysinseason	0	
+[00:00:21]: setting 	isfullmoon	false	
+[00:00:21]: setting 	moisture	1.8416652679443	
+[00:00:21]: setting 	springlength	20	
+[00:00:21]: setting 	isnightmarewild	false	
+[00:00:21]: setting 	moonphase	new	
+[00:00:21]: setting 	precipitationrate	0	
+[00:00:21]: setting 	iswet	false	
+[00:00:21]: setting 	isnewmoon	false	
+[00:00:21]: setting 	iswinter	false	
+[00:00:21]: setting 	israining	false	
+[00:00:21]: setting 	isnightmarewarn	false	
+[00:00:21]: setting 	precipitation	none	
+[00:00:21]: setting 	cavephase	day	
+[00:00:21]: setting 	moistureceil	791.60205078125	
+[00:00:21]: setting 	isday	false	
+[00:00:21]: setting 	iscaveday	true	
+[00:00:21]: setting 	season	autumn	
+[00:00:21]: setting 	timeinphase	0.0045843124389648	
+[00:00:21]: setting 	temperature	19.066821433699	
+[00:00:21]: setting 	isnightmarecalm	true	
+[00:00:21]: setting 	isnight	true	
+[00:00:21]: setting 	isdusk	false	
+[00:00:21]: setting 	iscavedusk	false	
+[00:00:21]: setting 	isautumn	true	
+[00:00:21]: setting 	issnowing	false	
+[00:00:21]: setting 	iswaxingmoon	true	
+[00:00:21]: setting 	pop	0.0023265039120689	
+[00:00:21]: setting 	snowlevel	0	
+[00:00:21]: setting 	issnowcovered	false	
+[00:00:21]: setting 	autumnlength	20	
+[00:00:21]: setting 	phase	night	
+[00:00:21]: setting 	nightmaretime	7.3648681640625	
+[00:00:21]: setting 	winterlength	15	
+[00:00:21]: setting 	isspring	false	
+[00:00:21]: setting 	nightmarephase	calm	
+[00:00:21]: setting 	remainingdaysinseason	20	
+[00:00:21]: setting 	cycles	0	
+[00:00:21]: setting 	iscavenight	false	
+[00:00:21]: setting 	nightmaretimeinphase	0.020457967122396	
+[00:00:21]: setting 	wetness	0	
+[00:00:21]: setting 	time	0.0022921562194824	
+[00:00:21]: setting 	issummer	false	
+[00:00:22]: [Shard] Slave is waiting for LUA...
+[00:00:38]: Reconstructing topology	
+[00:00:38]: 	...Sorting points	
+[00:00:38]: 	...Sorting edges	
+[00:00:38]: 	...Connecting nodes	
+[00:00:38]: 	...Validating connections	
+[00:00:38]: 	...Housekeeping	
+[00:00:38]: 	...Done!	
+[00:00:39]: 1 uploads added to server. From server_temp
+[00:00:39]: About to start a shard with these settings:
+[00:00:39]:   ShardName: Caves2
+[00:00:39]:   ShardID: 110
+[00:00:39]:   ShardRole: SLAVE
+[00:00:39]:   MasterHost: 127.0.0.1
+[00:00:39]:   MasterBind: (null)
+[00:00:39]:   MasterPort: 10888
+[00:00:39]: [Shard] Connecting to master...
+[00:00:39]: Telling Client our new session identifier: 750641F2FD8E4383
+[00:00:39]: ModIndex: Load sequence finished successfully.	
+[00:00:40]: Reset() returning
+[00:00:40]: [Steam] SteamGameServer_Init(8768, 10999, 27018)
+[00:00:41]: [Steam] SteamGameServer_Init success
+[00:00:41]: [Shard] Connection to master failed. Waiting to reconnect...
+[00:00:44]: Validating portal[3] <-> 1[3] (inactive)	
+[00:00:44]: Validating portal[9] <-> 1[9] (inactive)	
+[00:00:44]: Validating portal[1] <-> 1[1] (inactive)	
+[00:00:44]: Validating portal[5] <-> 1[5] (inactive)	
+[00:00:44]: Validating portal[6] <-> 1[6] (inactive)	
+[00:00:44]: Validating portal[7] <-> 1[7] (inactive)	
+[00:00:44]: Validating portal[2] <-> 1[2] (inactive)	
+[00:00:44]: Validating portal[10] <-> 1[10] (inactive)	
+[00:00:44]: Validating portal[4] <-> 1[4] (inactive)	
+[00:00:44]: Validating portal[8] <-> 1[8] (inactive)	
+[00:00:44]: Gameserver logged on to Steam, assigned SteamID [A:1:1495907332:11641]
+[00:00:46]: About to start a shard with these settings:
+[00:00:46]:   ShardName: Caves2
+[00:00:46]:   ShardID: 110
+[00:00:46]:   ShardRole: SLAVE
+[00:00:46]:   MasterHost: 127.0.0.1
+[00:00:46]:   MasterBind: (null)
+[00:00:46]:   MasterPort: 10888
+[00:00:46]: [Shard] Connecting to master...
+[00:00:46]: [Shard] Sending slave information to master...
+[00:00:50]: Overriding region to US
+[00:00:50]: Registering slave in US lobby
+[00:00:51]: [Shard] Slave is now ready!
+[00:00:51]: World 1 is now connected	
+[00:00:51]: Validating portal[3] <-> 1[3] (active)	
+[00:00:51]: Validating portal[9] <-> 1[9] (active)	
+[00:00:51]: Validating portal[1] <-> 1[1] (active)	
+[00:00:51]: Validating portal[5] <-> 1[5] (active)	
+[00:00:51]: Validating portal[6] <-> 1[6] (active)	
+[00:00:51]: Validating portal[7] <-> 1[7] (active)	
+[00:00:51]: Validating portal[2] <-> 1[2] (active)	
+[00:00:51]: Validating portal[10] <-> 1[10] (active)	
+[00:00:51]: Validating portal[4] <-> 1[4] (active)	
+[00:00:51]: Validating portal[8] <-> 1[8] (active)	
+[00:00:52]: [Shard] Slave LUA is now ready!
+[00:00:52]: Sim paused
