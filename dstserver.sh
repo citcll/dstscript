@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.3.1.2"
+script_ver="2.3.3"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -15,6 +15,7 @@ data_dir="${HOME}/.dstscript"
 dst_token_file="${data_dir}/clustertoken.txt"
 server_conf_file="${data_dir}/server.conf"
 dst_cluster_file="${data_dir}/clusterdata.txt"
+log_arr_str="${data_dir}/logarr.txt"
 feedback_link="https://blog.wqlin.com/dstscript.html"
 my_api_link="https://api.wqlin.com/dst"
 update_link="${my_api_link}/dstscript"
@@ -39,7 +40,7 @@ error(){
 Menu(){
     while (true)
     do
-        echo -e "\e[33m==============欢迎使用饥荒联机版独立服务器脚本[Linux-Steam](${script_ver})==============\e[0m"
+        echo -e "\e[33m============欢迎使用饥荒联机版独立服务器脚本[Linux-Steam](${script_ver})============\e[0m"
         echo -e "\e[33m作者：Ariwori        Bug反馈：${feedback_link}\e[0m"
         echo -e "\e[33m本脚本一切权利归作者所有。未经许可禁止使用本脚本进行任何的商业活动！\e[0m"
         echo -e "\e[31m游戏服务端安装目录：${dst_server_dir} (Version: $(cat ${dst_server_dir}/version.txt))\e[33m【${dst_need_update_str}】\e[0m"
@@ -646,12 +647,16 @@ Close_server(){
         if tmux has-session -t DST_${shard} > /dev/null 2>&1
         then
             tmux send-keys -t DST_${shard} "c_shutdown(true)" C-m
-            sleep 5
+            sleep 10
             info "${shard}世界服务器已关闭！"
             exchangestatus false
         else
             info "${shard}世界服务器未开启！"
         fi
+    done
+    for shard in ${shardarray}
+    do
+        tmux kill-session -t DST_${shard} > /dev/null 2>&1
     done
 }
 Exit_auto_update(){
@@ -975,63 +980,103 @@ Start_shard(){
 }
 Start_check(){
     Get_shard_array
-    newshardarray=""
-    for shard in ${shardarray}
+    Get_single_shard
+    for shardt in ${shardarray}
     do
-        serverlog_path="${dst_base_dir}/${cluster}/${shard}/server_log.txt"
-        start_time=$(date "+%s")
-        while (true)
-        do
-            if tmux has-session -t DST_${shard} > /dev/null 2>&1
-            then
-                if [[ $(grep "Sim paused" -c "${serverlog_path}") > 0 ]]
-                then
-                    newshardarray="${newshardarray}${shard}"
-                    break
-                fi
-                if [[ $(grep "Your Server Will Not Start" -c "${serverlog_path}") > 0 ]]
-                then
-                    newshardarray="TOKENINVALID"
-                    break
-                fi
-            else
-                current_time=$(date "+%s")
-                check_time=$[ $current_time - $start_time ]
-                # 一分钟超时 MOD bug 或者设置问题
-                if [ ${check_time} > 60 ]
-                then
-                    newshardarray="BREAK"
-                    break
-                fi
-            fi
-            current_time=$(date "+%s")
-            check_time=$[ ${current_time} - ${start_time} ]
-            # 十分钟超时 MOD下载超时或端口占用
-            if [ ${check_time} -gt 600 ]
-            then
-                newshardarray="TIME_OUT"
-                break
-            fi
-        done
-    done
-    shardarray=$(echo ${shardarray} | sed 's/ //g')
-    if [[ ${shardarray} == ${newshardarray} ]]
-    then
-        info "服务器开启成功，和小伙伴尽情玩耍吧！"
-    else
-        if [[ ${newshardarray} == "TIME_OUT" ]]
+        if [ $(grep 'is_master = true' -c ${dst_base_dir}/${cluster}/${shard}/server.ini) -gt 0 ] 
         then
-            error "MOD下载超时或端口占用, 请自行检查服务器日志处理问题后重试！"
-        elif [[ ${newshardarray} == "BREAK" ]]
-        then
-            error "开启的MOD存在bug或设置存在问题, 请自行检查服务器日志处理问题后重试！"
-        elif [[ ${newshardarray} == "TOKENINVALID" ]]
-        then
-            error "服务器令牌无效或未设置！！！请自行检查处理问题后重试！"
-        else
-            error "未知错误！！！请反顾给作者！！！谢谢！"
+            shard=$shardt
         fi
+    done
+    log_file=${dst_base_dir}/${cluster}/${shard}/server_log.txt
+    if [ -f $log_file ]
+    then
+        RES="ok"
+        log_index=1
+        old_line1=""
+        while [ "$RES" = "ok" ]
+        do
+            RES=`flock -x -n $log_file -c "echo ok"`
+            line1=$(sed -n ${log_index}p $log_file)
+            if [[ $line1 != $old_line1 ]]
+            then
+                log_index=$[$log_index + 1]
+                old_line1=$line1
+            fi
+            while read line
+            do
+                if [[ $line =~ '.*script_ver.*' ]]
+                then
+                    break
+                else
+                    line_0=$(echo $line | cut -d '@' -f1)
+                    line_1=$(echo $line | cut -d '@' -f2)
+                    line_2=$(echo $line | cut -d '@' -f3)
+                    if [[ $line1 =~ $line_1 ]]
+                    then
+                        info $line_2
+                        if [[ $line_0 == "1" ]]
+                        then
+                            RES="done"
+                        fi
+                        break
+                    fi
+                fi
+            done < ${log_arr_str}
+        done
     fi
+    #     while (true)
+    #     do
+    #         if tmux has-session -t DST_${shard} > /dev/null 2>&1
+    #         then
+    #             if [[ $(grep "Sim paused" -c "${serverlog_path}") > 0 ]]
+    #             then
+    #                 newshardarray="${newshardarray}${shard}"
+    #                 break
+    #             fi
+    #             if [[ $(grep "Your Server Will Not Start" -c "${serverlog_path}") > 0 ]]
+    #             then
+    #                 newshardarray="TOKENINVALID"
+    #                 break
+    #             fi
+    #         else
+    #             current_time=$(date "+%s")
+    #             check_time=$[ $current_time - $start_time ]
+    #             # 一分钟超时 MOD bug 或者设置问题
+    #             if [ ${check_time} > 60 ]
+    #             then
+    #                 newshardarray="BREAK"
+    #                 break
+    #             fi
+    #         fi
+    #         current_time=$(date "+%s")
+    #         check_time=$[ ${current_time} - ${start_time} ]
+    #         # 十分钟超时 MOD下载超时或端口占用
+    #         if [ ${check_time} -gt 600 ]
+    #         then
+    #             newshardarray="TIME_OUT"
+    #             break
+    #         fi
+    #     done
+    # done
+    # shardarray=$(echo ${shardarray} | sed 's/ //g')
+    # if [[ ${shardarray} == ${newshardarray} ]]
+    # then
+    #     info "服务器开启成功，和小伙伴尽情玩耍吧！"
+    # else
+    #     if [[ ${newshardarray} == "TIME_OUT" ]]
+    #     then
+    #         error "MOD下载超时或端口占用, 请自行检查服务器日志处理问题后重试！"
+    #     elif [[ ${newshardarray} == "BREAK" ]]
+    #     then
+    #         error "开启的MOD存在bug或设置存在问题, 请自行检查服务器日志处理问题后重试！"
+    #     elif [[ ${newshardarray} == "TOKENINVALID" ]]
+    #     then
+    #         error "服务器令牌无效或未设置！！！请自行检查处理问题后重试！"
+    #     else
+    #         error "未知错误！！！请反顾给作者！！！谢谢！"
+    #     fi
+    # fi
 }
 #############################################################################
 First_run_check(){
@@ -1151,12 +1196,12 @@ Fix_steamcmd(){
 ##########################################################################
 # Show change log
 Show_changelog(){
-    echo -e "\e[33m==============================脚本更新说明======================================\e[0m"
+    echo -e "\e[33m============================脚本更新说明====================================\e[0m"
     #cat /tmp/dstscript/.dstscript/changelog.txt > /tmp/changelog.txt
     wget ${update_link}/.dstscript/changelog.txt -O /tmp/changelog.txt > /dev/null 2>&1
     datelog=$(cat /tmp/changelog.txt | head -n 1)
     cat /tmp/changelog.txt | grep -A 20 "更新日志 ${datelog}"
-    echo -e "\e[33m================================================================================\e[0m"
+    echo -e "\e[33m============================================================================\e[0m"
     sleep 3
 }
 # 脚本更新
@@ -1366,7 +1411,7 @@ if [[ $1 == "au" ]]; then
     while (true)
     do
         clear
-        echo -e "\e[33m===========饥荒联机版独立服务器脚本自动更新及异常维护进程[Linux-Steam](${script_ver})===========\e[0m"
+        echo -e "\e[33m=========饥荒联机版独立服务器脚本自动更新及异常维护进程[Linux-Steam](${script_ver})=========\e[0m"
         Update_DST
         Update_DST_MOD_Check
         if [[ ${MOD_update} == "true" ]]
