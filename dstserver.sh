@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.3.3.3"
+script_ver="2.3.3.4"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -662,22 +662,16 @@ Close_server(){
             info "${shard}世界服务器未开启！"
         fi
     done
-    # 服务器日志文件不再写入时，可认为服务器已关闭！
     for shard in ${shardarray}
     do
-        log_file=${dst_base_dir}/${cluster}/${shard}/server_log.txt
-        if [ -f $log_file ]
-        then
-            while (true)
-            do
-                RES=`flock -x -n $log_file -c "echo ok"`
-                if [[ $RES != "ok" ]]
-                then
-                    info "${shard}世界服务器已关闭！"
-                    break
-                fi
-            done
-        fi
+        while (true)
+        do
+            if ! tmux has-session -t DST_${shard} > /dev/null 2>&1
+            then
+                info "${shard}世界服务器已关闭！"
+                break
+            fi
+        done
     done
     for shard in ${shardarray}
     do
