@@ -1416,7 +1416,7 @@ if [[ $1 == "sa" ]]; then
         clear
         echo -e "\e[33m=========饥荒联机版独立服务器脚本发送公告后台[Linux-Steam](${script_ver})=========\e[0m"
         Get_single_shard
-        echo -e "\e[92m请输入你要发送的公告内容，按下回车键发送：\e[0m\c"
+        echo -e "\e[92m请输入你要发送的公告内容，按下回车键发送：\e[0m"
         read an
         tmux send-keys -t DST_${shard} "c_announce(\"$an\")" C-m
         info "公告已发送！"
