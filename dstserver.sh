@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.3.3.1"
+script_ver="2.3.3.2"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -118,7 +118,17 @@ Get_shard_array(){
 }
 Get_single_shard(){
     Get_current_cluster
-    [ $cluster != "无" ] && shard=$(ls -l $dst_base_dir/${cluster} | grep ^d | awk '{print $9}' | head -n 1)
+    Get_shard_array
+    for shard in ${shardarray}
+    do
+        shardm=$shard
+        if [ $(grep 'is_master = true' -c ${dst_base_dir}/${cluster}/${shardm}/server.ini) -gt 0 ] 
+        then
+            shardm=$shard
+            break
+        fi
+    done
+    [ -z $shardm ] && shard=$shardm
 }
 Get_current_cluster(){
     [ -f ${server_conf_file} ] && cluster=$(cat ${server_conf_file} | grep "^cluster" | cut -d "=" -f2)
@@ -981,13 +991,6 @@ Start_shard(){
 Start_check(){
     Get_shard_array
     Get_single_shard
-    for shardt in ${shardarray}
-    do
-        if [ $(grep 'is_master = true' -c ${dst_base_dir}/${cluster}/${shardt}/server.ini) -gt 0 ] 
-        then
-            shard=$shardt
-        fi
-    done
     log_file=${dst_base_dir}/${cluster}/${shard}/server_log.txt
     if [ -f $log_file ]
     then
