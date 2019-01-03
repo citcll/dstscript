@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.3.3.8"
+script_ver="2.3.3.9"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -426,11 +426,9 @@ Show_players(){
         sleep 1
     else
         tmux new-session -s Show_players -d "bash $HOME/dstserver.sh sp"
-        info "即将跳转。。。退出请按Ctrl + B松开再按D!"
-        sleep 1
-        tmux attach-session -t Show_players
         tmux split-window -t Show_players
         tmux send-keys -t Show_players:1 "bash $HOME/dstserver.sh sa"
+        info "进程已开启。。。请再次执行命令进入!"
     fi
 }
 Update_DST_Check(){
