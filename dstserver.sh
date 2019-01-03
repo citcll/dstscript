@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.3.3.4"
+script_ver="2.3.3.5"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -652,31 +652,36 @@ Choose_exit_cluster(){
 }
 Close_server(){
     tip "正在关闭已开启的服务器（有的话） ..."
+    unset nodone
     for shard in ${shardarray}
     do
         if tmux has-session -t DST_${shard} > /dev/null 2>&1
         then
             tmux send-keys -t DST_${shard} "c_shutdown(true)" C-m
             exchangestatus false
+            nodone="true"
         else
             info "${shard}世界服务器未开启！"
         fi
     done
-    for shard in ${shardarray}
-    do
-        while (true)
+    if [[ $nodone == "true" ]]
+    then
+        for shard in ${shardarray}
         do
-            if ! tmux has-session -t DST_${shard} > /dev/null 2>&1
-            then
-                info "${shard}世界服务器已关闭！"
-                break
-            fi
+            while (true)
+            do
+                if ! tmux has-session -t DST_${shard} > /dev/null 2>&1
+                then
+                    info "${shard}世界服务器已关闭！"
+                    break
+                fi
+            done
         done
-    done
-    for shard in ${shardarray}
-    do
-        tmux kill-session -t DST_${shard} > /dev/null 2>&1
-    done
+        for shard in ${shardarray}
+        do
+            tmux kill-session -t DST_${shard} > /dev/null 2>&1
+        done
+    fi
 }
 Exit_auto_update(){
     if tmux has-session -t Auto_update > /dev/null 2>&1
