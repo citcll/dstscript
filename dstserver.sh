@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.3.3.6"
+script_ver="2.3.3.7"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -1409,7 +1409,6 @@ if [[ $1 == "sp" ]]; then
     echo -e "\e[33m=========饥荒联机版独立服务器脚本当前玩家记录后台[Linux-Steam](${script_ver})=========\e[0m"
     Get_single_shard
     tail -f ${dst_base_dir}/${cluster}/${shard}/server_chat_log.txt | cut -d ' ' -f2-100
-}
 fi
 # 移动根目录到隐藏目录
 if [ -d ${HOME}/dstscript ]
