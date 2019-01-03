@@ -1418,7 +1418,7 @@ if [[ $1 == "sa" ]]; then
         Get_single_shard
         echo -e "\e[92m请输入你要发送的公告内容，按下回车键发送：\e[0m\c"
         read an
-        tmux send-keys -t DST_${shard} "c_announce(\"$an\")"
+        tmux send-keys -t DST_${shard} "c_announce(\"$an\")" C-m
         info "公告已发送！"
         sleep 1
     done
