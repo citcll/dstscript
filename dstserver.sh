@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.3.3.5"
+script_ver="2.3.3.6"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -49,6 +49,7 @@ Menu(){
         echo -e "\e[92m[4]修改房间设置         [5]添加或移除MOD        [6]设置管理员和黑名单\e[0m"
         echo -e "\e[92m[7]游戏服务端控制台     [8]自动更新及异常维护   [9]退出本脚本\e[0m"
         echo -e "\e[92m[10]删除存档            [11]更新游戏服务端      [12]更新MOD\e[0m"
+        echo -e "\e[92m[13]当前玩家记录\e[0m"
         Simple_server_status
         echo -e "\e[33m================================================================================\e[0m"
         echo -e "\e[92m（如需中断任何操作请直接按Ctrl+C）请输入命令代号：\e[0m\c"
@@ -90,6 +91,8 @@ Menu(){
             ;;
             12)
             Update_MOD
+            ;;
+            13)Show_players
             ;;
             *)
             error "输入有误！！！"
@@ -413,6 +416,19 @@ Auto_update(){
         info "自动更新已开启！即将跳转。。。退出请按Ctrl + B松开再按D!"
         sleep 1
         tmux attach-session -t Auto_update
+    fi
+}
+Show_players(){
+    if tmux has-session -t Show_players > /dev/null 2>&1
+    then
+        info "即将跳转。。。退出请按Ctrl + B松开再按D！"
+        tmux attach-session -t Show_players
+        sleep 1
+    else
+        tmux new-session -s Show_players -d "bash $HOME/dstserver.sh sp"
+        info "即将跳转。。。退出请按Ctrl + B松开再按D!"
+        sleep 1
+        tmux attach-session -t Show_players
     fi
 }
 Update_DST_Check(){
@@ -1388,6 +1404,13 @@ if [[ $1 == "au" ]]; then
         sleep 1800
     done
 fi
+if [[ $1 == "sp" ]]; then
+    clear
+    echo -e "\e[33m=========饥荒联机版独立服务器脚本当前玩家记录后台[Linux-Steam](${script_ver})=========\e[0m"
+    Get_single_shard
+    tail -f ${dst_base_dir}/${cluster}/${shard}/server_chat_log.txt | cut -d ' ' -f2-100
+}
+fi
 # 移动根目录到隐藏目录
 if [ -d ${HOME}/dstscript ]
 then
@@ -1397,6 +1420,10 @@ fi
 if [ ! -d ${data_dir} ]
 then
     mkdir -p ${data_dir}
+fi
+if [ ! -d ${data_dir}/playerhistory ]
+then
+    mkdir -p ${data_dir}/playerhistory
 fi
 # Run from here
 Check_sys
