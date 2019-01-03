@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.3.3.7"
+script_ver="2.3.3.8"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -429,6 +429,8 @@ Show_players(){
         info "即将跳转。。。退出请按Ctrl + B松开再按D!"
         sleep 1
         tmux attach-session -t Show_players
+        tmux split-window -t Show_players
+        tmux send-keys -t Show_players:1 "bash $HOME/dstserver.sh sa"
     fi
 }
 Update_DST_Check(){
@@ -1409,6 +1411,19 @@ if [[ $1 == "sp" ]]; then
     echo -e "\e[33m=========饥荒联机版独立服务器脚本当前玩家记录后台[Linux-Steam](${script_ver})=========\e[0m"
     Get_single_shard
     tail -f ${dst_base_dir}/${cluster}/${shard}/server_chat_log.txt | cut -d ' ' -f2-100
+fi
+if [[ $1 == "sa" ]]; then
+    while (true)
+    do
+        clear
+        echo -e "\e[33m=========饥荒联机版独立服务器脚本发送公告后台[Linux-Steam](${script_ver})=========\e[0m"
+        Get_single_shard
+        echo -e "\e[92m请输入你要发送的公告内容，按下回车键发送：\e[0m\c"
+        read an
+        tmux send-keys -t DST_${shard} "c_announce(\"$an\")"
+        info "公告已发送！"
+        sleep 1
+    done
 fi
 # 移动根目录到隐藏目录
 if [ -d ${HOME}/dstscript ]
