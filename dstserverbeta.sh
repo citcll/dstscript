@@ -36,6 +36,7 @@ tip(){
 error(){
     echo -e "${Error} $1"
 }
+
 # Main menu
 Menu(){
     while (true)
