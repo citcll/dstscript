@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.3.4"
+script_ver="2.3.4.4"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -92,7 +92,8 @@ Menu(){
             12)
             Update_MOD
             ;;
-            13)Show_players
+            13)
+            Show_players
             ;;
             *)
             error "输入有误！！！"
@@ -1408,7 +1409,16 @@ if [[ $1 == "sp" ]]; then
     clear
     echo -e "\e[33m=====饥荒联机版独立服务器脚本当前玩家记录后台[Linux-Steam](${script_ver})=====\e[0m"
     Get_single_shard
-    tail -f ${dst_base_dir}/${cluster}/${shard}/server_chat_log.txt | cut -d ' ' -f2-100
+    while (true)
+    do
+        logstr1=$(cat ${data_dir}/logout.txt | sed 's/\n//g')
+        logstr2=$(cat ${dst_base_dir}/${cluster}/${shard}/server_chat_log.txt | tail -n 1 | cut -d ' ' -f2-100 | sed 's/\n//g')
+        if [[ $logstr1 != $logstr2 ]]
+        then
+            echo $logstr2
+            echo $logstr2 > ${data_dir}/logout.txt
+        fi
+    done
 fi
 if [[ $1 == "sa" ]]; then
     while (true)
