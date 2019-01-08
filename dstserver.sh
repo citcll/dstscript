@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.3.4"
+script_ver="2.3.4.1"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -1408,7 +1408,16 @@ if [[ $1 == "sp" ]]; then
     clear
     echo -e "\e[33m=========饥荒联机版独立服务器脚本当前玩家记录后台[Linux-Steam](${script_ver})=========\e[0m"
     Get_single_shard
-    tail -f ${dst_base_dir}/${cluster}/${shard}/server_chat_log.txt | cut -d ' ' -f2-100
+    logstr1=""
+    while (true)
+    do
+        logstr2=$(cat ${dst_base_dir}/${cluster}/${shard}/server_chat_log.txt | tail -n 1 | cut -d ' ' -f2-100)
+        if [[ $logstr1 != $logstr2 ]]
+        then
+            echo $logstr2
+            logstr1=$logstr2
+        fi
+    done
 fi
 if [[ $1 == "sa" ]]; then
     while (true)
