@@ -1391,7 +1391,7 @@ if [[ $1 == "au" ]]; then
     while (true)
     do
         clear
-        echo -e "\e[33m=========饥荒联机版独立服务器脚本自动更新及异常维护进程[Linux-Steam](${script_ver})=========\e[0m"
+        echo -e "\e[33m=====饥荒联机版独立服务器脚本自动更新及异常维护进程[Linux-Steam](${script_ver})=====\e[0m"
         Update_DST
         Update_DST_MOD_Check
         if [[ ${MOD_update} == "true" ]]
@@ -1406,7 +1406,7 @@ if [[ $1 == "au" ]]; then
 fi
 if [[ $1 == "sp" ]]; then
     clear
-    echo -e "\e[33m=========饥荒联机版独立服务器脚本当前玩家记录后台[Linux-Steam](${script_ver})=========\e[0m"
+    echo -e "\e[33m=====饥荒联机版独立服务器脚本当前玩家记录后台[Linux-Steam](${script_ver})=====\e[0m"
     Get_single_shard
     tail -f ${dst_base_dir}/${cluster}/${shard}/server_chat_log.txt | cut -d ' ' -f2-100
 fi
@@ -1414,7 +1414,7 @@ if [[ $1 == "sa" ]]; then
     while (true)
     do
         clear
-        echo -e "\e[33m=========饥荒联机版独立服务器脚本发送公告后台[Linux-Steam](${script_ver})=========\e[0m"
+        echo -e "\e[33m=====饥荒联机版独立服务器脚本发送公告后台[Linux-Steam](${script_ver})=====\e[0m"
         Get_single_shard
         echo -e "\e[92m请输入你要发送的公告内容，按下回车键发送：\e[0m"
         read an
@@ -1448,6 +1448,8 @@ clear
 Menu
 # intention = TheNet:GetDefaultServerIntention(),
 #         pvp = TheNet:GetDefaultPvpSetting(),
+#   print(TheNet:GetDefaultServerName())
+#   TheNet:SetDefaultServerName("efejojo")
 #         game_mode = TheNet:GetDefaultGameMode(),
 #         online_mode = TheNet:IsOnlineMode(),
 #         encode_user_path = TheNet:GetDefaultEncodeUserPath(),
