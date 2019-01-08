@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.3.4.2"
+script_ver="2.3.4.3"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -1411,7 +1411,7 @@ if [[ $1 == "sp" ]]; then
     Get_single_shard
     while (true)
     do
-        logstr1=$(${data_dir}/logout.txt)
+        logstr1=$(cat ${data_dir}/logout.txt)
         logstr2=$(cat ${dst_base_dir}/${cluster}/${shard}/server_chat_log.txt | tail -n 1 | cut -d ' ' -f2-100)
         if [[ $logstr1 != $logstr2 ]]
         then
