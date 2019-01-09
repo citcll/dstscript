@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.3.4.4"
+script_ver="2.3.5.1"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -699,6 +699,7 @@ Close_server(){
             tmux kill-session -t DST_${shard} > /dev/null 2>&1
         done
     fi
+    Exit_show_players
 }
 Exit_auto_update(){
     if tmux has-session -t Auto_update > /dev/null 2>&1
@@ -706,6 +707,13 @@ Exit_auto_update(){
         tmux kill-session -t Auto_update > /dev/null 2>&1
     fi
     info "自动更新进程已停止运行 ..."
+}
+Exit_show_players(){
+    if tmux has-session -t Show_players > /dev/null 2>&1
+    then
+        tmux kill-session -t Show_players > /dev/null 2>&1
+    fi
+    info "玩家记录后台进程已停止运行 ..."
 }
 Set_cluster(){
     if [ -f ${dst_base_dir}/${cluster}/cluster.ini ]
@@ -1387,12 +1395,11 @@ Send_md5_ip(){
         fi
     fi
 }
-####################################################################################
 if [[ $1 == "au" ]]; then
     while (true)
     do
         clear
-        echo -e "\e[33m=========饥荒联机版独立服务器脚本自动更新及异常维护进程[Linux-Steam](${script_ver})=========\e[0m"
+        echo -e "\e[33m=====饥荒联机版独立服务器脚本自动更新及异常维护进程[Linux-Steam](${script_ver})=====\e[0m"
         Update_DST
         Update_DST_MOD_Check
         if [[ ${MOD_update} == "true" ]]
@@ -1407,44 +1414,15 @@ if [[ $1 == "au" ]]; then
 fi
 if [[ $1 == "sp" ]]; then
     clear
-    echo -e "\e[33m=========饥荒联机版独立服务器脚本当前玩家记录后台[Linux-Steam](${script_ver})=========\e[0m"
+    echo -e "\e[33m=====饥荒联机版独立服务器脚本当前玩家记录后台[Linux-Steam](${script_ver})=====\e[0m"
     Get_single_shard
-    while read line
-            do
-                if [[ $line =~ '.*script_ver.*' ]]
-                then
-                    break
-                else
-                    line_0=$(echo $line | cut -d '@' -f1)
-                    line_1=$(echo $line | cut -d '@' -f2)
-                    line_2=$(echo $line | cut -d '@' -f3)
-                    if [[ $line1 =~ $line_1 ]]
-                    then
-                        info $line_2
-                        if [[ $line_0 == "1" ]]
-                        then
-                            RES="done"
-                        fi
-                        break
-                    fi
-                fi
-            done < ${log_arr_str}
-    while (true)
-    do
-        logstr1=$(cat ${data_dir}/logout.txt | sed 's/\n//g')
-        logstr2=$(cat ${dst_base_dir}/${cluster}/${shard}/server_chat_log.txt | tail -n 1 | cut -d ' ' -f2-100 | sed 's/\n//g')
-        if [[ $logstr1 != $logstr2 ]]
-        then
-            echo $logstr2
-            echo $logstr2 > ${data_dir}/logout.txt
-        fi
-    done
+    tail -f ${dst_base_dir}/${cluster}/${shard}/server_chat_log.txt | cut -d " " -f2-100
 fi
 if [[ $1 == "sa" ]]; then
     while (true)
     do
         clear
-        echo -e "\e[33m=========饥荒联机版独立服务器脚本发送公告后台[Linux-Steam](${script_ver})=========\e[0m"
+        echo -e "\e[33m=====饥荒联机版独立服务器脚本发送公告后台[Linux-Steam](${script_ver})=====\e[0m"
         Get_single_shard
         echo -e "\e[92m请输入你要发送的公告内容，按下回车键发送：\e[0m"
         read an
@@ -1478,6 +1456,8 @@ clear
 Menu
 # intention = TheNet:GetDefaultServerIntention(),
 #         pvp = TheNet:GetDefaultPvpSetting(),
+#   print(TheNet:GetDefaultServerName())
+#   TheNet:SetDefaultServerName("efejojo")
 #         game_mode = TheNet:GetDefaultGameMode(),
 #         online_mode = TheNet:IsOnlineMode(),
 #         encode_user_path = TheNet:GetDefaultEncodeUserPath(),
