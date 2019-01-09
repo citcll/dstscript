@@ -1409,6 +1409,26 @@ if [[ $1 == "sp" ]]; then
     clear
     echo -e "\e[33m=========饥荒联机版独立服务器脚本当前玩家记录后台[Linux-Steam](${script_ver})=========\e[0m"
     Get_single_shard
+    while read line
+            do
+                if [[ $line =~ '.*script_ver.*' ]]
+                then
+                    break
+                else
+                    line_0=$(echo $line | cut -d '@' -f1)
+                    line_1=$(echo $line | cut -d '@' -f2)
+                    line_2=$(echo $line | cut -d '@' -f3)
+                    if [[ $line1 =~ $line_1 ]]
+                    then
+                        info $line_2
+                        if [[ $line_0 == "1" ]]
+                        then
+                            RES="done"
+                        fi
+                        break
+                    fi
+                fi
+            done < ${log_arr_str}
     while (true)
     do
         logstr1=$(cat ${data_dir}/logout.txt | sed 's/\n//g')
