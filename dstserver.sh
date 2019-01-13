@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.3.5.3"
+script_ver="2.3.6"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -569,7 +569,7 @@ Start_server(){
 Addshard(){
     while (true)
     do
-        echo -e "\e[92m请选择要添加的世界：1.地面世界  2.洞穴世界  3.添加完成选我\n                     4.熔炉MOD选我  5.挂机MOD房选我\n\e[0m\c"
+        echo -e "\e[92m请选择要添加的世界：1.地面世界  2.洞穴世界  3.添加完成选我\n                    4.熔炉MOD选我  5.挂机MOD房选我\n\e[0m\c"
         read shardop
         case ${shardop} in
             1)
