@@ -1,4 +1,4 @@
-dstserver.sh:2.3.5.1
+dstserver.sh:2.3.5.2
 modconf.lua:1.2.8
 Cavesleveldata.txt:1.2.5
 Forestleveldata.txt:1.2.6
@@ -11,3 +11,4 @@ lavaarena.lua:1.0.3
 updatelib.txt:1.0.6
 announce.txt:1.0.5
 logarr.txt:1.0.6
+aog.lua:1.0.0

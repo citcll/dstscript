@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.3.5.1"
+script_ver="2.3.5.2"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/.klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -569,7 +569,7 @@ Start_server(){
 Addshard(){
     while (true)
     do
-        echo -e "\e[92m请选择要添加的世界：1.地面世界  2.洞穴世界  3.添加完成选我? \e[0m\c"
+        echo -e "\e[92m请选择要添加的世界：1.地面世界  2.洞穴世界  3.添加完成选我\n               4.熔炉MOD选我  5.挂机MOD房选我\e[0m\c"
         read shardop
         case ${shardop} in
             1)
@@ -578,12 +578,19 @@ Addshard(){
             Addcaves;;
             3)
             break;;
+            4)
+            Forgeworld
+            break;;
+            5)
+            AOGworld
+            break;;
             *)
-            error "输入有误，请输入[1-3]！！！";;
+            error "输入有误，请输入[1-5]！！！";;
         esac
     done
 }
 Shardconfig(){
+    tip "熔炉MOD房和挂机MOD房只能选主世界！！！"
     info "已创建${shardtype}[$sharddir]，这是一个：1. 主世界   2. 附从世界？ "
     read ismaster
     if [ ${ismaster} -eq 1 ]
@@ -633,6 +640,26 @@ Addcaves(){
 Addforest(){
     shardtype="地面世界"
     shardname="Forest"
+    Getidnum
+    Createsharddir
+    Shardconfig
+    Set_world
+}
+Forgeworld(){
+    shardtype="熔炉MOD房"
+    shardname="Forge"
+    Wmodid="1531169447"
+    Wconfigfile="lavaarena.lua"
+    Getidnum
+    Createsharddir
+    Shardconfig
+    Set_world
+}
+AOGworld(){
+    shardtype="挂机MOD房"
+    shardname="AOG"
+    Wmodid="1210706609"
+    Wconfigfile="aog.lua"
     Getidnum
     Createsharddir
     Shardconfig
@@ -852,9 +879,30 @@ Set_list(){
     cat ${data_dir}/wlist.txt > ${dst_base_dir}/${cluster}/whitelist.txt
 }
 Set_world(){
-    game_mode=$(cat ${dst_base_dir}/${cluster}/cluster.ini | grep ^game_mode= | cut -d "=" -f2)
-    if [[ ${game_mode} != "lavaarena" ]]
+    if [[ ${shardtype} == "熔炉MOD房" || ${shardtype} == "挂机MOD房" ]]
     then
+        cat ${data_dir}/${Wconfigfile} > ${dst_base_dir}/${cluster}/${sharddir}/leveldataoverride.lua
+        info "${shardtype}世界配置已写入！"
+        info "正在检查${shardtype}MOD是否已下载安装 。。。"
+        if [ -f ${dst_server_dir}/mods/workshop-${Wmodid}/modinfo.lua ]
+        then
+            info "${shardtype}MOD已安装 。。。"
+        else
+            tip "${shardtype}MOD未安装 。。。即将下载 。。。"
+            echo "ServerModSetup(\"${Wmodid}\")" > ${dst_server_dir}/mods/dedicated_server_mods_setup.lua
+            Download_MOD
+        fi
+        if [ -f ${dst_server_dir}/mods/workshop-${Wmodid}/modinfo.lua ]
+        then
+            Default_mod
+            modid=${Wmodid}
+            Get_shard_array
+            Addmodfunc
+            info "${shardtype}MOD已启用 。。。"
+        else
+            tip "${shardtype}MOD启用失败，请自行检查原因或反馈 。。。"
+        fi
+    else
         info "是否修改${shardtype}[${sharddir}]配置？：1.是 2.否（默认为上次配置）"
         read wc
         configure_file="${data_dir}/${shardname}leveldata.txt"
@@ -864,28 +912,6 @@ Set_world(){
             Set_world_config
         fi
         Write_in ${shardname}
-    else
-        cat ${data_dir}/lavaarena.lua > ${dst_base_dir}/${cluster}/${sharddir}/leveldataoverride.lua
-        info "熔炉世界配置已写入！"
-        info "正在检查熔炉MOD是否已下载安装 。。。"
-        if [ -f ${dst_server_dir}/mods/workshop-1531169447/modinfo.lua ]
-        then
-            info "熔炉MOD已安装 。。。"
-        else
-            tip "熔炉MOD未安装 。。。即将下载 。。。"
-            echo "ServerModSetup(\"1531169447\")" > ${dst_server_dir}/mods/dedicated_server_mods_setup.lua
-            Download_MOD
-        fi
-        if [ -f ${dst_server_dir}/mods/workshop-1531169447/modinfo.lua ]
-        then
-            Default_mod
-            modid='1531169447'
-            Get_shard_array
-            Addmodfunc
-            info "熔炉MOD已启用 。。。"
-        else
-            tip "熔炉MOD启用失败，请自行检查原因或反馈 。。。"
-        fi
     fi
 }
 Set_world_config(){
