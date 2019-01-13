@@ -569,7 +569,7 @@ Start_server(){
 Addshard(){
     while (true)
     do
-        echo -e "\e[92m请选择要添加的世界：1.地面世界  2.洞穴世界  3.添加完成选我\n               4.熔炉MOD选我  5.挂机MOD房选我\e[0m\c"
+        echo -e "\e[92m请选择要添加的世界：1.地面世界  2.洞穴世界  3.添加完成选我\n                     4.熔炉MOD选我  5.挂机MOD房选我\n\e[0m\c"
         read shardop
         case ${shardop} in
             1)
