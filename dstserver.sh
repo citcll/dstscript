@@ -5,9 +5,9 @@
 #    Author: Ariwori
 #    Blog: https://wqlin.com
 #===============================================================================
-script_ver="2.3.6"
+script_ver="2.3.6.1"
 dst_conf_dirname="DoNotStarveTogether"
-dst_conf_basedir="${HOME}/.klei"
+dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
 dst_server_dir="${HOME}/DSTServer"
 dst_bin_cmd="./dontstarve_dedicated_server_nullrenderer"
@@ -52,7 +52,7 @@ Menu(){
         echo -e "\e[92m[13]当前玩家记录\e[0m"
         Simple_server_status
         echo -e "\e[33m================================================================================\e[0m"
-        echo -e "\e[92m（如需中断任何操作请直接按Ctrl+C）请输入命令代号：\e[0m\c"
+        echo -e "\e[92m[如需中断任何操作请直接按Ctrl+C]请输入命令代号：\e[0m\c"
         read cmd
         case ${cmd} in
             1)
@@ -1050,7 +1050,7 @@ Start_shard(){
     for shard in ${shardarray}
     do
         unset TMUX
-        tmux new-session -s DST_${shard} -d "${dst_bin_cmd} -cluster ${cluster} -shard ${shard}"
+        tmux new-session -s DST_${shard} -d "${dst_bin_cmd} -persistent_storage_root ${dst_conf_basedir} -cluster ${cluster} -shard ${shard}"
     done
 }
 Start_check(){
@@ -1421,6 +1421,13 @@ Send_md5_ip(){
         fi
     fi
 }
+### 防止次级tmux目录出错
+if [ ! -f ${data_dir}/Move_base_dir.txt ]
+then
+    dst_conf_basedir="$HOME/.klei"
+    dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
+fi
+###
 if [[ $1 == "au" ]]; then
     while (true)
     do
@@ -1471,6 +1478,31 @@ if [ ! -d ${data_dir}/playerhistory ]
 then
     mkdir -p ${data_dir}/playerhistory
 fi
+# 迁移存档根目录到显性目录
+Move_base_dir(){
+    if [ ! -f ${data_dir}/Move_base_dir.txt ]
+    then
+        tip "为方便小白找到存档根目录，根目录迁移至[${dst_conf_basedir}]，不再为隐藏目录"
+        info "是否现在转移现有存档，为保证数据安全这将关闭正在运行的服务器：1.是   2.否？"
+        read ismove
+        if [[ $ismove == "1" ]]
+        then
+            Get_shard_array
+            Close_server
+            info "正在转移已有存档。。。请勿中断。。。"
+            cp -r $HOME/.klei $HOME/Klei
+            info "存档转移到[$HOME/Klei]。完毕！！！"
+            touch ${data_dir}/Move_base_dir.txt
+            dst_conf_basedir="$HOME/Klei"
+            dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
+        else
+            dst_conf_basedir="$HOME/.klei"
+            dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
+            tip "你选择了否，根目录未改变，下次运行脚本仍会提醒！！！"
+        fi
+        sleep 1
+    fi
+}
 # Run from here
 Check_sys
 First_run_check
@@ -1478,28 +1510,6 @@ Fix_Net_hosts
 Update_script
 Update_DST_Check
 Send_md5_ip
+Move_base_dir
 clear
 Menu
-# intention = TheNet:GetDefaultServerIntention(),
-#         pvp = TheNet:GetDefaultPvpSetting(),
-#   print(TheNet:GetDefaultServerName())
-#   TheNet:SetDefaultServerName("efejojo")
-#         game_mode = TheNet:GetDefaultGameMode(),
-#         online_mode = TheNet:IsOnlineMode(),
-#         encode_user_path = TheNet:GetDefaultEncodeUserPath(),
-#         max_players = TheNet:GetDefaultMaxPlayers(),
-#         name = TheNet:GetDefaultServerName(),
-#         password = TheNet:GetDefaultServerPassword(),
-#         description = TheNet:GetDefaultServerDescription(),
-#         server_language = TheNet:GetDefaultServerLanguage(),
-#         privacy_type =
-#             (TheNet:GetDefaultFriendsOnlyServer() and PRIVACY_TYPE.FRIENDS) or
-#             (TheNet:GetDefaultLANOnlyServer() and PRIVACY_TYPE.LOCAL) or
-#             (TheNet:GetDefaultClanOnly() and PRIVACY_TYPE.CLAN) or
-#             PRIVACY_TYPE.PUBLIC,
-#         clan =
-#         {
-#             id = TheNet:GetDefaultClanID(),
-#             only = TheNet:GetDefaultClanOnly(),
-#             admin = TheNet:GetDefaultClanAdmins(),
-#         },
