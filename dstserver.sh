@@ -3,7 +3,7 @@
 #    System Required: Ubuntu12+/Debian7+/CentOS7+
 #    Description: Install and manager the Don't Starve Together Dedicated Server
 #    Author: Ariwori
-#    Blog: https://wqlin.com
+#    Blog: https://blog.wqlin.com
 #===============================================================================
 script_ver="2.3.6.1"
 dst_conf_dirname="DoNotStarveTogether"
