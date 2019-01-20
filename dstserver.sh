@@ -3,9 +3,9 @@
 #    System Required: Ubuntu12+/Debian7+/CentOS7+
 #    Description: Install and manager the Don't Starve Together Dedicated Server
 #    Author: Ariwori
-#    Blog: https://wqlin.com
+#    Blog: https://blog.wqlin.com
 #===============================================================================
-script_ver="2.3.6.1"
+script_ver="2.3.6.2"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -1290,7 +1290,7 @@ Update_DST_MOD_Check(){
             MOD_update="true"
             break
         else
-            info "MOD (${modid}) 无更新！"
+            info "MOD (${modid})[${mod_new_ver}] 无更新！"
         fi
     done
 }
