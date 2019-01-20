@@ -1284,9 +1284,9 @@ Update_DST_MOD_Check(){
         else
             mod_cur_ver=000
         fi
-        if [[ ${mod_new_ver} != "" && ${mod_new_ver} != "" && ${mod_new_ver} != "nil" && ${mod_new_ver} != ${mod_new_ver} ]]
+        if [[ ${mod_new_ver} != "" && ${mod_cur_ver} != "" && ${mod_new_ver} != "nil" && ${mod_new_ver} != ${mod_cur_ver} ]]
         then
-            info "MOD 有更新(${modid}[${mod_new_ver} ==> ${mod_new_ver}])，即将重启更新 ..."
+            info "MOD 有更新(${modid}[${mod_cur_ver} ==> ${mod_new_ver}])，即将重启更新 ..."
             MOD_update="true"
             break
         else
@@ -1433,6 +1433,7 @@ if [[ $1 == "au" ]]; then
     do
         clear
         echo -e "\e[33m=====饥荒联机版独立服务器脚本自动更新及异常维护进程[Linux-Steam](${script_ver})=====\e[0m"
+        info "$(date) [退出请按Ctrl + B松开再按D]"
         Update_DST
         Update_DST_MOD_Check
         if [[ ${MOD_update} == "true" ]]
@@ -1440,9 +1441,8 @@ if [[ $1 == "au" ]]; then
             Reboot_server
         fi
         Status_keep
-        info "$(date) [退出请按Ctrl + B松开再按D]"
-        info "每半小时进行一次更新检测。。。"
-        sleep 1800
+        info "每五分钟进行一次更新检测。。。"
+        sleep 300
     done
 fi
 if [[ $1 == "sp" ]]; then
