@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://blog.wqlin.com
 #===============================================================================
-script_ver="2.3.6.2"
+script_ver="2.3.6.3"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -542,7 +542,7 @@ Start_server(){
         then
             tip "${cluster}存档已存在！是否删除已有存档：1.是  2.否？ "
             read ifdel
-            if [[ $ifdel == "2" ]]
+            if [[ $ifdel == "1" ]]
             then
                 rm -rf ${dst_base_dir}/${cluster}
             else
