@@ -10,11 +10,12 @@ return {
     ["ordered_story_setpieces"]={},
     ["override_level_string"]=false,
     ["overrides"]={
-      ["task_set"]="Auto_Open_Gift"
+      ["task_set"]="Auto_Open_Gift",
+      ["layout_mode"]="LinkNodesByKeys"
     },
     ["random_set_pieces"]={},
     ["required_prefabs"]={ "multiplayer_portal" },
     ["substitutes"]={},
     ["version"]=3 
 }
---script_ver="1.0.1"
+--script_ver="1.0.2"
