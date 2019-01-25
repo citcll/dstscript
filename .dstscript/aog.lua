@@ -68,7 +68,7 @@ return {
     ["rock_ice"]="never",
     ["sapling"]="never",
     ["season_start"]="default",
-    ["specialevent"]="default",
+    ["specialevent"]="year_of_the_pig",
     ["spiders"]="never",
     ["spring"]="default",
     ["start_location"]="default",
@@ -91,4 +91,4 @@ return {
   ["substitutes"]={},
   ["version"]=3 
 }
---script_ver="1.0.3"
+--script_ver="1.0.4"
