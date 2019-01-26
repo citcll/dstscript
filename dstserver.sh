@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://blog.wqlin.com
 #===============================================================================
-script_ver="2.3.6.4"
+script_ver="2.3.6.5"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -1295,6 +1295,7 @@ Update_DST_MOD_Check(){
     done
 }
 Status_keep(){
+    Get_current_cluster
     Get_shard_array
     for shard in $shardarray
     do
@@ -1309,6 +1310,11 @@ Status_keep(){
     if [[ $(grep "serveropen" ${server_conf_file} | cut -d "=" -f2) == "true" &&  ${server_alive} == "false" ]]
     then
         tip "服务器异常退出，即将重启 ..."
+        for shard in $shardarray
+        do
+            cp $dst_conf_basedir/$cluster/$shard/server_chat_log.txt >> $dst_conf_basedir/server_chat_log_backup_${cluster}_${shard}_$(date "+%F_%T").txt
+            cp $dst_conf_basedir/$cluster/$shard/server_log.txt >> $dst_conf_basedir/server_log_backup_${cluster}_${shard}_$(date "+%F_%T").txt
+        done
         Reboot_server
     fi
 }

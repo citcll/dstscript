@@ -9,7 +9,7 @@ loop default environment 环状地形 never 无 least 最少 default 默认 most
 petrification default environment 石化速率 none 无 few 慢 default 默认 many 快 max 极快
 regrowth default environment 资源再生 veryslow 极慢 slow 慢 default 默认 fast 快 veryfast 极快
 season_start default environment 初始季节 default 秋季 winter 冬季 spring 春季 summer 夏季 autumnorspring 秋或春 winterorsummer 冬或夏 random 随机
-specialevent default environment 节日活动 none 无 default 自动 hallowed_nights 万圣夜 winters_feast 冬季盛宴 year_of_the_gobbler 鸡年活动 year_of_the_varg 狗年活动
+specialevent default environment 节日活动 none 无 default 自动 hallowed_nights 万圣夜 winters_feast 冬季盛宴 year_of_the_gobbler 鸡年活动 year_of_the_varg 狗年活动 year_of_the_pig 猪王年
 spring default environment 春天 noseason 无 veryshortseason 很短 shortseason 短 longseason 长 verylongseason 很长 random 随机 default 默认
 start_location default environment 初始环境 plus 三箱 darkness 永夜 default 默认
 summer default environment 夏天 noseason 无 veryshortseason 很短 shortseason 短 longseason 长 verylongseason 很长 random 随机 default 默认
@@ -73,4 +73,4 @@ tentacles default monster 触手怪 never 无 rare 较少 default 默认 often �
 walrus default monster 海象 never 无 rare 较少 default 默认 often 较多 always 大量
 layout_mode LinkNodesByKeys other 其他
 wormhole_prefab wormhole other 虫洞生物
-script_ver="1.2.6"
+script_ver="1.2.7"
