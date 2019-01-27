@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://blog.wqlin.com
 #===============================================================================
-script_ver="2.3.6.6"
+script_ver="2.3.7"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -1049,6 +1049,10 @@ Start_shard(){
     cd "${dst_server_dir}/bin"
     for shard in ${shardarray}
     do
+        echo $(date) >> $dst_base_dir/server_chat_log_backup_${cluster}_${shard}_$(date "+%F_%T").txt
+        cp $dst_base_dir/$cluster/$shard/server_chat_log.txt >> $dst_base_dir/server_chat_log_backup_${cluster}_${shard}_$(date "+%F_%T").txt
+        echo $(date) >> $dst_base_dir/server_log_backup_${cluster}_${shard}_$(date "+%F_%T").txt
+        cp  $dst_base_dir/$cluster/$shard/server_log.txt >> $dst_base_dir/server_log_backup_${cluster}_${shard}_$(date "+%F_%T").txt
         unset TMUX
         tmux new-session -s DST_${shard} -d "${dst_bin_cmd} -persistent_storage_root ${dst_conf_basedir} -cluster ${cluster} -shard ${shard}"
     done
@@ -1310,11 +1314,6 @@ Status_keep(){
     if [[ $(grep "serveropen" ${server_conf_file} | cut -d "=" -f2) == "true" &&  ${server_alive} == "false" ]]
     then
         tip "服务器异常退出，即将重启 ..."
-        for shard in $shardarray
-        do
-            cp $dst_base_dir/$cluster/$shard/server_chat_log.txt >> $dst_conf_basedir/server_chat_log_backup_${cluster}_${shard}_$(date "+%F_%T").txt
-            cp  $dst_base_dir/$cluster/$shard/server_log.txt >> $dst_conf_basedir/server_log_backup_${cluster}_${shard}_$(date "+%F_%T").txt
-        done
         Reboot_server
     fi
 }
