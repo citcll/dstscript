@@ -11,4 +11,4 @@ lavaarena.lua:1.0.3
 updatelib.txt:1.0.6
 announce.txt:1.0.6
 logarr.txt:1.0.6
-aog.lua:1.0.4
+aog.lua:1.0.5
