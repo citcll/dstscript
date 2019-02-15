@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://blog.wqlin.com
 #===============================================================================
-script_ver="2.3.7.1"
+script_ver="2.3.7.2"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -590,7 +590,7 @@ Addshard(){
     done
 }
 Shardconfig(){
-    tip "熔炉MOD房和挂机MOD房只能选主世界！！！"
+    tip "只能有一个主世界！！！熔炉MOD房和挂机MOD房只能选主世界！！！"
     info "已创建${shardtype}[$sharddir]，这是一个：1. 主世界   2. 附从世界？ "
     read ismaster
     if [ ${ismaster} -eq 1 ]
@@ -1050,9 +1050,9 @@ Start_shard(){
     for shard in ${shardarray}
     do
         echo $(date) >> $dst_base_dir/server_chat_log_backup_${cluster}_${shard}_$(date "+%F_%T").txt
-        cp $dst_base_dir/$cluster/$shard/server_chat_log.txt $dst_base_dir/server_chat_log_backup_${cluster}_${shard}_$(date "+%F_%T").txt
+        cp $dst_base_dir/$cluster/$shard/server_chat_log.txt $dst_base_dir/server_chat_log_backup_${cluster}_${shard}_$(date "+%F_%T").txt >/dev/null 2>&1
         echo $(date) >> $dst_base_dir/server_log_backup_${cluster}_${shard}_$(date "+%F_%T").txt
-        cp  $dst_base_dir/$cluster/$shard/server_log.txt $dst_base_dir/server_log_backup_${cluster}_${shard}_$(date "+%F_%T").txt
+        cp  $dst_base_dir/$cluster/$shard/server_log.txt $dst_base_dir/server_log_backup_${cluster}_${shard}_$(date "+%F_%T").txt >/dev/null 2>&1
         unset TMUX
         tmux new-session -s DST_${shard} -d "${dst_bin_cmd} -persistent_storage_root ${dst_conf_basedir} -cluster ${cluster} -shard ${shard}"
     done
