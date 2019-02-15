@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://blog.wqlin.com
 #===============================================================================
-script_ver="2.3.7.2"
+script_ver="2.3.7.4"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -1065,39 +1065,42 @@ Start_check(){
     shardnum=0
     for shard in $shardarray
     do
-        echo $shard > $data_dir/oneshard.txt
-        tmux new-session -s DST_${shard}_log -d "bash $HOME/dstserver.sh ay"
+        unset TMUX
+        tmux new-session -s DST_${shard}_log -d "bash $HOME/dstserver.sh ay $shard"
         shardnum=$[$shardnum + 1]
     done
     ANALYSIS_SHARD=0
     any_log_index=1
-    any_old_line1=""
-    while [ $ANALYSIS_SHARD < $shardnum ]
+    any_old_line=""
+    while (true)
     do
-        anyline1=$(sed -n ${any_log_index}p ${ays_log_file})
-        if [[ $anyline1 != $any_old_line1 ]]
+        if [ $ANALYSIS_SHARD -lt $shardnum ]
         then
-            any_log_index=$[$any_log_index + 1]
-            any_old_line1=$anyline1
-        fi
-        cat ${ays_log_file} | while read line
-        do
-            if [[ $line =~ '.*ANALYSIS LOG DONE.*' ]]
+            anyline=$(sed -n ${any_log_index}p ${ays_log_file})
+            if [[ $anyline != "" && $anyline != $any_old_line ]]
             then
-                ANALYSIS_SHARD=$[$ANALYSIS_SHAR +1]
-            else
-                info $line
+                any_log_index=$[$any_log_index + 1]
+                any_old_line=$anyline
+                if [ $(echo $anyline | grep -c ANALYSISLOGDONE) -gt 0 ]
+                then
+                    ANALYSIS_SHARD=$[$ANALYSIS_SHARD +1]
+                else
+                    info $anyline
+                fi
             fi
-        done
+        else
+            break
+        fi
     done
 }
 Analysis_log(){
-    log_file=${dst_base_dir}/${cluster}/${shard}/server_log.txt
+    log_file=${dst_base_dir}/${cluster}/$1/server_log.txt
     if [ -f $log_file ]
     then
         RES="ok"
         log_index=1
         old_line1=""
+        retrytime=0
         while [ "$RES" = "ok" ]
         do
             RES=`flock -x -n $log_file -c "echo ok"`
@@ -1118,11 +1121,25 @@ Analysis_log(){
                     line_2=$(echo $line | cut -d '@' -f3)
                     if [[ $line1 =~ $line_1 ]]
                     then
-                        echo "$shard: $line_2" >> $ays_log_file
+                        if [[ $line_0 != "2" ]]
+                        then
+                            echo "$1:$line_2" >> $ays_log_file
+                        fi
                         if [[ $line_0 == "1" ]]
                         then
                             RES="done"
-                            echo "$shard: ANALYSIS LOG DONE" >> $ays_log_file
+                            echo "$1:ANALYSISLOGDONE" >> $ays_log_file
+                        fi
+                        if [[ $line_0 == "2" ]]
+                        then
+                            retrytime=$[$retrytime + 1]
+                            if [ $retrytime -le 5 ]
+                            then
+                                echo "$1:连接失败！第$retrytime次连接重试！" >> $ays_log_file
+                            else
+                                RES="done"
+                                echo "$1:ANALYSISLOGDONE" >> $ays_log_file
+                            fi
                         fi
                         break
                     fi
@@ -1503,9 +1520,8 @@ if [[ $1 == "sa" ]]; then
     done
 fi
 if [[ $1 == "ay" ]]; then
-    shard=$(cat $data_dir/oneshard.txt)
     Get_current_cluster
-    Analysis_log
+    Analysis_log $2
     exit
 fi
 # 移动根目录到隐藏目录
