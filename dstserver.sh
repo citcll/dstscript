@@ -16,6 +16,7 @@ dst_token_file="${data_dir}/clustertoken.txt"
 server_conf_file="${data_dir}/server.conf"
 dst_cluster_file="${data_dir}/clusterdata.txt"
 log_arr_str="${data_dir}/logarr.txt"
+ays_log_file="${data_dir}/ays_log_file.txt"
 feedback_link="https://blog.wqlin.com/dstscript.html"
 my_api_link="https://api.wqlin.com/dst"
 update_link="${my_api_link}/dstscript"
@@ -818,7 +819,7 @@ Set_cluster(){
             ;;
         esac
     done
-    type=([GAMEPLAY] [NETWORK] [MISC] [SHARD])
+    type=([STEAM] [GAMEPLAY] [NETWORK] [MISC] [SHARD])
     for ((i=0;i<${#type[*]};i++))
     do
         echo "${type[i]}" >> ${dst_base_dir}/${cluster}/cluster.ini
@@ -1059,7 +1060,38 @@ Start_shard(){
 }
 Start_check(){
     Get_shard_array
-    Get_single_shard
+    rm ${ays_log_file} >/dev/null 2>&1
+    touch ${ays_log_file}
+    shardnum=0
+    for shard in $shardarray
+    do
+        echo $shard > $data_dir/oneshard.txt
+        tmux new-session -s DST_${shard}_log -d "bash $HOME/dstserver.sh ay"
+        shardnum=$[$shardnum + 1]
+    done
+    ANALYSIS_SHARD=0
+    any_log_index=1
+    any_old_line1=""
+    while [ $ANALYSIS_SHARD < $shardnum ]
+    do
+        anyline1=$(sed -n ${any_log_index}p ${ays_log_file})
+        if [[ $anyline1 != $any_old_line1 ]]
+        then
+            any_log_index=$[$any_log_index + 1]
+            any_old_line1=$anyline1
+        fi
+        cat ${ays_log_file} | while read line
+        do
+            if [[ $line =~ '.*ANALYSIS LOG DONE.*' ]]
+            then
+                ANALYSIS_SHARD=$[$ANALYSIS_SHAR +1]
+            else
+                info $line
+            fi
+        done
+    done
+}
+Analysis_log(){
     log_file=${dst_base_dir}/${cluster}/${shard}/server_log.txt
     if [ -f $log_file ]
     then
@@ -1086,10 +1118,11 @@ Start_check(){
                     line_2=$(echo $line | cut -d '@' -f3)
                     if [[ $line1 =~ $line_1 ]]
                     then
-                        info $line_2
+                        echo "$shard: $line_2" >> $ays_log_file
                         if [[ $line_0 == "1" ]]
                         then
                             RES="done"
+                            echo "$shard: ANALYSIS LOG DONE" >> $ays_log_file
                         fi
                         break
                     fi
@@ -1468,6 +1501,12 @@ if [[ $1 == "sa" ]]; then
         info "公告已发送！"
         sleep 1
     done
+fi
+if [[ $1 == "ay" ]]; then
+    shard=$(cat $data_dir/oneshard.txt)
+    Get_current_cluster
+    Analysis_log
+    exit
 fi
 # 移动根目录到隐藏目录
 if [ -d ${HOME}/dstscript ]
