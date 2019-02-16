@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://blog.wqlin.com
 #===============================================================================
-script_ver="2.3.7.4"
+script_ver="2.3.7.5"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -1137,6 +1137,7 @@ Analysis_log(){
                             then
                                 echo "$1:连接失败！第$retrytime次连接重试！" >> $ays_log_file
                             else
+                                echo "$1:$line_2" >> $ays_log_file
                                 RES="done"
                                 echo "$1:ANALYSISLOGDONE" >> $ays_log_file
                             fi
@@ -1430,7 +1431,7 @@ Download_MOD(){
         tmux kill-session -t DST_MODUPDATE
     fi
     cd ${dst_server_dir}/bin || exit 1
-    tmux new-session -s DST_MODUPDATE -d "${dst_bin_cmd} -cluster downloadmod -shard Master"
+    tmux new-session -s DST_MODUPDATE -d "${dst_bin_cmd} -persistent_storage_root ${dst_conf_basedir} -cluster downloadmod -shard Master"
     sleep 5
     while (true)
     do
