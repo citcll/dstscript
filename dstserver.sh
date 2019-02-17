@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://blog.wqlin.com
 #===============================================================================
-script_ver="2.3.7.5"
+script_ver="2.3.8"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -20,6 +20,7 @@ ays_log_file="${data_dir}/ays_log_file.txt"
 feedback_link="https://blog.wqlin.com/dstscript.html"
 my_api_link="https://api.wqlin.com/dst"
 update_link="${my_api_link}/dstscript"
+log_save_dir="${dst_conf_basedir}/LogBackup"
 # 屏幕输出
 Green_font_prefix="\033[32m"
 Red_font_prefix="\033[31m"
@@ -104,7 +105,12 @@ Menu(){
 }
 Change_cluster(){
     Get_current_cluster
-    Set_cluster
+    if [ -d $dst_base_dir/${cluster} ]
+    then
+        Set_cluster
+    else
+        error "当前存档【${cluster}】已被删除或已损坏！"
+    fi
 }
 Server_console(){
     Get_single_shard
@@ -119,7 +125,7 @@ Server_console(){
 }
 Get_shard_array(){
     Get_current_cluster
-    [ $cluster != "无" ] && shardarray=$(ls -l $dst_base_dir/${cluster} | grep ^d | awk '{print $9}')
+    [ $cluster != "无" ] && [ -d $dst_base_dir/${cluster} ] && shardarray=$(ls -l $dst_base_dir/${cluster} | grep ^d | awk '{print $9}')
 }
 Get_single_shard(){
     Get_current_cluster
@@ -127,10 +133,16 @@ Get_single_shard(){
     for shard in ${shardarray}
     do
         shardm=$shard
-        if [ $(grep 'is_master = true' -c ${dst_base_dir}/${cluster}/${shardm}/server.ini) -gt 0 ] 
+        if [ -f ${dst_base_dir}/${cluster}/${shardm}/server.ini ]
         then
-            shardm=$shard
-            break
+            if [ $(grep 'is_master = true' -c ${dst_base_dir}/${cluster}/${shardm}/server.ini) -gt 0 ] 
+            then
+                shardm=$shard
+                break
+            fi
+        else
+            error "存档【${cluster}】世界【${shardm}】配置文件server.ini缺失，存档损坏！"
+            exit
         fi
     done
     [ -z $shardm ] && shard=$shardm
@@ -143,20 +155,30 @@ Get_server_status(){
 }
 MOD_manager(){
     Get_current_cluster
-    Default_mod
-    echo -e "\e[92m【存档：${cluster}】 你要 1.添加mod  2.删除mod：\e[0m\c"
-    read mc
-    case ${mc} in
-        1)
-        Listallmod
-        Addmod;;
-        2)
-        Listusedmod
-        Delmod;;
-        *)
-        break;;
-    esac
-    Removelastcomma
+    if [ -d ${dst_base_dir}/${cluster} ]
+    then
+        if [ $( ls -l ${dst_base_dir}/${cluster} | grep -c ^d) -gt 0 ]
+        then
+            Default_mod
+            echo -e "\e[92m【存档：${cluster}】 你要 1.添加mod  2.删除mod：\e[0m\c"
+            read mc
+            case ${mc} in
+                1)
+                Listallmod
+                Addmod;;
+                2)
+                Listusedmod
+                Delmod;;
+                *)
+                break;;
+            esac
+            Removelastcomma
+        else
+            error "当前存档【${cluster}】已被删除或已损坏！"
+        fi
+    else
+        error "当前存档【${cluster}】已被删除或已损坏！"
+    fi
 }
 MOD_conf(){
     echo "fuc = \"${fuc}\"
@@ -383,12 +405,11 @@ Addlist(){
         fi
     done
 }
-Dellist()
-{
-    while (ture)
+Dellist(){
+    while (true)
     do
         echo "=========================================================================="
-        grep -n "KU" "${data_dir}/${listfile}"
+        grep -n "^" "${data_dir}/${listfile}"
         echo -e "\e[92m请输入你要移除的KLEIID${Red_font_prefix}[编号]${Font_color_suffix}，删除完毕请输入数字 0 \e[0m"
         read kleiid
         if [[ "${kleiid}" == "0" ]]
@@ -396,7 +417,7 @@ Dellist()
             info "移除完毕！"
             break
         else
-            sed -i "${kleid}d" ${dst_base_dir}/${listfile}
+            sed -i "${kleid}d" ${data_dir}/${listfile}
             info "名单已移除！"
         fi
     done
@@ -408,29 +429,41 @@ Cluster_manager(){
     info "存档 ${cluster} 已删除！"
 }
 Auto_update(){
-    if tmux has-session -t Auto_update > /dev/null 2>&1
-    then
-        info "自动更新进程已在运行，即将跳转。。。退出请按Ctrl + B松开再按D！"
-        tmux attach-session -t Auto_update
-        sleep 1
+    Get_single_shard
+    if tmux has-session -t DST_${shard} > /dev/null 2>&1
+    then       
+        if tmux has-session -t Auto_update > /dev/null 2>&1
+        then
+            info "自动更新进程已在运行，即将跳转。。。退出请按Ctrl + B松开再按D！"
+            tmux attach-session -t Auto_update
+            sleep 1
+        else
+            tmux new-session -s Auto_update -d "bash $HOME/dstserver.sh au"
+            info "自动更新已开启！即将跳转。。。退出请按Ctrl + B松开再按D!"
+            sleep 1
+            tmux attach-session -t Auto_update
+        fi
     else
-        tmux new-session -s Auto_update -d "bash $HOME/dstserver.sh au"
-        info "自动更新已开启！即将跳转。。。退出请按Ctrl + B松开再按D!"
-        sleep 1
-        tmux attach-session -t Auto_update
+        tip "${shard}世界未开启或已异常退出！无法启用自动更新！"
     fi
 }
 Show_players(){
-    if tmux has-session -t Show_players > /dev/null 2>&1
+    Get_single_shard
+    if tmux has-session -t DST_${shard} > /dev/null 2>&1
     then
-        info "即将跳转。。。退出请按Ctrl + B松开再按D！"
-        tmux attach-session -t Show_players
-        sleep 1
+        if tmux has-session -t Show_players > /dev/null 2>&1
+        then
+            info "即将跳转。。。退出请按Ctrl + B松开再按D！"
+            tmux attach-session -t Show_players
+            sleep 1
+        else
+            tmux new-session -s Show_players -d "bash $HOME/dstserver.sh sp"
+            tmux split-window -t Show_players
+            tmux send-keys -t Show_players:0 "bash $HOME/dstserver.sh sa" C-m
+            info "进程已开启。。。请再次执行命令进入!"
+        fi
     else
-        tmux new-session -s Show_players -d "bash $HOME/dstserver.sh sp"
-        tmux split-window -t Show_players
-        tmux send-keys -t Show_players:0 "bash $HOME/dstserver.sh sa" C-m
-        info "进程已开启。。。请再次执行命令进入!"
+        tip "${shard}世界未开启或已异常退出！无法启用玩家日志后台！"
     fi
 }
 Update_DST_Check(){
@@ -507,14 +540,19 @@ exchangestatus(){
 }
 Run_server(){
     Get_current_cluster
-    Get_shard_array
-    exchangestatus true
-    Default_mod
-    Set_list
-    Start_shard
-    info "服务器开启中。。。请稍候。。。"
-    sleep 10
-    Start_check
+    if [ -d $dst_base_dir/${cluster} ]
+    then
+        Get_shard_array
+        exchangestatus true
+        Default_mod
+        Set_list
+        Start_shard
+        info "服务器开启中。。。请稍候。。。"
+        sleep 10
+        Start_check
+    else
+        error "存档【${cluster}】已被删除或损坏！服务器无法开启！"
+    fi
 }
 Reboot_announce(){
     Get_shard_array
@@ -570,7 +608,7 @@ Start_server(){
 Addshard(){
     while (true)
     do
-        echo -e "\e[92m请选择要添加的世界：1.地面世界  2.洞穴世界  3.添加完成选我\n                    4.熔炉MOD选我  5.挂机MOD房选我\n\e[0m\c"
+        echo -e "\e[92m请选择要添加的世界：1.地面世界  2.洞穴世界  3.添加完成选我\n          快捷设置： 4.熔炉MOD选我  5.挂机MOD房选我\n\e[0m\c"
         read shardop
         case ${shardop} in
             1)
@@ -680,12 +718,17 @@ Choose_exit_cluster(){
     index=1
     for dirlist in $(cat /tmp/dirlist.txt)
     do
-        if [ -f ${dst_base_dir}/${dirlist}/cluster.ini ]
+        if [ $(ls -l ${dst_base_dir}/${dirlist} | grep -c ^d) -gt 0 ]
         then
-            cluster_name_str=$(cat ${dst_base_dir}/${dirlist}/cluster.ini | grep ^cluster_name= | cut -d "=" -f2)
-        fi
-        if [[ $cluster_name_str == "" ]]
-        then
+            if [ -f ${dst_base_dir}/${dirlist}/cluster.ini ]
+            then
+                cluster_name_str=$(cat ${dst_base_dir}/${dirlist}/cluster.ini | grep '^cluster_name =' | cut -d " " -f3)
+            fi
+            if [[ $cluster_name_str == "" ]]
+            then
+                cluster_name_str="不完整或已损坏的存档"
+            fi
+        else
             cluster_name_str="不完整或已损坏的存档"
         fi
         echo "${index}. ${dirlist}：${cluster_name_str}"
@@ -776,6 +819,8 @@ Set_cluster(){
             index=$[${index} + 1]
         done
         echo -e "\e[92m===============================================\e[0m"
+        echo -e "\e[31m要开熔炉MOD房的要先在这里修改游戏模式为熔炉！！！\e[0m"
+        echo -e "\e[92m===============================================\e[0m"
         cmd=""
         while (true)
         do
@@ -834,7 +879,7 @@ Set_cluster(){
                 fi
                 # 还原空格
                 value_str=$(echo ${lcstr[1]} | sed 's/#/ /g')
-                echo "${lcstr[0]}=${value_str}" >> ${dst_base_dir}/${cluster}/cluster.ini
+                echo "${lcstr[0]} = ${value_str}" >> ${dst_base_dir}/${cluster}/cluster.ini
             fi
         done
         echo "" >> ${dst_base_dir}/${cluster}/cluster.ini
@@ -1050,13 +1095,23 @@ Start_shard(){
     cd "${dst_server_dir}/bin"
     for shard in ${shardarray}
     do
-        echo $(date) >> $dst_base_dir/server_chat_log_backup_${cluster}_${shard}_$(date "+%F_%T").txt
-        cp $dst_base_dir/$cluster/$shard/server_chat_log.txt $dst_base_dir/server_chat_log_backup_${cluster}_${shard}_$(date "+%F_%T").txt >/dev/null 2>&1
-        echo $(date) >> $dst_base_dir/server_log_backup_${cluster}_${shard}_$(date "+%F_%T").txt
-        cp  $dst_base_dir/$cluster/$shard/server_log.txt $dst_base_dir/server_log_backup_${cluster}_${shard}_$(date "+%F_%T").txt >/dev/null 2>&1
+        Save_log
         unset TMUX
         tmux new-session -s DST_${shard} -d "${dst_bin_cmd} -persistent_storage_root ${dst_conf_basedir} -cluster ${cluster} -shard ${shard}"
     done
+}
+Save_log(){
+    cur_day=$(date "+%F")
+    if [ ! -d $log_save_dir/$cur_day ]
+    then
+        mkdir -p $log_save_dir/$cur_day
+    fi
+    info "旧的日志已备份到【$log_save_dir】。"
+    cur_time=$(date "+%T")
+    echo $(date) >> $log_save_dir/$cur_day/server_chat_log_backup_${cluster}_${shard}_${cur_time}.txt
+    cp $dst_base_dir/$cluster/$shard/server_chat_log.txt $log_save_dir/$cur_day/server_chat_log_backup_${cluster}_${shard}_${cur_time}.txt >/dev/null 2>&1
+    echo $(date) >> $log_save_dir/$cur_day/server_log_backup_${cluster}_${shard}_${cur_time}.txt
+    cp  $dst_base_dir/$cluster/$shard/server_log.txt $log_save_dir/$cur_day/server_log_backup_${cluster}_${shard}_${cur_time}.txt >/dev/null 2>&1
 }
 Start_check(){
     Get_shard_array
@@ -1413,11 +1468,16 @@ Fix_Net_hosts(){
 }
 Update_MOD(){
     Get_current_cluster
-    Setup_mod
-    Update_DST_MOD_Check
-    if [[ ${MOD_update} == "true" ]]
+    if [ -f ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua ]
     then
-        Download_MOD
+        Setup_mod
+        Update_DST_MOD_Check
+        if [[ ${MOD_update} == "true" ]]
+        then
+            Download_MOD
+        fi
+    else
+        tip "当前存档【${cluster}】没有启用MOD或存档已损坏！"
     fi
 }
 Download_MOD(){
