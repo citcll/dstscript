@@ -2,7 +2,7 @@ dstserver.sh:2.3.8.1
 modconf.lua:1.2.8
 Cavesleveldata.txt:1.2.5
 Forestleveldata.txt:1.2.7
-clusterdata.txt:1.2.5
+clusterdata.txt:1.2.6
 Forestend.lua:1.1.9
 Foreststart.lua:1.2.2
 Cavesstart.lua:1.2.2

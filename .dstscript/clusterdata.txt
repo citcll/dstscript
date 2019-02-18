@@ -9,6 +9,7 @@ pause_when_empty true 无人暂停 [GAMEPLAY] choose true 开启 false 关闭
 vote_enabled true 投票 [GAMEPLAY] choose true 开启 false 关闭
 pvp false PVP竞技 [GAMEPLAY] choose true 开启 false 关闭
 whitelist_slots 0 房间预留位置个数 [NETWORK] read
+idle_timeout 0 挂机超时踢出时间 [NETWORK] read
 cluster_password 无 房间密码[设无密码请输入无！！！] [NETWORK] read
 max_players 6 最大玩家人数 [GAMEPLAY] read
 master_ip 127.0.0.1 主世界IP(多服务器必须修改此项) [SHARD] read
@@ -22,4 +23,4 @@ shard_enabled true 多世界 [SHARD] readonly
 bind_ip 0.0.0.0 绑定IP [SHARD] readonly
 master_port 10888 游戏端口 [SHARD] readonly
 cluster_key Ariwori 多世界通信秘钥 [SHARD] readonly
-script_ver="1.2.5"
+script_ver="1.2.6"
