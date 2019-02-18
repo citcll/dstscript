@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://blog.wqlin.com
 #===============================================================================
-script_ver="2.3.8"
+script_ver="2.3.8.1"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -548,7 +548,6 @@ Run_server(){
         Set_list
         Start_shard
         info "服务器开启中。。。请稍候。。。"
-        sleep 10
         Start_check
     else
         error "存档【${cluster}】已被删除或损坏！服务器无法开启！"
@@ -608,7 +607,7 @@ Start_server(){
 Addshard(){
     while (true)
     do
-        echo -e "\e[92m请选择要添加的世界：1.地面世界  2.洞穴世界  3.添加完成选我\n          快捷设置： 4.熔炉MOD选我  5.挂机MOD房选我\n\e[0m\c"
+        echo -e "\e[92m请选择要添加的世界：1.地面世界  2.洞穴世界  3.添加完成选我\n          快捷设置：4.熔炉MOD选我  5.挂机MOD房选我\n\e[0m\c"
         read shardop
         case ${shardop} in
             1)
@@ -1128,48 +1127,52 @@ Start_check(){
         shardnum=$[$shardnum + 1]
     done
     ANALYSIS_SHARD=0
-    tail -f ${ays_log_file} &
-    while (true)
-    do
-        if [ $(tail -n 1 ${ays_log_file} | grep -c ANALYSISLOGDONE) -gt 0 ]
-        then
-            ANALYSIS_SHARD=$[$ANALYSIS_SHARD +1]
-        fi
-        if [ $ANALYSIS_SHARD -ge $shardnum ]
-        then
-            Pid_kill 'tail'
-            break
-        fi
-    done
-    # any_log_index=1
-    # any_old_line=""
+    # tail -f ${ays_log_file} &
     # while (true)
     # do
-    #     if [ $ANALYSIS_SHARD -lt $shardnum ]
+    #     if [ $(tail -n 1 ${ays_log_file} | grep -c ANALYSISLOGDONE) -gt 0 ]
     #     then
-    #         anyline=$(sed -n ${any_log_index}p ${ays_log_file})
-    #         if [[ $anyline != "" && $anyline != $any_old_line ]]
-    #         then
-    #             any_log_index=$[$any_log_index + 1]
-    #             any_old_line=$anyline
-    #             if [ $(echo $anyline | grep -c ANALYSISLOGDONE) -gt 0 ]
-    #             then
-    #                 ANALYSIS_SHARD=$[$ANALYSIS_SHARD +1]
-    #             else
-    #                 info $anyline
-    #             fi
-    #         fi
-    #     else
+    #         ANALYSIS_SHARD=$[$ANALYSIS_SHARD +1]
+    #     fi
+    #     if [ $ANALYSIS_SHARD -ge $shardnum ]
+    #     then
+    #         Pid_kill 'tail'
     #         break
     #     fi
     # done
+    any_log_index=1
+    any_old_line=""
+    while (true)
+    do
+        if [ $ANALYSIS_SHARD -lt $shardnum ]
+        then
+            anyline=$(sed -n ${any_log_index}p ${ays_log_file})
+            if [[ $anyline != "" && $anyline != $any_old_line ]]
+            then
+                any_log_index=$[$any_log_index + 1]
+                any_old_line=$anyline
+                if [ $(echo $anyline | grep -c ANALYSISLOGDONE) -gt 0 ]
+                then
+                    ANALYSIS_SHARD=$[$ANALYSIS_SHARD +1]
+                else
+                    info $anyline
+                fi
+            fi
+        else
+            break
+        fi
+    done
 }
 Analysis_log(){
     log_file=${dst_base_dir}/${cluster}/$1/server_log.txt
+    cp ${log_arr_str} ${data_dir}/log_arr_str_$1.txt
     if [ -f $log_file ]
     then
+        RES="ok"
+        log_index=1
+        old_line1=""
         retrytime=0
-        while (true)
+        while [ "$RES" = "ok" ]
         do
             RES=`flock -x -n $log_file -c "echo ok"`
             line1=$(sed -n ${log_index}p $log_file)
@@ -1189,86 +1192,36 @@ Analysis_log(){
                     line_2=$(echo $line | cut -d '@' -f3)
                     if [[ $line1 =~ $line_1 ]]
                     then
-                        if [[ $line_0 != "2" ]]
-                        then
+                        case $line_0 in
+                            1)
                             echo "$1:$line_2" >> $ays_log_file
-                        fi
-                        if [[ $line_0 == "1" ]]
-                        then
                             RES="done"
                             echo "$1:ANALYSISLOGDONE" >> $ays_log_file
-                        fi
-                        if [[ $line_0 == "2" ]]
-                        then
+                            break;;
+                            2)
                             retrytime=$[$retrytime + 1]
                             if [ $retrytime -le 5 ]
                             then
                                 echo "$1:连接失败！第$retrytime次连接重试！" >> $ays_log_file
                             else
                                 echo "$1:$line_2" >> $ays_log_file
+                                num=$(grep $line_2 -n ${data_dir}/log_arr_str_$1.txt | cut -d ":" -f1)
+                                sed -i "${num}d" ${data_dir}/log_arr_str_$1.txt
                                 RES="done"
                                 echo "$1:ANALYSISLOGDONE" >> $ays_log_file
                             fi
-                        fi
-                        break
+                            break;;
+                            *)
+                            echo "$1:$line_2" >> $ays_log_file
+                            num=$(grep $line_2 -n ${data_dir}/log_arr_str_$1.txt | cut -d ":" -f1)
+                            sed -i "${num}d" ${data_dir}/log_arr_str_$1.txt
+                            break;;
+                        esac
                     fi
                 fi
-            done < ${log_arr_str}
+            done < ${data_dir}/log_arr_str_$1.txt
         done
     fi
-    # if [ -f $log_file ]
-    # then
-    #     RES="ok"
-    #     log_index=1
-    #     old_line1=""
-    #     retrytime=0
-    #     while [ "$RES" = "ok" ]
-    #     do
-    #         RES=`flock -x -n $log_file -c "echo ok"`
-    #         line1=$(sed -n ${log_index}p $log_file)
-    #         if [[ $line1 != $old_line1 ]]
-    #         then
-    #             log_index=$[$log_index + 1]
-    #             old_line1=$line1
-    #         fi
-    #         while read line
-    #         do
-    #             if [[ $line =~ '.*script_ver.*' ]]
-    #             then
-    #                 break
-    #             else
-    #                 line_0=$(echo $line | cut -d '@' -f1)
-    #                 line_1=$(echo $line | cut -d '@' -f2)
-    #                 line_2=$(echo $line | cut -d '@' -f3)
-    #                 if [[ $line1 =~ $line_1 ]]
-    #                 then
-    #                     if [[ $line_0 != "2" ]]
-    #                     then
-    #                         echo "$1:$line_2" >> $ays_log_file
-    #                     fi
-    #                     if [[ $line_0 == "1" ]]
-    #                     then
-    #                         RES="done"
-    #                         echo "$1:ANALYSISLOGDONE" >> $ays_log_file
-    #                     fi
-    #                     if [[ $line_0 == "2" ]]
-    #                     then
-    #                         retrytime=$[$retrytime + 1]
-    #                         if [ $retrytime -le 5 ]
-    #                         then
-    #                             echo "$1:连接失败！第$retrytime次连接重试！" >> $ays_log_file
-    #                         else
-    #                             echo "$1:$line_2" >> $ays_log_file
-    #                             RES="done"
-    #                             echo "$1:ANALYSISLOGDONE" >> $ays_log_file
-    #                         fi
-    #                     fi
-    #                     break
-    #                 fi
-    #             fi
-    #         done < ${log_arr_str}
-    #     done
-    # fi
 }
 #############################################################################
 First_run_check(){
