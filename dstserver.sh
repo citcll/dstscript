@@ -1069,27 +1069,41 @@ Start_check(){
         tmux new-session -s DST_${shard}_log -d "bash $HOME/dstserver.sh ay"
         shardnum=$[$shardnum + 1]
     done
+    tail -f ${ays_log_file} &
     ANALYSIS_SHARD=0
-    any_log_index=1
-    any_old_line1=""
-    while [ $ANALYSIS_SHARD < $shardnum ]
+    while (true)
     do
-        anyline1=$(sed -n ${any_log_index}p ${ays_log_file})
-        if [[ $anyline1 != $any_old_line1 ]]
+        if [ $(tail -n 1 ${ays_log_file}) =~ '.*ANALYSIS LOG DONE.*' ]
         then
-            any_log_index=$[$any_log_index + 1]
-            any_old_line1=$anyline1
+            ANALYSIS_SHARD=$[$ANALYSIS_SHAR +1]
         fi
-        cat ${ays_log_file} | while read line
-        do
-            if [[ $line =~ '.*ANALYSIS LOG DONE.*' ]]
-            then
-                ANALYSIS_SHARD=$[$ANALYSIS_SHAR +1]
-            else
-                info $line
-            fi
-        done
+        if [ $ANALYSIS_SHARD < $shardnum ]
+        then
+            break
+        fi
     done
+
+    # ANALYSIS_SHARD=0
+    # any_log_index=1
+    # any_old_line1=""
+    # while [ $ANALYSIS_SHARD < $shardnum ]
+    # do
+    #     anyline1=$(sed -n ${any_log_index}p ${ays_log_file})
+    #     if [[ $anyline1 != $any_old_line1 ]]
+    #     then
+    #         any_log_index=$[$any_log_index + 1]
+    #         any_old_line1=$anyline1
+    #     fi
+    #     cat ${ays_log_file} | while read line
+    #     do
+    #         if [[ $line =~ '.*ANALYSIS LOG DONE.*' ]]
+    #         then
+    #             ANALYSIS_SHARD=$[$ANALYSIS_SHAR +1]
+    #         else
+    #             info $line
+    #         fi
+    #     done
+    # done
 }
 Analysis_log(){
     log_file=${dst_base_dir}/${cluster}/${shard}/server_log.txt
@@ -1534,7 +1548,7 @@ Move_base_dir(){
             Get_shard_array
             Close_server
             info "正在转移已有存档。。。请勿中断。。。"
-            cp -r $HOME/.klei $HOME/Klei
+            cp -r $HOME/.klei $HOME/Klei >/dev/null 2>&1
             info "存档转移到[$HOME/Klei]。完毕！！！"
             touch ${data_dir}/Move_base_dir.txt
             dst_conf_basedir="$HOME/Klei"
