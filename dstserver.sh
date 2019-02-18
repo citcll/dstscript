@@ -1113,6 +1113,9 @@ Save_log(){
     echo $(date) >> $log_save_dir/$cur_day/server_log_backup_${cluster}_${shard}_${cur_time}.txt
     cp  $dst_base_dir/$cluster/$shard/server_log.txt $log_save_dir/$cur_day/server_log_backup_${cluster}_${shard}_${cur_time}.txt >/dev/null 2>&1
 }
+Pid_kill(){
+    kill $(ps -ef | grep -v grep | grep $1 | awk '{print $2}')
+}
 Start_check(){
     Get_shard_array
     rm ${ays_log_file} >/dev/null 2>&1
@@ -1125,28 +1128,41 @@ Start_check(){
         shardnum=$[$shardnum + 1]
     done
     ANALYSIS_SHARD=0
-    any_log_index=1
-    any_old_line=""
+    tail -f ${ays_log_file} &
     while (true)
     do
-        if [ $ANALYSIS_SHARD -lt $shardnum ]
+        if [ $(tail -n 1 ${ays_log_file} | grep -c ANALYSISLOGDONE) -gt 0 ]
         then
-            anyline=$(sed -n ${any_log_index}p ${ays_log_file})
-            if [[ $anyline != "" && $anyline != $any_old_line ]]
-            then
-                any_log_index=$[$any_log_index + 1]
-                any_old_line=$anyline
-                if [ $(echo $anyline | grep -c ANALYSISLOGDONE) -gt 0 ]
-                then
-                    ANALYSIS_SHARD=$[$ANALYSIS_SHARD +1]
-                else
-                    info $anyline
-                fi
-            fi
-        else
+            ANALYSIS_SHARD=$[$ANALYSIS_SHARD +1]
+        fi
+        if [ $ANALYSIS_SHARD -ge $shardnum ]
+        then
+            Pid_kill 'tail'
             break
         fi
     done
+    # any_log_index=1
+    # any_old_line=""
+    # while (true)
+    # do
+    #     if [ $ANALYSIS_SHARD -lt $shardnum ]
+    #     then
+    #         anyline=$(sed -n ${any_log_index}p ${ays_log_file})
+    #         if [[ $anyline != "" && $anyline != $any_old_line ]]
+    #         then
+    #             any_log_index=$[$any_log_index + 1]
+    #             any_old_line=$anyline
+    #             if [ $(echo $anyline | grep -c ANALYSISLOGDONE) -gt 0 ]
+    #             then
+    #                 ANALYSIS_SHARD=$[$ANALYSIS_SHARD +1]
+    #             else
+    #                 info $anyline
+    #             fi
+    #         fi
+    #     else
+    #         break
+    #     fi
+    # done
 }
 Analysis_log(){
     log_file=${dst_base_dir}/${cluster}/$1/server_log.txt
