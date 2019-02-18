@@ -1168,11 +1168,8 @@ Analysis_log(){
     log_file=${dst_base_dir}/${cluster}/$1/server_log.txt
     if [ -f $log_file ]
     then
-        RES="ok"
-        log_index=1
-        old_line1=""
         retrytime=0
-        while [ "$RES" = "ok" ]
+        while (true)
         do
             RES=`flock -x -n $log_file -c "echo ok"`
             line1=$(sed -n ${log_index}p $log_file)
@@ -1219,6 +1216,59 @@ Analysis_log(){
             done < ${log_arr_str}
         done
     fi
+    # if [ -f $log_file ]
+    # then
+    #     RES="ok"
+    #     log_index=1
+    #     old_line1=""
+    #     retrytime=0
+    #     while [ "$RES" = "ok" ]
+    #     do
+    #         RES=`flock -x -n $log_file -c "echo ok"`
+    #         line1=$(sed -n ${log_index}p $log_file)
+    #         if [[ $line1 != $old_line1 ]]
+    #         then
+    #             log_index=$[$log_index + 1]
+    #             old_line1=$line1
+    #         fi
+    #         while read line
+    #         do
+    #             if [[ $line =~ '.*script_ver.*' ]]
+    #             then
+    #                 break
+    #             else
+    #                 line_0=$(echo $line | cut -d '@' -f1)
+    #                 line_1=$(echo $line | cut -d '@' -f2)
+    #                 line_2=$(echo $line | cut -d '@' -f3)
+    #                 if [[ $line1 =~ $line_1 ]]
+    #                 then
+    #                     if [[ $line_0 != "2" ]]
+    #                     then
+    #                         echo "$1:$line_2" >> $ays_log_file
+    #                     fi
+    #                     if [[ $line_0 == "1" ]]
+    #                     then
+    #                         RES="done"
+    #                         echo "$1:ANALYSISLOGDONE" >> $ays_log_file
+    #                     fi
+    #                     if [[ $line_0 == "2" ]]
+    #                     then
+    #                         retrytime=$[$retrytime + 1]
+    #                         if [ $retrytime -le 5 ]
+    #                         then
+    #                             echo "$1:连接失败！第$retrytime次连接重试！" >> $ays_log_file
+    #                         else
+    #                             echo "$1:$line_2" >> $ays_log_file
+    #                             RES="done"
+    #                             echo "$1:ANALYSISLOGDONE" >> $ays_log_file
+    #                         fi
+    #                     fi
+    #                     break
+    #                 fi
+    #             fi
+    #         done < ${log_arr_str}
+    #     done
+    # fi
 }
 #############################################################################
 First_run_check(){
