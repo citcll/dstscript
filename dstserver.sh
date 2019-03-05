@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://blog.wqlin.com
 #===============================================================================
-script_ver="2.3.8.2"
+script_ver="2.3.8.3"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -548,6 +548,7 @@ Run_server(){
         Set_list
         Start_shard
         info "服务器开启中。。。请稍候。。。"
+        sleep 5
         Start_check
     else
         error "存档【${cluster}】已被删除或损坏！服务器无法开启！"
@@ -1137,19 +1138,6 @@ Start_check(){
         shardnum=$[$shardnum + 1]
     done
     ANALYSIS_SHARD=0
-    # tail -f ${ays_log_file} &
-    # while (true)
-    # do
-    #     if [ $(tail -n 1 ${ays_log_file} | grep -c ANALYSISLOGDONE) -gt 0 ]
-    #     then
-    #         ANALYSIS_SHARD=$[$ANALYSIS_SHARD +1]
-    #     fi
-    #     if [ $ANALYSIS_SHARD -ge $shardnum ]
-    #     then
-    #         Pid_kill 'tail'
-    #         break
-    #     fi
-    # done
     any_log_index=1
     any_old_line=""
     while (true)
