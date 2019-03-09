@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://blog.wqlin.com
 #===============================================================================
-script_ver="2.3.8.3"
+script_ver="2.3.8.4"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -43,7 +43,7 @@ Menu(){
     while (true)
     do
         echo -e "\e[33m============欢迎使用饥荒联机版独立服务器脚本[Linux-Steam](${script_ver})============\e[0m"
-        echo -e "\e[33m作者：Ariwori        Bug反馈：${feedback_link}\e[0m"
+        echo -e "\e[33m作者：Ariwori    下载更新及Bug反馈：${feedback_link}\e[0m"
         echo -e "\e[33m本脚本一切权利归作者所有。未经许可禁止使用本脚本进行任何的商业活动！\e[0m"
         echo -e "\e[31m游戏服务端安装目录：${dst_server_dir} (Version: $(cat ${dst_server_dir}/version.txt))\e[33m【${dst_need_update_str}】\e[0m"
         echo -e "\e[35m公告：$(cat "${data_dir}/announce.txt" | grep -v script_ver)\e[0m"
@@ -490,6 +490,7 @@ Force_update(){
         Reboot_announce
         Close_server
         Install_Game
+        Update_DST_Check
         if [[ ${cur_serveropen} == "true" ]]
         then
             Run_server
@@ -510,6 +511,7 @@ Update_DST(){
         Reboot_announce
         Close_server
         Install_Game
+        Update_DST_Check
     else
         tip "无可用更新！当前版本（${availablebuild}）"
     fi

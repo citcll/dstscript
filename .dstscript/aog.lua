@@ -5,7 +5,7 @@ return {
   location="forest",
   max_playlist_position=9,
   min_playlist_position=0,
-  name="偷渡欧洲宝地",
+  name="偷渡欧洲宝地--由脚本dstserver.sh创建！",
   numrandom_set_pieces=0,
   ordered_story_setpieces={  },
   override_level_string=false,
@@ -91,4 +91,4 @@ return {
   substitutes={  },
   version=3 
 }
---script_ver="1.0.5"
+--script_ver="1.0.6"

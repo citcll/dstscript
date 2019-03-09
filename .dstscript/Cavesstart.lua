@@ -1,7 +1,7 @@
--- script_ver="1.2.2"
+-- script_ver="1.2.3"
 return {
   background_node_range={ 0, 1 },
-  desc="由最好用的脚本dstserver.sh创建！",
+  desc="由脚本dstserver.sh创建！",
   hideminimap=false,
   id="DST_CAVE",
   location="cave",
