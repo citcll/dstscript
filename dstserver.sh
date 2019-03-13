@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://blog.wqlin.com
 #===============================================================================
-script_ver="2.3.8.5"
+script_ver="2.3.8.6"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -1471,9 +1471,9 @@ Simple_server_status(){
 }
 Fix_Net_hosts(){
     sudo chmod 666 /etc/hosts
-    d1n = $(grep -n "steamusercontent-a.akamaihd.net" /etc/hosts | cut -d : -f1)
+    d1n=$(grep -n "steamusercontent-a.akamaihd.net" /etc/hosts | cut -d : -f1)
     sed -i ${d1n}d /etc/hosts
-    d1n = $(grep -n "steamcommunity.com" /etc/hosts | cut -d : -f1)
+    d1n=$(grep -n "steamcommunity.com" /etc/hosts | cut -d : -f1)
     sed -i ${d1n}d /etc/hosts
     if ! grep steamusercontent-a.akamaihd.net /etc/hosts > /dev/null 2>&1
     then
