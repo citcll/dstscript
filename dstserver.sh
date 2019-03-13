@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://blog.wqlin.com
 #===============================================================================
-script_ver="2.3.8.4"
+script_ver="2.3.8.5"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -1415,7 +1415,7 @@ Update_DST_MOD_Check(){
         fi
         if [[ ${mod_new_ver} != "" && ${mod_cur_ver} != "" && ${mod_new_ver} != "nil" && ${mod_new_ver} != ${mod_cur_ver} ]]
         then
-            info "MOD 有更新(${modid}[${mod_cur_ver} ==> ${mod_new_ver}])，即将重启更新 ..."
+            info "MOD 有更新(${modid}[${mod_cur_ver} ==> ${mod_new_ver}])，即将更新 ..."
             MOD_update="true"
             break
         else
@@ -1471,9 +1471,13 @@ Simple_server_status(){
 }
 Fix_Net_hosts(){
     sudo chmod 666 /etc/hosts
+    d1n = $(grep -n "steamusercontent-a.akamaihd.net" /etc/hosts | cut -d : -f1)
+    sed -i ${d1n}d /etc/hosts
+    d1n = $(grep -n "steamcommunity.com" /etc/hosts | cut -d : -f1)
+    sed -i ${d1n}d /etc/hosts
     if ! grep steamusercontent-a.akamaihd.net /etc/hosts > /dev/null 2>&1
     then
-        echo "72.246.103.17 steamusercontent-a.akamaihd.net" >> /etc/hosts
+        echo "23.48.201.40 steamusercontent-a.akamaihd.net" >> /etc/hosts
     fi
     if ! grep s3.amazonaws.com /etc/hosts > /dev/null 2>&1
     then
@@ -1481,7 +1485,7 @@ Fix_Net_hosts(){
     fi
     if ! grep steamcommunity.com /etc/hosts > /dev/null 2>&1
     then
-        echo "23.222.167.249 steamcommunity.com" >> /etc/hosts
+        echo "104.85.221.169 steamcommunity.com" >> /etc/hosts
     fi
     sudo chmod 644 /etc/hosts
 }
@@ -1518,7 +1522,13 @@ Download_MOD(){
         then
             if [[ $(grep "Your Server Will Not Start" -c "${dst_base_dir}/downloadmod/Master/server_log.txt") > 0 ]]
             then
-                info "新MOD安装/更新完毕！"
+                Update_DST_MOD_Check > /dev/null 2>&1
+                if [[ ${MOD_update} == "true" ]]
+                then
+                    tip "因网络或不明原因MOD更新失败！请本地上传更新或重试！"
+                else
+                    info "新MOD安装/更新完毕！"              
+                fi
                 tmux kill-session -t DST_MODUPDATE
                 break
             fi
