@@ -201,6 +201,7 @@ used = \"${used}\"" > "${data_dir}/modinfo.lua"
             echo "name = \"UNKNOWN\"" >> "${data_dir}/modinfo.lua"
         fi
     fi
+    
     cd ${data_dir}
     lua ${data_dir}/modconf.lua > /dev/null 2>&1
     cd ${HOME}
@@ -1162,6 +1163,8 @@ Start_check(){
             break
         fi
     done
+    # 清空需要更新的mod列表
+    rm ${data_dir}/needupdatemodlist.txt > /dev/null 2>&1
 }
 Analysis_log(){
     log_file=${dst_base_dir}/${cluster}/$1/server_log.txt
@@ -1401,6 +1404,8 @@ Update_script(){
 Update_DST_MOD_Check(){
     info "检查启用的创意工坊MOD是否有更新 ..."
     MOD_update="false"
+    rm ${data_dir}/needupdatemodlist.txt > /dev/null 2>&1
+    touch ${data_dir}/needupdatemodlist.txt
     for modid in $(cat ${data_dir}/mods_setup.lua | grep "ServerModSetup" | cut -d '"' -f2)
     do
         mod_new_ver=$(curl -s "${my_api_link}/?type=mod&modid=${modid}" | sed 's/[ \t]*$//g')
@@ -1410,16 +1415,21 @@ Update_DST_MOD_Check(){
             cat ${dst_server_dir}/mods/workshop-${modid}/modinfo.lua >> ${data_dir}/modinfo.lua
             cd ${data_dir}
             mod_cur_ver=$(lua modconf.lua)
+            echo "fuc=\"getname\"" > ${data_dir}/modinfo.lua
+            cat ${dst_server_dir}/mods/workshop-${modid}/modinfo.lua >> ${data_dir}/modinfo.lua
+            cd ${data_dir}
+            cur_mod_name=$(lua modconf.lua)
         else
             mod_cur_ver=000
+            cur_mod_name="未知名称"
         fi
         if [[ ${mod_new_ver} != "" && ${mod_cur_ver} != "" && ${mod_new_ver} != "nil" && ${mod_new_ver} != ${mod_cur_ver} ]]
         then
-            info "MOD 有更新(${modid}[${mod_cur_ver} ==> ${mod_new_ver}])，即将更新 ..."
+            info "MOD 有更新(${modid}[${cur_mod_name}][${mod_cur_ver} ==> ${mod_new_ver}])，即将更新 ..."
             MOD_update="true"
-            break
+            echo ${modid} >> ${data_dir}/needupdatemodlist.txt
         else
-            info "MOD (${modid})[${mod_new_ver}] 无更新！"
+            info "MOD (${modid})[${cur_mod_name}][${mod_new_ver}] 无更新！"
         fi
     done
 }
@@ -1469,26 +1479,26 @@ Simple_server_status(){
     echo -e "\e[33m存档: ${cluster}   开启的世界：${server_on}   名称: ${cluster_name}\e[0m"
     echo -e "\e[33m自动更新维护：${auto_on}\e[0m"
 }
-Fix_Net_hosts(){
-    sudo chmod 666 /etc/hosts
-    d1n=$(grep -n "steamusercontent-a.akamaihd.net" /etc/hosts | cut -d : -f1)
-    sed -i ${d1n}d /etc/hosts
-    d1n=$(grep -n "steamcommunity.com" /etc/hosts | cut -d : -f1)
-    sed -i ${d1n}d /etc/hosts
-    if ! grep steamusercontent-a.akamaihd.net /etc/hosts > /dev/null 2>&1
-    then
-        echo "23.48.201.40 steamusercontent-a.akamaihd.net" >> /etc/hosts
-    fi
-    if ! grep s3.amazonaws.com /etc/hosts > /dev/null 2>&1
-    then
-        echo "52.216.136.5 s3.amazonaws.com" >> /etc/hosts
-    fi
-    if ! grep steamcommunity.com /etc/hosts > /dev/null 2>&1
-    then
-        echo "104.85.221.169 steamcommunity.com" >> /etc/hosts
-    fi
-    sudo chmod 644 /etc/hosts
-}
+# Fix_Net_hosts(){
+#     sudo chmod 666 /etc/hosts
+#     d1n=$(grep -n "steamusercontent-a.akamaihd.net" /etc/hosts | cut -d : -f1)
+#     sed -i ${d1n}d /etc/hosts
+#     d1n=$(grep -n "steamcommunity.com" /etc/hosts | cut -d : -f1)
+#     sed -i ${d1n}d /etc/hosts
+#     if ! grep steamusercontent-a.akamaihd.net /etc/hosts > /dev/null 2>&1
+#     then
+#         echo "23.48.201.40 steamusercontent-a.akamaihd.net" >> /etc/hosts
+#     fi
+#     if ! grep s3.amazonaws.com /etc/hosts > /dev/null 2>&1
+#     then
+#         echo "52.216.136.5 s3.amazonaws.com" >> /etc/hosts
+#     fi
+#     if ! grep steamcommunity.com /etc/hosts > /dev/null 2>&1
+#     then
+#         echo "104.85.221.169 steamcommunity.com" >> /etc/hosts
+#     fi
+#     sudo chmod 644 /etc/hosts
+# }
 Update_MOD(){
     Get_current_cluster
     if [ -f ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua ]
@@ -1526,6 +1536,7 @@ Download_MOD(){
                 if [[ ${MOD_update} == "true" ]]
                 then
                     tip "因网络或不明原因MOD更新失败！请本地上传更新或重试！"
+                    newmodinstalled="false"
                 else
                     info "新MOD安装/更新完毕！"              
                 fi
@@ -1656,7 +1667,7 @@ Move_base_dir(){
 # Run from here
 Check_sys
 First_run_check
-Fix_Net_hosts
+#Fix_Net_hosts
 Update_script
 Update_DST_Check
 Send_md5_ip

@@ -1,4 +1,4 @@
--- script_ver="1.2.8"
+-- script_ver="1.2.9"
 require "modinfo"
 
 -- Addon function
@@ -32,23 +32,22 @@ function LuaReomve(str,remove)
 end
 ---
 function list()
-    local f = assert(io.open("modconflist.lua", 'a'))
     if used == "true" then
         f:write("[已启用]:")
     else
         f:write("[未启用]:")
     end
-    if modid ~= nil then
-        if modid == "DONOTDELETE" then
-            name = "一定不要删这个，不然MOD增删功能会出错导致服务器无法运行"
-        end
-        f:write(modid)
+    if modid == nil then
+        modid = "unknown"
     end
     if name ~= nil then
         name = trim(name)
         name = LuaReomve(name, "\n")
-        f:write(":", name, "\n")
+    else
+        name = "Unknown"
     end
+    local f = assert(io.open("modconflist.lua", 'a'))
+    f:write(modid, ":", name, "\n")
     f:close()
 end
 
@@ -57,7 +56,6 @@ function writein()
     if name ~= nil then
         name = trim(name)
         name = LuaReomve(name, "\n")
-        --f:write("--", name, "\n")
     end
     if configuration_options ~= nil and #configuration_options > 0 then
         f:write('  ["', modid, '"]={    --[[', name, "]]\n")
@@ -153,11 +151,16 @@ function table2json(t)
     end  
     assert(type(t) == "table")  
     return serialize(t)  
-end  
+end
+function getname()
+    print(name)
+end
 if fuc == "list" then
     list()
 elseif fuc == "getver" then
     getver()
+elseif fuc == "getname" then
+    getname()
 elseif fuc == "writein" then
     writein()
 end
