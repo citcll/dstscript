@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://blog.wqlin.com
 #===============================================================================
-script_ver="2.3.8.6"
+script_ver="2.3.8.7"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -194,6 +194,9 @@ used = \"${used}\"" > "${data_dir}/modinfo.lua"
         then
             Download_MOD
         fi
+        echo "fuc = \"${fuc}\"
+modid = \"${moddir}\"
+used = \"${used}\"" > "${data_dir}/modinfo.lua"
         if [[ -f "${dst_server_dir}/mods/${moddir}/modinfo.lua" ]]
         then
             cat "${dst_server_dir}/mods/${moddir}/modinfo.lua" >> "${data_dir}/modinfo.lua"
@@ -203,7 +206,7 @@ used = \"${used}\"" > "${data_dir}/modinfo.lua"
     fi
     
     cd ${data_dir}
-    lua ${data_dir}/modconf.lua > /dev/null 2>&1
+    lua modconf.lua >/dev/null 2>&1
     cd ${HOME}
 }
 Listallmod(){
@@ -236,6 +239,7 @@ Listusedmod(){
     Get_single_shard
     for moddir in $(grep "^  \[" "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua" | cut -d '"' -f2)
     do
+        used="false"
         if [[ "${moddir}" != "" ]]
         then
             fuc="list"
@@ -247,7 +251,8 @@ Listusedmod(){
 }
 Addmod(){
     info "请从以上列表选择你要启用的MOD${Red_font_prefix}[编号]${Font_color_suffix}，不存在的直接输入MODID"
-    info "具体配置已写入 modoverride.lua, shell下修改太麻烦，可打开配置文件手动修改"
+    info "具体配置已写入 modoverride.lua, shell下修改太麻烦，可打开配置文件手动修改！"
+    tip "大小超过10M的MOD如果无法在服务器添加下载，请手动上传到服务器再启用！！！"
     info "添加完毕要退出请输入数字 0 ！"
     while (true)
     do
@@ -271,7 +276,7 @@ Addmodtoshard(){
     do
         if [ -f ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua ]
         then
-            if [[ $(grep "${moddir}" "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua") > 0 ]]
+            if [[ $(grep "${moddir}" -c "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua") > 0 ]]
             then
                 info "${shard}世界该Mod(${moddir})已添加"
             else
@@ -280,7 +285,12 @@ Addmodtoshard(){
                 echo "return {" > ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
                 cat ${data_dir}/modconfwrite.lua >> ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
                 cat ${data_dir}/modconftemp.txt >> ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua
-                info "${shard}世界Mod(${moddir})添加完成"
+                if [[ ${newmodinstalled} == "false" ]]
+                then
+                    tips "${shard}世界Mod(${moddir})已添加到配置，但MOD安装/更新失败！请从本地上传MOD后再重启!"
+                else
+                    info "${shard}世界Mod(${moddir})添加完成"
+                fi
             fi
         else
             tip "${shard} MOD配置文件未由脚本初始化，无法操作！如你已自行配置请忽略本提示！"
@@ -549,6 +559,8 @@ Run_server(){
         exchangestatus true
         Default_mod
         Set_list
+        Update_DST_MOD_Check
+        Del_need_update_mod_folder
         Start_shard
         info "服务器开启中。。。请稍候。。。"
         sleep 5
@@ -1406,7 +1418,8 @@ Update_DST_MOD_Check(){
     MOD_update="false"
     rm ${data_dir}/needupdatemodlist.txt > /dev/null 2>&1
     touch ${data_dir}/needupdatemodlist.txt
-    for modid in $(cat ${data_dir}/mods_setup.lua | grep "ServerModSetup" | cut -d '"' -f2)
+    Get_single_shard
+    for modid in $(grep '^  \["workshop-' "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua" | cut -d '"' -f2 | cut -d '-' -f2)
     do
         mod_new_ver=$(curl -s "${my_api_link}/?type=mod&modid=${modid}" | sed 's/[ \t]*$//g')
         if [ -f ${dst_server_dir}/mods/workshop-${modid}/modinfo.lua ]
@@ -1479,26 +1492,29 @@ Simple_server_status(){
     echo -e "\e[33m存档: ${cluster}   开启的世界：${server_on}   名称: ${cluster_name}\e[0m"
     echo -e "\e[33m自动更新维护：${auto_on}\e[0m"
 }
-# Fix_Net_hosts(){
-#     sudo chmod 666 /etc/hosts
-#     d1n=$(grep -n "steamusercontent-a.akamaihd.net" /etc/hosts | cut -d : -f1)
-#     sed -i ${d1n}d /etc/hosts
-#     d1n=$(grep -n "steamcommunity.com" /etc/hosts | cut -d : -f1)
-#     sed -i ${d1n}d /etc/hosts
-#     if ! grep steamusercontent-a.akamaihd.net /etc/hosts > /dev/null 2>&1
-#     then
-#         echo "23.48.201.40 steamusercontent-a.akamaihd.net" >> /etc/hosts
-#     fi
-#     if ! grep s3.amazonaws.com /etc/hosts > /dev/null 2>&1
-#     then
-#         echo "52.216.136.5 s3.amazonaws.com" >> /etc/hosts
-#     fi
-#     if ! grep steamcommunity.com /etc/hosts > /dev/null 2>&1
-#     then
-#         echo "104.85.221.169 steamcommunity.com" >> /etc/hosts
-#     fi
-#     sudo chmod 644 /etc/hosts
-# }
+# 清楚旧版本修改的hosts
+Fix_Net_hosts(){
+    sudo chmod 666 /etc/hosts
+    d1n=$(grep -n "steamusercontent-a.akamaihd.net" /etc/hosts | cut -d : -f1)
+    sudo sed -i ${d1n}d /etc/hosts
+    d1n=$(grep -n "steamcommunity.com" /etc/hosts | cut -d : -f1)
+    sudo sed -i ${d1n}d /etc/hosts
+    d1n=$(grep -n "s3.amazonaws.com" /etc/hosts | cut -d : -f1)
+    sudo sed -i ${d1n}d /etc/hosts
+    # if ! grep steamusercontent-a.akamaihd.net /etc/hosts > /dev/null 2>&1
+    # then
+    #     echo "23.48.201.40 steamusercontent-a.akamaihd.net" >> /etc/hosts
+    # fi
+    # if ! grep s3.amazonaws.com /etc/hosts > /dev/null 2>&1
+    # then
+    #     echo "52.216.136.5 s3.amazonaws.com" >> /etc/hosts
+    # fi
+    # if ! grep steamcommunity.com /etc/hosts > /dev/null 2>&1
+    # then
+    #     echo "104.85.221.169 steamcommunity.com" >> /etc/hosts
+    # fi
+    sudo chmod 644 /etc/hosts
+}
 Update_MOD(){
     Get_current_cluster
     if [ -f ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua ]
@@ -1523,9 +1539,10 @@ Download_MOD(){
     then
         tmux kill-session -t DST_MODUPDATE
     fi
+    Del_need_update_mod_folder
     cd ${dst_server_dir}/bin || exit 1
     tmux new-session -s DST_MODUPDATE -d "${dst_bin_cmd} -persistent_storage_root ${dst_conf_basedir} -cluster downloadmod -shard Master"
-    sleep 5
+    sleep 3
     while (true)
     do
         if tmux has-session -t DST_MODUPDATE > /dev/null 2>&1
@@ -1538,13 +1555,30 @@ Download_MOD(){
                     tip "因网络或不明原因MOD更新失败！请本地上传更新或重试！"
                     newmodinstalled="false"
                 else
+                    newmodinstalled="true"
                     info "新MOD安装/更新完毕！"              
                 fi
                 tmux kill-session -t DST_MODUPDATE
+                rm $data_dir/needupdatemodlist.txt > /dev/null 2>&1
                 break
             fi
         fi
     done
+}
+# 更新MOD在删除已存在的MOD文件夹后更新成功率更高
+Del_need_update_mod_folder(){
+    if [ -s ${data_dir}/needupdatemodlist.txt ]
+    then
+        info "清除需要更新的MOD的旧版本 ..."
+        while read line
+        do
+            if [ -d ${dst_server_dir}/mods/workshop-${line} ]
+            then
+                rm -rf ${dst_server_dir}/mods/workshop-${line}
+            fi
+        done < ${data_dir}/needupdatemodlist.txt
+        info "旧版本MOD清楚完毕！"
+    fi
 }
 Get_IP(){
 	ip=$(wget -qO- -t1 -T2 ipinfo.io/ip)
@@ -1667,7 +1701,7 @@ Move_base_dir(){
 # Run from here
 Check_sys
 First_run_check
-#Fix_Net_hosts
+Fix_Net_hosts
 Update_script
 Update_DST_Check
 Send_md5_ip

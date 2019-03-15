@@ -1,4 +1,4 @@
--- script_ver="1.2.9"
+-- script_ver="1.3.0"
 require "modinfo"
 
 -- Addon function
@@ -32,6 +32,7 @@ function LuaReomve(str,remove)
 end
 ---
 function list()
+    local f = assert(io.open("modconflist.lua", 'a'))
     if used == "true" then
         f:write("[已启用]:")
     else
@@ -46,7 +47,6 @@ function list()
     else
         name = "Unknown"
     end
-    local f = assert(io.open("modconflist.lua", 'a'))
     f:write(modid, ":", name, "\n")
     f:close()
 end
