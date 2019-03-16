@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://blog.wqlin.com
 #===============================================================================
-script_ver="2.3.9.1"
+script_ver="2.3.9.2"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -255,7 +255,7 @@ Show_mod_cfg(){
                 then
                     echo -e "\e[33m[ ${index}] ${ss[3]}：${value}\n    简介==>${ss[4]}\e[0m"
                 else
-                    echo -e "\e[33m[${index}] ${ss[3]}：${value}\n    简洁==>${ss[4]}\e[0m"
+                    echo -e "\e[33m[${index}] ${ss[3]}：${value}\n    简介==>${ss[4]}\e[0m"
                 fi
                 index=$[${index} + 1]
             done
@@ -467,7 +467,7 @@ Addmod(){
             Addmodfunc
         fi
     done
-    info "要修改具体参数配置请手动打开***更改："
+    info "默认参数配置已写入配置文件，可手动修改，也可通过脚本修改："
     info "${dst_base_dir}/${cluster}/***/modoverrides.lua"
     sleep 3
     clear
