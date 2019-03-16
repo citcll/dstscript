@@ -1,4 +1,4 @@
--- script_ver="1.3.0"
+-- script_ver="1.3.1"
 require "modinfo"
 
 -- Addon function
@@ -32,11 +32,10 @@ function LuaReomve(str,remove)
 end
 ---
 function list()
-    local f = assert(io.open("modconflist.lua", 'a'))
     if used == "true" then
-        f:write("[已启用]:")
+        used = "[已启用]:"
     else
-        f:write("[未启用]:")
+        used = "[未启用]:"
     end
     if modid == nil then
         modid = "unknown"
@@ -47,7 +46,13 @@ function list()
     else
         name = "Unknown"
     end
-    f:write(modid, ":", name, "\n")
+    if configuration_options ~= nil and #configuration_options > 0 then
+        cfg = "[可配置]:"
+    else
+        cfg = "[无配置]:"
+    end
+    local f = assert(io.open("modconflist.lua", 'a'))
+    f:write(used, cfg, modid, ":", name, "\n")
     f:close()
 end
 
@@ -126,9 +131,11 @@ function writein()
     end
     f:close()
 end
+
 function getver()
     print(version)
 end
+
 function table2json(t)  
     local function serialize(tbl)  
         local tmp = {}  
@@ -152,9 +159,66 @@ function table2json(t)
     assert(type(t) == "table")  
     return serialize(t)  
 end
+
 function getname()
+    if name ~= nil then
+        name = trim(name)
+        name = LuaReomve(name, "\n")
+    else
+        name = "unknown"
+    end
     print(name)
 end
+
+function createmodcfg()
+    fname = "modconfigure/" .. modid .. ".cfg"
+    local f = assert(io.open(fname, 'w'))
+    f:write("mod-version = " .. version .. "\n")
+    if name ~= nil then
+        name = trim(name)
+        name = LuaReomve(name, "\n")
+    end
+    f:write("mod-name = " .. name .. "\n")
+    if configuration_options ~= nil and #configuration_options > 0 then
+        f:write("mod-configureable = true\n")
+        for i, j in pairs(configuration_options) do
+            if j.default ~= nil then
+                local label = "nolabel"
+                if j.label ~= nil then
+                    label = LuaReomve(j.label, " ")
+                end
+                local hover = "该项没有简介！"
+                if j.hover ~= nil then
+                    hover = LuaReomve(j.hover, " ")
+                end
+                if type(j.default) == "table" then
+                    f:write(j.name .. " 表数据请直接修改modinfo.lua文件 table " .. label .. " " .. hover .. "\n")
+                elseif type(j.default) == "number" then
+                    f:write(j.name .. " " .. tostring(j.default) .. " number " .. label .. " " .. hover .. "\n")
+                else
+                    f:write(j.name .. " " .. tostring(j.default) .. " other " .. label .. " " .. hover .. " ")
+                    if j.options ~= nil and #j.options > 0 then
+                        for k, v in pairs(j.options) do
+                            if type(v.data) ~= "table" then
+                                local description = LuaReomve(v.description, " ")
+                                f:write(tostring(v.data) .. " " .. description)
+                            end    
+                            if k ~= #j.options then
+                                f:write(" ")
+                            else
+                                f:write("\n")
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    else
+        f:write("mod-configureable = false\n")
+    end
+    f:close()
+end
+---------------------------------
 if fuc == "list" then
     list()
 elseif fuc == "getver" then
@@ -163,4 +227,6 @@ elseif fuc == "getname" then
     getname()
 elseif fuc == "writein" then
     writein()
+elseif fuc == "createmodcfg" then
+    createmodcfg()
 end

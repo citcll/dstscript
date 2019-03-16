@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://blog.wqlin.com
 #===============================================================================
-script_ver="2.3.8.7"
+script_ver="2.3.9"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -21,6 +21,7 @@ feedback_link="https://blog.wqlin.com/dstscript.html"
 my_api_link="https://api.wqlin.com/dst"
 update_link="${my_api_link}/dstscript"
 log_save_dir="${dst_conf_basedir}/LogBackup"
+mod_cfg_dir="${data_dir}/modconfigure"
 # 屏幕输出
 Green_font_prefix="\033[32m"
 Red_font_prefix="\033[31m"
@@ -160,7 +161,7 @@ MOD_manager(){
         if [ $( ls -l ${dst_base_dir}/${cluster} | grep -c ^d) -gt 0 ]
         then
             Default_mod
-            echo -e "\e[92m【存档：${cluster}】 你要 1.添加mod  2.删除mod：\e[0m\c"
+            echo -e "\e[92m【存档：${cluster}】 你要 1.添加mod  2.删除mod  3.修改MOD配置：\e[0m\c"
             read mc
             case ${mc} in
                 1)
@@ -169,6 +170,8 @@ MOD_manager(){
                 2)
                 Listusedmod
                 Delmod;;
+                3)               
+                Mod_Cfg;;
                 *)
                 break;;
             esac
@@ -180,6 +183,206 @@ MOD_manager(){
         error "当前存档【${cluster}】已被删除或已损坏！"
     fi
 }
+Mod_Cfg(){
+    while (true)
+    do
+        clear
+        Get_current_cluster
+        echo -e "\e[92m【存档：${cluster}】已启用的MOD配置修改===============\e[0m"
+        Listusedmod
+        info "请从以上列表选择你要配置的MOD${Red_font_prefix}[编号]${Font_color_suffix},完毕请输数字 0 ！"
+        read modid
+        if [[ "${modid}" == "0" ]]
+        then
+            info "MOD配置完毕！"
+            break
+        else
+            Truemodid #moddir
+            Show_mod_cfg
+            Write_mod_cfg
+        fi
+    done
+}
+# 传入moddir
+Show_mod_cfg(){
+    if [ ! -d ${mod_cfg_dir} ]
+    then
+        mkdir -p ${mod_cfg_dir}
+    fi
+    if [ -f ${mod_cfg_dir}/${moddir}.cfg ]
+    then
+        Get_installed_mod_version
+        n_ver=$result
+        Get_data_from_file ${mod_cfg_dir}/${moddir}.cfg "mod-version"
+        c_ver=$result
+        if [[ $n_ver != $c_ver ]]
+        then
+            update_mod_cfg
+        fi
+    else
+        update_mod_cfg
+    fi
+    Get_data_from_file ${mod_cfg_dir}/${moddir}.cfg "mod-configureable"
+    c_able=$result
+    c_line=$(grep "^" -n ${mod_cfg_dir}/${moddir}.cfg | tail -n 1 | cut -d : -f1)
+    if [[ $c_able == "true" && $c_line -gt 3 ]]
+    then
+        Get_data_from_file ${mod_cfg_dir}/${moddir}.cfg "mod-version"
+        c_ver=$result
+        Get_data_from_file ${mod_cfg_dir}/${moddir}.cfg "mod-name"
+        c_name=$result
+        while (true)
+        do
+            clear
+            echo -e "\e[92m【修改MOD：$c_name配置】[$c_ver]\e[0m"
+            index=1
+            cat ${mod_cfg_dir}/${moddir}.cfg | grep -v "mod-configureable" | grep -v "mod-version" | grep -v "mod-name" | while read line
+            do
+                ss=(${line})
+                if [ "${ss[2]}" != "other" ]
+                then
+                    value=${ss[1]}
+                else               
+                    for ((i=5;i<${#ss[*]};i++))
+                    do
+                        if [ "${ss[$i]}" == "${ss[1]}" ]
+                        then
+                            value=${ss[$i+1]}
+                        fi
+                    done
+                fi
+                if [ ${index} -lt 10 ]
+                then
+                    echo -e "\e[33m[ ${index}] ${ss[3]}：${value}\n    简介==>${ss[4]}\e[0m"
+                else
+                    echo -e "\e[33m[${index}] ${ss[3]}：${value}\n    简洁==>${ss[4]}\e[0m"
+                fi
+                index=$[${index} + 1]
+            done
+            echo -e "\e[92m===============================================\e[0m"
+            cmd=""
+            while (true)
+            do
+                if [[ ${cmd} == "" ]]
+                then
+                    echo -e "\e[92m请选择你要更改的选项(修改完毕输入数字 0 确认修改并退出)：\e[0m\c"
+                    read cmd
+                else
+                    break
+                fi
+            done
+            case ${cmd} in
+                0)
+                info "更改已保存！"
+                break
+                ;;
+                *)
+                cmd=$[$cmd + 3]
+                changelist=($(sed -n "${cmd}p" ${mod_cfg_dir}/${moddir}.cfg))
+                if [ "${changelist[2]}" = "table" ]
+                then
+                    tips "此项为表数据，请直接修改modinfo.lua文件"
+                elif [ "${changelist[2]}" = "number" ]
+                then
+                    echo -e "\e[92m请输入数字以设定 ${changelist[3]}： \e[0m\c"
+                    read changestr
+                    changelist[1]=${changestr}
+                else
+                    echo -e "\e[92m请选择${changelist[3]}： \e[0m\c"
+                    index=1
+                    for ((i=5;i<${#changelist[*]};i=$i+2))
+                    do
+                        echo -e "\e[92m${index}.${changelist[$[$i + 1]]}   \e[0m\c"
+                        index=$[${index} + 1]
+                    done
+                    echo -e "\e[92m: \e[0m\c"
+                    read changelistindex
+                    listnum=$[${changelistindex} - 1]*2
+                    changelist[1]=${changelist[$[$listnum + 5]]}
+                fi
+                changestr="${changelist[@]}"
+                sed -i "${cmd}c ${changestr}" ${mod_cfg_dir}/${moddir}.cfg
+                ;;
+            esac
+        done
+    fi
+}
+# new
+Write_mod_cfg(){
+    # modconfwrite.lua
+    Delmodfromshard > /dev/null 2>&1
+    rm ${data_dir}/modconfwrite.lua > /dev/null 2>&1
+    touch ${data_dir}/modconfwrite.lua
+    c_line=$(grep "^" -n ${mod_cfg_dir}/${moddir}.cfg | tail -n 1 | cut -d : -f1)
+    if [[ $c_line -le 3 ]]
+    then
+        echo "  [\"$moddir\"]={ [\"enabled\"]=true }," >> ${data_dir}/modconfwrite.lua
+    else
+        echo "  [\"$moddir\"]={" >> ${data_dir}/modconfwrite.lua
+        echo "    configuration_options={" >> ${data_dir}/modconfwrite.lua
+        cindex=1
+        cat ${mod_cfg_dir}/${moddir}.cfg | grep -v "mod-configureable" | grep -v "mod-version" | grep -v "mod-name" | while read lc
+        do
+            lcstr=($lc)
+            if [[ ${lcstr[2]} != "table" ]]
+            then
+                if [[ ${lcstr[2]} == "number" ]]
+                then
+                    echo -e "      [\"${lcstr[0]}\"]=${lcstr[1]}\c" >> ${data_dir}/modconfwrite.lua
+                elif [[ ${lcstr[2]} == "other" ]]
+                then
+                    if [[ ${lcstr[1]} == "true" || ${lcstr[1]} == "false" ]]
+                    then
+                        echo -e "      [\"${lcstr[0]}\"]=${lcstr[1]}\c" >> ${data_dir}/modconfwrite.lua
+                    else
+                        echo -e "      [\"${lcstr[0]}\"]=\"${lcstr[1]}\"\c" >> ${data_dir}/modconfwrite.lua
+                    fi
+                fi
+                if [ $cindex -lt $c_line ]
+                then
+                    echo "," >> ${data_dir}/modconfwrite.lua
+                fi
+            fi
+        done
+        echo "    }," >> ${data_dir}/modconfwrite.lua
+        echo "    [\"enabled\"]=true" >> ${data_dir}/modconfwrite.lua
+        echo "  }," >> ${data_dir}/modconfwrite.lua
+    fi
+    Addmodtoshard > /dev/null 2>&1
+}
+# xxx = yyyy
+# $1 filename
+# $2 parm
+Get_data_from_file(){
+    if [ -f $1 ]
+    then       
+        result=$(grep "^$2" $1 |head -n 1 | cut -d " " -f3)
+    fi
+}
+Get_installed_mod_version(){
+    echo "fuc=\"getver\"" > ${data_dir}/modinfo.lua
+    cat ${dst_server_dir}/mods/${moddir}/modinfo.lua >> ${data_dir}/modinfo.lua
+    cd ${data_dir}
+    result=$(lua modconf.lua)
+}
+
+update_mod_cfg(){
+    if [[ -f "${dst_server_dir}/mods/${moddir}/modinfo.lua" ]]
+    then
+        echo "fuc = \"createmodcfg\"
+modid = \"${moddir}\"
+used = \"true\"" > "${data_dir}/modinfo.lua"
+        cat "${dst_server_dir}/mods/${moddir}/modinfo.lua" >> "${data_dir}/modinfo.lua"
+        cd ${data_dir}
+        lua modconf.lua >/dev/null 2>&1
+        cd ${HOME}
+    else
+        tip "请先安装并启用MOD！"
+        break
+    fi
+}
+
+# old
 MOD_conf(){
     echo "fuc = \"${fuc}\"
 modid = \"${moddir}\"
@@ -251,7 +454,6 @@ Listusedmod(){
 }
 Addmod(){
     info "请从以上列表选择你要启用的MOD${Red_font_prefix}[编号]${Font_color_suffix}，不存在的直接输入MODID"
-    info "具体配置已写入 modoverride.lua, shell下修改太麻烦，可打开配置文件手动修改！"
     tip "大小超过10M的MOD如果无法在服务器添加下载，请手动上传到服务器再启用！！！"
     info "添加完毕要退出请输入数字 0 ！"
     while (true)
@@ -298,9 +500,9 @@ Addmodtoshard(){
     done
 }
 Truemodid(){
-    if [ ${modid} -lt 1000 ]
+    if [ ${modid} -lt 10000 ]
     then
-        moddir=$(sed -n ${modid}p ${data_dir}/modconflist.lua | cut -d ':' -f2)
+        moddir=$(sed -n ${modid}p ${data_dir}/modconflist.lua | cut -d ':' -f3)
     else
         moddir="workshop-${modid}"
     fi
@@ -312,6 +514,7 @@ Addmodfunc(){
     Addmodtoshard
 }
 Delmodfromshard(){
+    Get_shard_array
     for shard in ${shardarray}
     do
         if [ -f ${dst_base_dir}/${cluster}/${shard}/modoverrides.lua ]
@@ -1051,7 +1254,7 @@ Set_world_config(){
                index=1
                for ((i=4;i<${#changelist[*]};i=$i+2))
                do
-                   echo -e "\e[92m${index}.${changelist[$[$i + 1]]}\e[0m\c"
+                   echo -e "\e[92m${index}.${changelist[$[$i + 1]]}   \e[0m\c"
                    index=$[${index} + 1]
                done
                echo -e "\e[92m: \e[0m\c"
