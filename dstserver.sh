@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://blog.wqlin.com
 #===============================================================================
-script_ver="2.3.9"
+script_ver="2.3.9.1"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -1697,25 +1697,26 @@ Simple_server_status(){
 }
 # 清楚旧版本修改的hosts
 Fix_Net_hosts(){
-    sudo chmod 666 /etc/hosts
-    d1n=$(grep -n "steamusercontent-a.akamaihd.net" /etc/hosts | cut -d : -f1)
-    sudo sed -i ${d1n}d /etc/hosts
-    d1n=$(grep -n "steamcommunity.com" /etc/hosts | cut -d : -f1)
-    sudo sed -i ${d1n}d /etc/hosts
-    d1n=$(grep -n "s3.amazonaws.com" /etc/hosts | cut -d : -f1)
-    sudo sed -i ${d1n}d /etc/hosts
-    # if ! grep steamusercontent-a.akamaihd.net /etc/hosts > /dev/null 2>&1
-    # then
-    #     echo "23.48.201.40 steamusercontent-a.akamaihd.net" >> /etc/hosts
-    # fi
-    # if ! grep s3.amazonaws.com /etc/hosts > /dev/null 2>&1
-    # then
-    #     echo "52.216.136.5 s3.amazonaws.com" >> /etc/hosts
-    # fi
-    # if ! grep steamcommunity.com /etc/hosts > /dev/null 2>&1
-    # then
-    #     echo "104.85.221.169 steamcommunity.com" >> /etc/hosts
-    # fi
+    sudo chmod 777 /etc/hosts
+    cat > /etc/hosts<<-EOF
+# Your system has configured 'manage_etc_hosts' as True.
+# As a result, if you wish for changes to this file to persist
+# then you will need to either
+# a.) make changes to the master file in /etc/cloud/templates/hosts.redhat.tmpl
+# b.) change or remove the value of 'manage_etc_hosts' in
+#     /etc/cloud/cloud.cfg or cloud-config from user-data
+#
+# The following lines are desirable for IPv4 capable hosts
+127.0.0.1 $HOSTNAME $HOSTNAME
+127.0.0.1 localhost.localdomain localhost
+127.0.0.1 localhost4.localdomain4 localhost4
+
+# The following lines are desirable for IPv6 capable hosts
+::1 $HOSTNAME $HOSTNAME
+::1 localhost.localdomain localhost
+::1 localhost6.localdomain6 localhost6
+
+EOF
     sudo chmod 644 /etc/hosts
 }
 Update_MOD(){

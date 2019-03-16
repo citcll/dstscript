@@ -1,4 +1,4 @@
--- script_ver="1.3.1"
+-- script_ver="1.3.2"
 require "modinfo"
 
 -- Addon function
@@ -6,7 +6,7 @@ function trim (s)
     return (string.gsub(s, "^%s*(.-)%s*$", "%1")) 
 end
 
-function LuaReomve(str,remove)
+function LuaRemove(str,remove)
     local lcSubStrTab = {}    
     while true do        
         local lcPos = string.find(str,remove)
@@ -42,7 +42,7 @@ function list()
     end
     if name ~= nil then
         name = trim(name)
-        name = LuaReomve(name, "\n")
+        name = LuaRemove(name, "\n")
     else
         name = "Unknown"
     end
@@ -60,7 +60,7 @@ function writein()
     local f = assert(io.open("modconfwrite.lua", 'w'))
     if name ~= nil then
         name = trim(name)
-        name = LuaReomve(name, "\n")
+        name = LuaRemove(name, "\n")
     end
     if configuration_options ~= nil and #configuration_options > 0 then
         f:write('  ["', modid, '"]={    --[[', name, "]]\n")
@@ -163,7 +163,7 @@ end
 function getname()
     if name ~= nil then
         name = trim(name)
-        name = LuaReomve(name, "\n")
+        name = LuaRemove(name, "\n")
     else
         name = "unknown"
     end
@@ -176,7 +176,7 @@ function createmodcfg()
     f:write("mod-version = " .. version .. "\n")
     if name ~= nil then
         name = trim(name)
-        name = LuaReomve(name, "\n")
+        name = LuaRemove(name, "\n")
     end
     f:write("mod-name = " .. name .. "\n")
     if configuration_options ~= nil and #configuration_options > 0 then
@@ -185,11 +185,13 @@ function createmodcfg()
             if j.default ~= nil then
                 local label = "nolabel"
                 if j.label ~= nil then
-                    label = LuaReomve(j.label, " ")
+                    label = LuaRemove(j.label, " ")
+                    label = LuaRemove(label, "\n")
                 end
                 local hover = "该项没有简介！"
                 if j.hover ~= nil then
-                    hover = LuaReomve(j.hover, " ")
+                    hover = LuaRemove(j.hover, " ")
+                    hover = LuaRemove(hover, "\n")
                 end
                 if type(j.default) == "table" then
                     f:write(j.name .. " 表数据请直接修改modinfo.lua文件 table " .. label .. " " .. hover .. "\n")
@@ -200,7 +202,7 @@ function createmodcfg()
                     if j.options ~= nil and #j.options > 0 then
                         for k, v in pairs(j.options) do
                             if type(v.data) ~= "table" then
-                                local description = LuaReomve(v.description, " ")
+                                local description = LuaRemove(v.description, " ")
                                 f:write(tostring(v.data) .. " " .. description)
                             end    
                             if k ~= #j.options then
