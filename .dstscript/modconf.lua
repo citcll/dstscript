@@ -1,4 +1,4 @@
--- script_ver="1.3.3"
+-- script_ver="1.3.4"
 require "modinfo"
 
 -- Addon function
@@ -212,7 +212,9 @@ function createmodcfg()
                                 description = LuaRemove(description, "\n")                                
                                 local cfghover = "该项没有说明！"
                                 if v.hover ~= nil then
-                                    cfghover = v.hover
+                                    if string.len(v.hover) >= 2 then
+                                        cfghover = v.hover
+                                    end                                   
                                 end
                                 cfghover = Blank2jin(cfghover)
                                 cfghover = LuaRemove(cfghover, "\n")

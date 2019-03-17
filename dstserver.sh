@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://blog.wqlin.com
 #===============================================================================
-script_ver="2.3.9.3"
+script_ver="2.4.0"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -149,6 +149,7 @@ Get_single_shard(){
     [ -z $shardm ] && shard=$shardm
 }
 Get_current_cluster(){
+    cluster="无"
     [ -f ${server_conf_file} ] && cluster=$(cat ${server_conf_file} | grep "^cluster" | cut -d "=" -f2)
 }
 Get_server_status(){
@@ -248,7 +249,7 @@ Show_mod_cfg(){
                     do
                         if [ "${ss[$i]}" == "${ss[1]}" ]
                         then
-                            value=${ss[$i+2]}
+                            value=${ss[$i+1]}
                         fi
                     done
                 fi
@@ -337,7 +338,7 @@ Write_mod_cfg(){
     else
         echo "  [\"$moddir\"]={" >> ${data_dir}/modconfwrite.lua
         echo "    configuration_options={" >> ${data_dir}/modconfwrite.lua
-        cindex=1
+        # cindex=4
         cat ${mod_cfg_dir}/${moddir}.cfg | grep -v "mod-configureable" | grep -v "mod-version" | grep -v "mod-name" | while read lc
         do
             lcstr=($lc)
@@ -346,21 +347,22 @@ Write_mod_cfg(){
             then
                 if [[ ${lcstr[2]} == "number" ]]
                 then
-                    echo -e "      [\"$cfgname\"]=${lcstr[1]}\c" >> ${data_dir}/modconfwrite.lua
+                    echo -e "      [\"$cfgname\"]=${lcstr[1]}," >> ${data_dir}/modconfwrite.lua
                 elif [[ ${lcstr[2]} == "other" ]]
                 then
                     if [[ ${lcstr[1]} == "true" || ${lcstr[1]} == "false" ]]
                     then
-                        echo -e "      [\"$cfgname\"]=${lcstr[1]}\c" >> ${data_dir}/modconfwrite.lua
+                        echo -e "      [\"$cfgname\"]=${lcstr[1]}," >> ${data_dir}/modconfwrite.lua
                     else
-                        echo -e "      [\"$cfgname\"]=\"${lcstr[1]}\"\c" >> ${data_dir}/modconfwrite.lua
+                        echo -e "      [\"$cfgname\"]=\"${lcstr[1]}\"," >> ${data_dir}/modconfwrite.lua
                     fi
                 fi
-                if [ $cindex -lt $c_line ]
-                then
-                    echo "," >> ${data_dir}/modconfwrite.lua
-                fi
+            #     if [ $cindex -lt $c_line ]
+            #     then
+            #         echo "," >> ${data_dir}/modconfwrite.lua
+            #     fi
             fi
+            # cindex=$[$cindex + 1]
         done
         echo "    }," >> ${data_dir}/modconfwrite.lua
         echo "    [\"enabled\"]=true" >> ${data_dir}/modconfwrite.lua
@@ -1335,9 +1337,13 @@ Setup_mod(){
         fi
     done
     cp "${data_dir}/mods_setup.lua" "${dst_server_dir}/mods/dedicated_server_mods_setup.lua"
+    info "添加启用的MODID到MOD更新配置文件！"
 }
 Start_shard(){
-    Setup_mod
+    if [[ $MOD_update == "true" ]]
+    then
+        Setup_mod
+    fi
     cd "${dst_server_dir}/bin"
     for shard in ${shardarray}
     do
@@ -1791,7 +1797,7 @@ Download_MOD(){
 Del_need_update_mod_folder(){
     if [ -s ${data_dir}/needupdatemodlist.txt ]
     then
-        info "清除需要更新的MOD的旧版本 ..."
+        info "清除需要更新的MOD的旧版本以加大更新成功率 ..."
         while read line
         do
             if [ -d ${dst_server_dir}/mods/workshop-${line} ]
@@ -1799,7 +1805,7 @@ Del_need_update_mod_folder(){
                 rm -rf ${dst_server_dir}/mods/workshop-${line}
             fi
         done < ${data_dir}/needupdatemodlist.txt
-        info "旧版本MOD清楚完毕！"
+        info "旧版本MOD清除完毕！"
     fi
 }
 Get_IP(){
@@ -1897,6 +1903,8 @@ then
 fi
 # 迁移存档根目录到显性目录
 Move_base_dir(){
+    if [ -d $HOME/.klei ]
+    then
     if [ ! -f ${data_dir}/Move_base_dir.txt ]
     then
         tip "为方便小白找到存档根目录，根目录迁移至[${dst_conf_basedir}]，不再为隐藏目录"
@@ -1907,7 +1915,8 @@ Move_base_dir(){
             Get_shard_array
             Close_server
             info "正在转移已有存档。。。请勿中断。。。"
-            cp -r $HOME/.klei $HOME/Klei
+            mkdir -p $HOME/Klei        
+            cp -r $HOME/.klei/* $HOME/Klei/ > /dev/null 2>&1
             info "存档转移到[$HOME/Klei]。完毕！！！"
             touch ${data_dir}/Move_base_dir.txt
             dst_conf_basedir="$HOME/Klei"
@@ -1918,6 +1927,9 @@ Move_base_dir(){
             tip "你选择了否，根目录未改变，下次运行脚本仍会提醒！！！"
         fi
         sleep 1
+    fi
+    else
+        dst_conf_basedir="$HOME/Klei"
     fi
 }
 # Run from here
