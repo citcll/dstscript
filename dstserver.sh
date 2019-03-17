@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://blog.wqlin.com
 #===============================================================================
-script_ver="2.4.0"
+script_ver="2.4.0.1"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -162,7 +162,7 @@ MOD_manager(){
         if [ $( ls -l ${dst_base_dir}/${cluster} | grep -c ^d) -gt 0 ]
         then
             Default_mod
-            echo -e "\e[92m【存档：${cluster}】 你要 1.添加mod  2.删除mod  3.修改MOD配置：\e[0m\c"
+            echo -e "\e[92m【存档：${cluster}】 你要 1.添加mod  2.删除mod  3.修改MOD配置\n                    4.重置MOD配置  5.安装MOD合集\n：\e[0m\c"
             read mc
             case ${mc} in
                 1)
@@ -173,6 +173,12 @@ MOD_manager(){
                 Delmod;;
                 3)               
                 Mod_Cfg;;
+                4)
+                Clear_mod_cfg
+                ;;
+                5)
+                Install_mod_collection
+                ;;
                 *)
                 break;;
             esac
@@ -183,6 +189,57 @@ MOD_manager(){
     else
         error "当前存档【${cluster}】已被删除或已损坏！"
     fi
+}
+Install_mod_collection(){
+    [ -f $data_dir/modcollectionlist.txt ] && rm -rf $data_dir/modcollectionlist.txt
+    touch $data_dir/modcollectionlist.txt
+    while (true)
+    do
+        clear
+        echo -e "\e[92m[输入结束请输入数字 0]请输入你的MOD合集ID:\e[0m\c"
+        read clid
+        if [ $clid -gt 0 ]
+        then
+            info "合集添加完毕！即将安装 ..."
+        else
+            echo "ServerModCollectionSetup(\"$clid\")" >> $data_dir/modcollectionlist.txt
+            info "该MOD合集($clid)已添加到待安装列表。"
+        fi
+    done
+    if [ -s $data_dir/modcollectionlist.txt ]
+    then
+        info "正在安装新添加的MOD(合集)，请稍候 。。。"
+        if [ ! -d ${dst_base_dir}/downloadmod/Master ]
+        then
+            mkdir -p ${dst_base_dir}/downloadmod/Master
+        fi
+        if tmux has-session -t DST_MODUPDATE > /dev/null 2>&1
+        then
+            tmux kill-session -t DST_MODUPDATE
+        fi
+        cp $data_dir/modcollectionlist.txt ${dst_server_dir}/mods/dedicated_server_mods_setup.lua
+        cd ${dst_server_dir}/bin || exit 1
+        tmux new-session -s DST_MODUPDATE -d "${dst_bin_cmd} -persistent_storage_root ${dst_conf_basedir} -cluster downloadmod -shard Master"
+        sleep 3
+        while (true)
+        do
+            if tmux has-session -t DST_MODUPDATE > /dev/null 2>&1
+            then
+                if [[ $(grep "Your Server Will Not Start" -c "${dst_base_dir}/downloadmod/Master/server_log.txt") > 0 ]]
+                then              
+                    info "安装进程已执行完毕，请到添加MOD中查看是否安装成功！"              
+                fi
+                tmux kill-session -t DST_MODUPDATE
+                break
+            fi
+        done
+    else
+        tip "没有新的MOD合集需要安装！"
+    fi
+}
+Clear_mod_cfg(){
+    [ -d $mod_cfg_dir ] && rm -rf $mod_cfg_dir
+    info "所有MOD配置均已重置！" 
 }
 Mod_Cfg(){
     while (true)
@@ -210,20 +267,19 @@ Show_mod_cfg(){
     then
         mkdir -p ${mod_cfg_dir}
     fi
-    # if [ -f ${mod_cfg_dir}/${moddir}.cfg ]
-    # then
-    #     Get_installed_mod_version
-    #     n_ver=$result
-    #     Get_data_from_file ${mod_cfg_dir}/${moddir}.cfg "mod-version"
-    #     c_ver=$result
-    #     if [[ $n_ver != $c_ver ]]
-    #     then
-    #         update_mod_cfg
-    #     fi
-    # else
-    #     update_mod_cfg
-    # fi
-    update_mod_cfg
+    if [ -f ${mod_cfg_dir}/${moddir}.cfg ]
+    then
+        Get_installed_mod_version
+        n_ver=$result
+        Get_data_from_file ${mod_cfg_dir}/${moddir}.cfg "mod-version"
+        c_ver=$result
+        if [[ $n_ver != $c_ver ]]
+        then
+            update_mod_cfg
+        fi
+    else
+        update_mod_cfg
+    fi
     Get_data_from_file ${mod_cfg_dir}/${moddir}.cfg "mod-configureable"
     c_able=$result
     c_line=$(grep "^" -n ${mod_cfg_dir}/${moddir}.cfg | tail -n 1 | cut -d : -f1)
@@ -1758,7 +1814,7 @@ Update_MOD(){
     fi
 }
 Download_MOD(){
-    info "正在安装/更新新添加的MOD，请稍候 。。。"
+    info "正在安装/更新新添加的MOD(合集)，请稍候 。。。"
     if [ ! -d ${dst_base_dir}/downloadmod/Master ]
     then
         mkdir -p ${dst_base_dir}/downloadmod/Master
