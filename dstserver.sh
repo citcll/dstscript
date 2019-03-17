@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://blog.wqlin.com
 #===============================================================================
-script_ver="2.4.0.1"
+script_ver="2.4.0.2"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -198,9 +198,10 @@ Install_mod_collection(){
         clear
         echo -e "\e[92m[输入结束请输入数字 0]请输入你的MOD合集ID:\e[0m\c"
         read clid
-        if [ $clid -gt 0 ]
+        if [ $clid -eq 0 ]
         then
             info "合集添加完毕！即将安装 ..."
+            break
         else
             echo "ServerModCollectionSetup(\"$clid\")" >> $data_dir/modcollectionlist.txt
             info "该MOD合集($clid)已添加到待安装列表。"
