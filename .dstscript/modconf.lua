@@ -1,8 +1,8 @@
--- script_ver="1.3.2"
+-- script_ver="1.3.3"
 require "modinfo"
 
 -- Addon function
-function trim (s) 
+function trim(s) 
     return (string.gsub(s, "^%s*(.-)%s*$", "%1")) 
 end
 
@@ -29,6 +29,9 @@ function LuaRemove(str,remove)
         end    
     end    
     return lcMergeStr
+end
+function Blank2jin(str)
+    return (string.gsub(str, " ", "#"))
 end
 ---
 function list()
@@ -176,6 +179,7 @@ function createmodcfg()
     f:write("mod-version = " .. version .. "\n")
     if name ~= nil then
         name = trim(name)
+        name = Blank2jin(name)
         name = LuaRemove(name, "\n")
     end
     f:write("mod-name = " .. name .. "\n")
@@ -185,25 +189,34 @@ function createmodcfg()
             if j.default ~= nil then
                 local label = "nolabel"
                 if j.label ~= nil then
-                    label = LuaRemove(j.label, " ")
+                    label = Blank2jin(j.label)
                     label = LuaRemove(label, "\n")
                 end
                 local hover = "该项没有简介！"
                 if j.hover ~= nil then
-                    hover = LuaRemove(j.hover, " ")
+                    hover = Blank2jin(j.hover)
                     hover = LuaRemove(hover, "\n")
                 end
+                local cfgname = Blank2jin(j.name)
+                cfgname = LuaRemove(cfgname, "\n")
                 if type(j.default) == "table" then
-                    f:write(j.name .. " 表数据请直接修改modinfo.lua文件 table " .. label .. " " .. hover .. "\n")
+                    f:write(cfgname .. " 表数据请直接修改modinfo.lua文件 table " .. label .. " " .. hover .. "\n")
                 elseif type(j.default) == "number" then
-                    f:write(j.name .. " " .. tostring(j.default) .. " number " .. label .. " " .. hover .. "\n")
+                    f:write(cfgname .. " " .. tostring(j.default) .. " number " .. label .. " " .. hover .. "\n")
                 else
-                    f:write(j.name .. " " .. tostring(j.default) .. " other " .. label .. " " .. hover .. " ")
+                    f:write(cfgname .. " " .. tostring(j.default) .. " other " .. label .. " " .. hover .. " ")
                     if j.options ~= nil and #j.options > 0 then
                         for k, v in pairs(j.options) do
                             if type(v.data) ~= "table" then
-                                local description = LuaRemove(v.description, " ")
-                                f:write(tostring(v.data) .. " " .. description)
+                                local description = Blank2jin(v.description)
+                                description = LuaRemove(description, "\n")                                
+                                local cfghover = "该项没有说明！"
+                                if v.hover ~= nil then
+                                    cfghover = v.hover
+                                end
+                                cfghover = Blank2jin(cfghover)
+                                cfghover = LuaRemove(cfghover, "\n")
+                                f:write(tostring(v.data) .. " " .. description .. " " .. cfghover)
                             end    
                             if k ~= #j.options then
                                 f:write(" ")

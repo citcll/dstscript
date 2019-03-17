@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://blog.wqlin.com
 #===============================================================================
-script_ver="2.3.9.2"
+script_ver="2.3.9.3"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -209,19 +209,20 @@ Show_mod_cfg(){
     then
         mkdir -p ${mod_cfg_dir}
     fi
-    if [ -f ${mod_cfg_dir}/${moddir}.cfg ]
-    then
-        Get_installed_mod_version
-        n_ver=$result
-        Get_data_from_file ${mod_cfg_dir}/${moddir}.cfg "mod-version"
-        c_ver=$result
-        if [[ $n_ver != $c_ver ]]
-        then
-            update_mod_cfg
-        fi
-    else
-        update_mod_cfg
-    fi
+    # if [ -f ${mod_cfg_dir}/${moddir}.cfg ]
+    # then
+    #     Get_installed_mod_version
+    #     n_ver=$result
+    #     Get_data_from_file ${mod_cfg_dir}/${moddir}.cfg "mod-version"
+    #     c_ver=$result
+    #     if [[ $n_ver != $c_ver ]]
+    #     then
+    #         update_mod_cfg
+    #     fi
+    # else
+    #     update_mod_cfg
+    # fi
+    update_mod_cfg
     Get_data_from_file ${mod_cfg_dir}/${moddir}.cfg "mod-configureable"
     c_able=$result
     c_line=$(grep "^" -n ${mod_cfg_dir}/${moddir}.cfg | tail -n 1 | cut -d : -f1)
@@ -230,7 +231,7 @@ Show_mod_cfg(){
         Get_data_from_file ${mod_cfg_dir}/${moddir}.cfg "mod-version"
         c_ver=$result
         Get_data_from_file ${mod_cfg_dir}/${moddir}.cfg "mod-name"
-        c_name=$result
+        c_name=$(echo $result | sed 's/#/ /g')
         while (true)
         do
             clear
@@ -247,15 +248,23 @@ Show_mod_cfg(){
                     do
                         if [ "${ss[$i]}" == "${ss[1]}" ]
                         then
-                            value=${ss[$i+1]}
+                            value=${ss[$i+2]}
                         fi
                     done
                 fi
+                value=$(echo $value | sed 's/#/ /g')
+                label=$(echo ${ss[3]} | sed 's/#/ /g')
+                hover=$(echo ${ss[4]} | sed 's/#/ /g')
+                if [[ $label == "" ]]
+                then
+                    label=$(echo ${ss[0]} | sed 's/#/ /g')
+                    hover="${Red_font_prefix}该项作用不明，请勿轻易修改否则可能出错。详情请查看modinfo.lua文件。${Font_color_suffix}"
+                fi
                 if [ ${index} -lt 10 ]
                 then
-                    echo -e "\e[33m[ ${index}] ${ss[3]}：${value}\n    简介==>${ss[4]}\e[0m"
+                    echo -e "\e[33m[ ${index}] $label：${Red_font_prefix}${value}${Font_color_suffix}\n    简介==>$hover\e[0m"
                 else
-                    echo -e "\e[33m[${index}] ${ss[3]}：${value}\n    简介==>${ss[4]}\e[0m"
+                    echo -e "\e[33m[${index}] $label：${Red_font_prefix}${value}${Font_color_suffix}\n    简介==>$hover\e[0m"
                 fi
                 index=$[${index} + 1]
             done
@@ -279,25 +288,33 @@ Show_mod_cfg(){
                 *)
                 cmd=$[$cmd + 3]
                 changelist=($(sed -n "${cmd}p" ${mod_cfg_dir}/${moddir}.cfg))
+                label=$(echo ${changelist[3]} | sed 's/#/ /g')
+                if [[ $label == "" ]]
+                then
+                    label=$(echo ${changelist[0]} | sed 's/#/ /g')
+                fi
                 if [ "${changelist[2]}" = "table" ]
                 then
-                    tips "此项为表数据，请直接修改modinfo.lua文件"
+                    tips "${Red_font_prefix}此项为表数据，请直接修改modinfo.lua文件${Font_color_suffix}"
                 elif [ "${changelist[2]}" = "number" ]
                 then
-                    echo -e "\e[92m请输入数字以设定 ${changelist[3]}： \e[0m\c"
+                    echo -e "\e[92m请输入数字以设定 $label： \e[0m\c"
                     read changestr
                     changelist[1]=${changestr}
                 else
-                    echo -e "\e[92m请选择${changelist[3]}： \e[0m\c"
+                    echo -e "\e[92m请选择$label： \e[0m"
                     index=1
-                    for ((i=5;i<${#changelist[*]};i=$i+2))
+                    for ((i=5;i<${#changelist[*]};i=$i+3))
                     do
-                        echo -e "\e[92m${index}.${changelist[$[$i + 1]]}   \e[0m\c"
+                        description=$(echo ${changelist[$[$i + 1]]} | sed 's/#/ /g')
+                        hover=$(echo ${changelist[$[$i + 2]]} | sed 's/#/ /g')
+                        printf "%-30s" "    ${index}.$description"
+                        echo -e "\e[92m简介==>$hover\e[0m"
                         index=$[${index} + 1]
                     done
                     echo -e "\e[92m: \e[0m\c"
                     read changelistindex
-                    listnum=$[${changelistindex} - 1]*2
+                    listnum=$[${changelistindex} - 1]*3
                     changelist[1]=${changelist[$[$listnum + 5]]}
                 fi
                 changestr="${changelist[@]}"
@@ -324,18 +341,19 @@ Write_mod_cfg(){
         cat ${mod_cfg_dir}/${moddir}.cfg | grep -v "mod-configureable" | grep -v "mod-version" | grep -v "mod-name" | while read lc
         do
             lcstr=($lc)
+            cfgname=$(echo ${lcstr[0]} | sed 's/#/ /g')
             if [[ ${lcstr[2]} != "table" ]]
             then
                 if [[ ${lcstr[2]} == "number" ]]
                 then
-                    echo -e "      [\"${lcstr[0]}\"]=${lcstr[1]}\c" >> ${data_dir}/modconfwrite.lua
+                    echo -e "      [\"$cfgname\"]=${lcstr[1]}\c" >> ${data_dir}/modconfwrite.lua
                 elif [[ ${lcstr[2]} == "other" ]]
                 then
                     if [[ ${lcstr[1]} == "true" || ${lcstr[1]} == "false" ]]
                     then
-                        echo -e "      [\"${lcstr[0]}\"]=${lcstr[1]}\c" >> ${data_dir}/modconfwrite.lua
+                        echo -e "      [\"$cfgname\"]=${lcstr[1]}\c" >> ${data_dir}/modconfwrite.lua
                     else
-                        echo -e "      [\"${lcstr[0]}\"]=\"${lcstr[1]}\"\c" >> ${data_dir}/modconfwrite.lua
+                        echo -e "      [\"$cfgname\"]=\"${lcstr[1]}\"\c" >> ${data_dir}/modconfwrite.lua
                     fi
                 fi
                 if [ $cindex -lt $c_line ]
