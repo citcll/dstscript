@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://blog.wqlin.com
 #===============================================================================
-script_ver="2.4.1"
+script_ver="2.4.1.1"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -162,7 +162,7 @@ MOD_manager(){
         if [ $( ls -l ${dst_base_dir}/${cluster} | grep -c ^d) -gt 0 ]
         then
             Default_mod
-            echo -e "\e[92m【存档：${cluster}】 你要 1.添加mod  2.删除mod  3.修改MOD配置\n                    4.重置MOD配置  5.安装MOD合集\n：\e[0m\c"
+            echo -e "\e[92m【存档：${cluster}】 你要 1.添加mod  2.删除mod  3.修改MOD配置\n                     4.重置MOD配置  5.安装MOD合集\n：\e[0m\c"
             read mc
             case ${mc} in
                 1)
@@ -297,7 +297,7 @@ Show_mod_cfg(){
             cat ${mod_cfg_dir}/${moddir}.cfg | grep -v "mod-configureable" | grep -v "mod-version" | grep -v "mod-name" | while read line
             do
                 ss=(${line})
-                if [ "${ss[2]}" != "other" ]
+                if [ "${ss[2]}" == "table" ]
                 then
                     value=${ss[1]}
                 else               
@@ -308,11 +308,15 @@ Show_mod_cfg(){
                             value=${ss[$i+1]}
                         fi
                     done
+                fi              
+                if [[ $value == "不明项勿修改" ]]
+                then
+                    value=${ss[1]}
                 fi
                 value=$(echo $value | sed 's/#/ /g')
                 label=$(echo ${ss[3]} | sed 's/#/ /g')
                 hover=$(echo ${ss[4]} | sed 's/#/ /g')
-                if [[ $label == "" ]]
+                if [[ $label == "" || $label == "nolabel" ]]
                 then
                     label=$(echo ${ss[0]} | sed 's/#/ /g')
                     hover="${Red_font_prefix}该项作用不明，请勿轻易修改否则可能出错。详情请查看modinfo.lua文件。${Font_color_suffix}"
@@ -346,7 +350,7 @@ Show_mod_cfg(){
                 cmd=$[$cmd + 3]
                 changelist=($(sed -n "${cmd}p" ${mod_cfg_dir}/${moddir}.cfg))
                 label=$(echo ${changelist[3]} | sed 's/#/ /g')
-                if [[ $label == "" ]]
+                if [[ $label == "" || $label == "nolabel" ]]
                 then
                     label=$(echo ${changelist[0]} | sed 's/#/ /g')
                 fi
@@ -401,18 +405,16 @@ Write_mod_cfg(){
             cfgname=$(echo ${lcstr[0]} | sed 's/#/ /g')
             if [[ ${lcstr[2]} != "table" ]]
             then
-                # if [[ ${lcstr[2]} == "number" ]]
-                # then
-                #     echo -e "      [\"$cfgname\"]=${lcstr[1]}," >> ${data_dir}/modconfwrite.lua
-                # elif [[ ${lcstr[2]} == "other" ]]
-                # then
-                    if [[ ${lcstr[1]} == "true" || ${lcstr[1]} == "false" ]]
-                    then
-                        echo -e "      [\"$cfgname\"]=${lcstr[1]}," >> ${data_dir}/modconfwrite.lua
-                    else
-                        echo -e "      [\"$cfgname\"]=\"${lcstr[1]}\"," >> ${data_dir}/modconfwrite.lua
-                    fi
-                # fi
+                if [[ ${lcstr[2]} == "number" ]]
+                then
+                    echo -e "      [\"$cfgname\"]=${lcstr[1]}," >> ${data_dir}/modconfwrite.lua
+                elif [[ ${lcstr[2]} == "string" ]]
+                then
+                    echo -e "      [\"$cfgname\"]=\"${lcstr[1]}\"," >> ${data_dir}/modconfwrite.lua
+                elif [[ ${lcstr[2]} == "boolean" ]]
+                then
+                    echo -e "      [\"$cfgname\"]=${lcstr[1]}," >> ${data_dir}/modconfwrite.lua
+                fi
             #     if [ $cindex -lt $c_line ]
             #     then
             #         echo "," >> ${data_dir}/modconfwrite.lua

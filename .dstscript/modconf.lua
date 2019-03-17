@@ -1,4 +1,4 @@
--- script_ver="1.3.5"
+-- script_ver="1.3.6"
 require "modinfo"
 
 -- Addon function
@@ -189,13 +189,17 @@ function createmodcfg()
             if j.default ~= nil then
                 local label = "nolabel"
                 if j.label ~= nil then
-                    label = Blank2jin(j.label)
-                    label = LuaRemove(label, "\n")
+                    if string.len(j.label) >= 2 then
+                        label = Blank2jin(j.label)
+                        label = LuaRemove(label, "\n")
+                    end
                 end
                 local hover = "该项没有简介！"
                 if j.hover ~= nil then
-                    hover = Blank2jin(j.hover)
-                    hover = LuaRemove(hover, "\n")
+                    if string.len(j.hover) >= 2 then
+                        hover = Blank2jin(j.hover)
+                        hover = LuaRemove(hover, "\n")
+                    end
                 end
                 local cfgname = Blank2jin(j.name)
                 cfgname = LuaRemove(cfgname, "\n")
@@ -204,12 +208,17 @@ function createmodcfg()
                 -- elseif type(j.default) == "number" then
                     -- f:write(cfgname .. " " .. tostring(j.default) .. " number " .. label .. " " .. hover .. "\n")
                 else
-                    f:write(cfgname .. " " .. tostring(j.default) .. " other " .. label .. " " .. hover .. " ")
+                    f:write(cfgname .. " " .. tostring(j.default) .. " " .. type(j.default) .. " " .. label .. " " .. hover .. " ")
                     if j.options ~= nil and #j.options > 0 then
                         for k, v in pairs(j.options) do
                             if type(v.data) ~= "table" then
-                                local description = Blank2jin(v.description)
-                                description = LuaRemove(description, "\n")                                
+                                local description = "不明项勿修改"
+                                if v.description ~= nil then
+                                    if string.len(v.description) >= 2 then
+                                        description = Blank2jin(v.description)
+                                        description = LuaRemove(description, "\n")
+                                    end
+                                end
                                 local cfghover = "该项没有说明！"
                                 if v.hover ~= nil then
                                     if string.len(v.hover) >= 2 then
