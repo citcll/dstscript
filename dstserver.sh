@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://blog.wqlin.com
 #===============================================================================
-script_ver="2.4.0.3"
+script_ver="2.4.1"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -301,7 +301,7 @@ Show_mod_cfg(){
                 then
                     value=${ss[1]}
                 else               
-                    for ((i=5;i<${#ss[*]};i++))
+                    for ((i=5;i<${#ss[*]};i=$i+3))
                     do
                         if [ "${ss[$i]}" == "${ss[1]}" ]
                         then
@@ -353,11 +353,11 @@ Show_mod_cfg(){
                 if [ "${changelist[2]}" = "table" ]
                 then
                     tips "${Red_font_prefix}此项为表数据，请直接修改modinfo.lua文件${Font_color_suffix}"
-                elif [ "${changelist[2]}" = "number" ]
-                then
-                    echo -e "\e[92m请输入数字以设定 $label： \e[0m\c"
-                    read changestr
-                    changelist[1]=${changestr}
+                # elif [ "${changelist[2]}" = "number" ]
+                # then
+                #     echo -e "\e[92m请输入数字以设定 $label： \e[0m\c"
+                #     read changestr
+                #     changelist[1]=${changestr}
                 else
                     echo -e "\e[92m请选择$label： \e[0m"
                     index=1
@@ -401,18 +401,18 @@ Write_mod_cfg(){
             cfgname=$(echo ${lcstr[0]} | sed 's/#/ /g')
             if [[ ${lcstr[2]} != "table" ]]
             then
-                if [[ ${lcstr[2]} == "number" ]]
-                then
-                    echo -e "      [\"$cfgname\"]=${lcstr[1]}," >> ${data_dir}/modconfwrite.lua
-                elif [[ ${lcstr[2]} == "other" ]]
-                then
+                # if [[ ${lcstr[2]} == "number" ]]
+                # then
+                #     echo -e "      [\"$cfgname\"]=${lcstr[1]}," >> ${data_dir}/modconfwrite.lua
+                # elif [[ ${lcstr[2]} == "other" ]]
+                # then
                     if [[ ${lcstr[1]} == "true" || ${lcstr[1]} == "false" ]]
                     then
                         echo -e "      [\"$cfgname\"]=${lcstr[1]}," >> ${data_dir}/modconfwrite.lua
                     else
                         echo -e "      [\"$cfgname\"]=\"${lcstr[1]}\"," >> ${data_dir}/modconfwrite.lua
                     fi
-                fi
+                # fi
             #     if [ $cindex -lt $c_line ]
             #     then
             #         echo "," >> ${data_dir}/modconfwrite.lua

@@ -1,4 +1,4 @@
--- script_ver="1.3.4"
+-- script_ver="1.3.5"
 require "modinfo"
 
 -- Addon function
@@ -201,8 +201,8 @@ function createmodcfg()
                 cfgname = LuaRemove(cfgname, "\n")
                 if type(j.default) == "table" then
                     f:write(cfgname .. " 表数据请直接修改modinfo.lua文件 table " .. label .. " " .. hover .. "\n")
-                elseif type(j.default) == "number" then
-                    f:write(cfgname .. " " .. tostring(j.default) .. " number " .. label .. " " .. hover .. "\n")
+                -- elseif type(j.default) == "number" then
+                    -- f:write(cfgname .. " " .. tostring(j.default) .. " number " .. label .. " " .. hover .. "\n")
                 else
                     f:write(cfgname .. " " .. tostring(j.default) .. " other " .. label .. " " .. hover .. " ")
                     if j.options ~= nil and #j.options > 0 then
