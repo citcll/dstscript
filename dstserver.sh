@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://blog.wqlin.com
 #===============================================================================
-script_ver="2.4.0.2"
+script_ver="2.4.0.3"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -193,10 +193,9 @@ MOD_manager(){
 Install_mod_collection(){
     [ -f $data_dir/modcollectionlist.txt ] && rm -rf $data_dir/modcollectionlist.txt
     touch $data_dir/modcollectionlist.txt
+    echo -e "\e[92m[输入结束请输入数字 0]请输入你的MOD合集ID:\e[0m\c"
     while (true)
     do
-        clear
-        echo -e "\e[92m[输入结束请输入数字 0]请输入你的MOD合集ID:\e[0m\c"
         read clid
         if [ $clid -eq 0 ]
         then
@@ -228,10 +227,10 @@ Install_mod_collection(){
             then
                 if [[ $(grep "Your Server Will Not Start" -c "${dst_base_dir}/downloadmod/Master/server_log.txt") > 0 ]]
                 then              
-                    info "安装进程已执行完毕，请到添加MOD中查看是否安装成功！"              
+                    info "安装进程已执行完毕，请到添加MOD中查看是否安装成功！"
+                    tmux kill-session -t DST_MODUPDATE
+                    break         
                 fi
-                tmux kill-session -t DST_MODUPDATE
-                break
             fi
         done
     else
