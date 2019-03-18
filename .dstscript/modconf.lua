@@ -1,4 +1,4 @@
--- script_ver="1.3.6"
+-- script_ver="1.3.7"
 require "modinfo"
 
 -- Addon function
@@ -212,12 +212,15 @@ function createmodcfg()
                     if j.options ~= nil and #j.options > 0 then
                         for k, v in pairs(j.options) do
                             if type(v.data) ~= "table" then
-                                local description = "不明项勿修改"
+                                local description = ""
                                 if v.description ~= nil then
                                     if string.len(v.description) >= 2 then
                                         description = Blank2jin(v.description)
                                         description = LuaRemove(description, "\n")
                                     end
+                                end
+                                if description == "" then
+                                    description = tostring(v.data)
                                 end
                                 local cfghover = "该项没有说明！"
                                 if v.hover ~= nil then

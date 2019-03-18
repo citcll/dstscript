@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://blog.wqlin.com
 #===============================================================================
-script_ver="2.4.1.1"
+script_ver="2.4.1.2"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -323,9 +323,9 @@ Show_mod_cfg(){
                 fi
                 if [ ${index} -lt 10 ]
                 then
-                    echo -e "\e[33m[ ${index}] $label：${Red_font_prefix}${value}${Font_color_suffix}\n    简介==>$hover\e[0m"
+                    echo -e "\e[33m[ ${index}] $label：${Red_font_prefix}${value}${Font_color_suffix}\n     简介==>$hover\e[0m"
                 else
-                    echo -e "\e[33m[${index}] $label：${Red_font_prefix}${value}${Font_color_suffix}\n    简介==>$hover\e[0m"
+                    echo -e "\e[33m[${index}] $label：${Red_font_prefix}${value}${Font_color_suffix}\n     简介==>$hover\e[0m"
                 fi
                 index=$[${index} + 1]
             done
