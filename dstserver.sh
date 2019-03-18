@@ -1544,15 +1544,22 @@ First_run_check(){
 }
 # open swap
 Open_swap(){
-    info "创建并开启虚拟内存 ..."
-    sudo dd if=/dev/zero of=/swapfile bs=1M count=2048
-    sudo mkswap /swapfile
-    sudo chmod 0600 /swapfile
-    sudo swapon /swapfile
-    sudo chmod 0666 /etc/fstab
-    echo "/swapfile swap swap defaults 0 0" >> /etc/fstab
-    sudo chmod 0644 /etc/fstab
-    info "虚拟内存已开启！"
+    if [ -f /swapfile ]
+    then
+        info "创建虚拟内存 ..."
+        sudo dd if=/dev/zero of=/swapfile bs=1M count=2048
+        sudo mkswap /swapfile
+        sudo chmod 0600 /swapfile
+        # 开机自启
+        sudo chmod 0666 /etc/fstab
+        echo "/swapfile swap swap defaults 0 0" >> /etc/fstab
+        sudo chmod 0644 /etc/fstab
+    fi
+    if [ $(free -m | grep -i swap | tr -cd [0-9]) == "000" ]
+    then
+        sudo swapon /swapfile    
+        info "虚拟内存已开启！"
+    fi
 }
 # 创建文件夹
 Mkdstdir(){
