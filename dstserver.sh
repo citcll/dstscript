@@ -131,12 +131,12 @@ Get_shard_array(){
 Get_single_shard(){
     Get_current_cluster
     Get_shard_array
-    for shard in "${shardarray}"
+    for shard in ${shardarray}
     do
         shardm=$shard
         if [ -f "${dst_base_dir}/${cluster}/${shardm}/server.ini" ]
         then
-            if [ "$(grep 'is_master = true' -c "${dst_base_dir}/${cluster}/${shardm}/server.ini")" -gt 0 ] 
+            if [ $(grep 'is_master = true' -c "${dst_base_dir}/${cluster}/${shardm}/server.ini") -gt 0 ] 
             then
                 shardm=$shard
                 break
@@ -197,7 +197,7 @@ Install_mod_collection(){
     while (true)
     do
         read clid
-        if [ "$clid -eq 0" ]
+        if [ "$clid" -eq 0 ]
         then
             info "合集添加完毕！即将安装 ..."
             break
@@ -225,7 +225,7 @@ Install_mod_collection(){
         do
             if tmux has-session -t DST_MODUPDATE > /dev/null 2>&1
             then
-                if [[ $(grep "Your Server Will Not Start" -c "${dst_base_dir}/downloadmod/Master/server_log.txt") > 0 ]]
+                if [[ $(grep "Your Server Will Not Start" -c "${dst_base_dir}/downloadmod/Master/server_log.txt") -gt 0 ]]
                 then              
                     info "安装进程已执行完毕，请到添加MOD中查看是否安装成功！"
                     tmux kill-session -t DST_MODUPDATE
@@ -250,7 +250,7 @@ Mod_Cfg(){
         Listusedmod
         info "请从以上列表选择你要配置的MOD${Red_font_prefix}[编号]${Font_color_suffix},完毕请输数字 0 ！"
         read modid
-        if [[ "${modid}" == "0" ]]
+        if [[ "${modid}" -eq 0 ]]
         then
             info "MOD配置完毕！"
             break
@@ -447,13 +447,15 @@ Get_installed_mod_version(){
 update_mod_cfg(){
     if [[ -f "${dst_server_dir}/mods/${moddir}/modinfo.lua" ]]
     then
-        echo "fuc = \"createmodcfg\""
-modid = "\"${moddir}\""
-used = \"true\" > "${data_dir}/modinfo.lua"
+        cat > "${data_dir}/modinfo.lua" <<-EOF
+fuc = "createmodcfg"
+modid = "${moddir}
+used = "true"
+EOF
         cat "${dst_server_dir}/mods/${moddir}/modinfo.lua" >> "${data_dir}/modinfo.lua"
-        cd "${data_dir}
-        lua modconf.lua" >/dev/null 2>&1
-        cd "${HOME}
+        cd "${data_dir}"
+        lua modconf.lua >/dev/null 2>&1
+        cd "${HOME}"
     else
         tip "请先安装并启用MOD！"
         break
@@ -462,9 +464,11 @@ used = \"true\" > "${data_dir}/modinfo.lua"
 
 # old
 MOD_conf(){
-    echo "fuc = \"${fuc}\"
-modid = \"${moddir}\"
-used = \"${used}\" > "${data_dir}/modinfo.lua"
+    cat > "${data_dir}/modinfo.lua" <<-EOF
+fuc = "${fuc}"
+modid = "${moddir}"
+used = "${used}"
+EOF
     if [[ -f "${dst_server_dir}/mods/${moddir}/modinfo.lua" ]]
     then
         cat "${dst_server_dir}/mods/${moddir}/modinfo.lua" >> "${data_dir}/modinfo.lua"
@@ -475,20 +479,22 @@ used = \"${used}\" > "${data_dir}/modinfo.lua"
         then
             Download_MOD
         fi
-        echo "fuc = \"${fuc}\"
-modid = \"${moddir}\"
-used = \"${used}\" > "${data_dir}/modinfo.lua"
+        cat > "${data_dir}/modinfo.lua" <<-EOF
+fuc = "${fuc}"
+modid = "${moddir}"
+used = "${used}"
+EOF
         if [[ -f "${dst_server_dir}/mods/${moddir}/modinfo.lua" ]]
         then
             cat "${dst_server_dir}/mods/${moddir}/modinfo.lua" >> "${data_dir}/modinfo.lua"
         else
-            echo "name = \"UNKNOWN\" >> "${data_dir}/modinfo.lua"
+            echo "name = \"UNKNOWN\"" >> "${data_dir}/modinfo.lua"
         fi
     fi
     
-    cd "${data_dir}
-    lua modconf.lua" >/dev/null 2>&1
-    cd "${HOME}
+    cd ${data_dir}
+    lua modconf.lua >/dev/null 2>&1
+    cd ${HOME}
 }
 Listallmod(){
     if [ ! -f "${data_dir}/mods_setup.lua" ]
@@ -498,15 +504,15 @@ Listallmod(){
     rm -f "${data_dir}/modconflist.lua"
     touch "${data_dir}/modconflist.lua"
     Get_single_shard
-    for moddir in "$(ls -F "${dst_server_dir}/mods" | grep "/$" | cut -d '/' -f1)
+    for moddir in $(ls -F "${dst_server_dir}/mods" | grep "/$" | cut -d '/' -f1)
     do
-        if [ "$(grep "${moddir}" -c "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua") -gt 0" ]
+        if [ $(grep "${moddir}" -c "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua") -gt 0 ]
         then
             used="true"
         else
             used="false"
         fi
-        if [[ "${moddir}" != " ]]
+        if [[ "${moddir}" != "" ]]
         then
             fuc="list"
             MOD_conf
@@ -518,10 +524,10 @@ Listusedmod(){
     rm -f "${data_dir}/modconflist.lua"
     touch "${data_dir}/modconflist.lua"
     Get_single_shard
-    for moddir in "$(grep "^  \[" "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua" | cut -d '"' -f2)
+    for moddir in $(grep "^  \[" "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua" | cut -d '"' -f2)
     do
         used="false"
-        if [[ "${moddir}" != " ]]
+        if [[ "${moddir}" != "" ]]
         then
             fuc="list"
             used="true"
@@ -552,11 +558,11 @@ Addmod(){
 }
 Addmodtoshard(){
     Get_shard_array
-    for shard in "${shardarray}
+    for shard in ${shardarray}
     do
         if [ -f "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua" ]
         then
-            if [[ "$(grep "${moddir}" -c "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua") > 0" ]]
+            if [ $(grep "${moddir}" -c "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua") -gt 0 ]
             then
                 info "${shard}世界该Mod(${moddir})已添加"
             else
@@ -573,14 +579,14 @@ Addmodtoshard(){
                 fi
             fi
         else
-            tip "${shard}" MOD配置文件未由脚本初始化，无法操作！如你已自行配置请忽略本提示！"
+            tip "${shard} MOD配置文件未由脚本初始化，无法操作！如你已自行配置请忽略本提示！"
         fi
     done
 }
 Truemodid(){
-    if [ "${modid}" -lt 10000" ]
+    if [ "${modid}" -lt 10000 ]
     then
-        moddir=$(sed -n "${modid}p "${data_dir}/modconflist.lua" | cut -d ':' -f3)
+        moddir=$(sed -n ${modid}p "${data_dir}/modconflist.lua" | cut -d ':' -f3)
     else
         moddir="workshop-${modid}"
     fi
@@ -593,11 +599,11 @@ Addmodfunc(){
 }
 Delmodfromshard(){
     Get_shard_array
-    for shard in "${shardarray}
+    for shard in ${shardarray}
     do
         if [ -f "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua" ]
         then
-            if [[ "$(grep "${moddir}" -c "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua") > 0" ]]
+            if [[ $(grep "${moddir}" -c "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua") -gt 0 ]]
             then
                 grep -n "^  \[" "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua" > "${data_dir}/modidlist.txt"
                 lastmodlinenum=$(cat "${data_dir}/modidlist.txt" | tail -n 1 | cut -d ":" -f1)
@@ -616,13 +622,13 @@ Delmodfromshard(){
                 info "${shard}世界该Mod(${moddir})未启用！"
             fi
         else
-            tip "${shard}" MOD配置文件未由脚本初始化，无法操作！如你已自行配置请忽略本提示！"
+            tip "${shard} MOD配置文件未由脚本初始化，无法操作！如你已自行配置请忽略本提示！"
         fi
     done
 }
 # 保证最后一个MOD配置结尾不含逗号
 Removelastcomma(){
-    for shard in "${shardarray}
+    for shard in ${shardarray}
     do
         if [ -f "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua" ]
         then
@@ -636,7 +642,7 @@ Delmod(){
     while (true)
     do
         read modid
-        if [[ "${modid}" == "0" ]]
+        if [[ "${modid}" -eq 0 ]]
         then
             info "MOD删除完毕！"
             break
@@ -682,16 +688,16 @@ Addlist(){
     while (true)
     do
         read kleiid
-        if [[ "${kleiid}" == "0" ]]
+        if [[ "${kleiid}" -eq 0 ]]
         then
             info "添加完毕！"
             break
         else
-            if [[ "$(grep "${kleiid}" -c "${data_dir}/${listfile}") > 0" ]]
+            if [[ $(grep "${kleiid}" -c "${data_dir}/${listfile}") -gt 0 ]]
             then
                 info "名单${kleiid}已经存在！"
             else
-                echo "${kleiid}" >> "${data_dir}/${listfile}
+                echo "${kleiid}" >> "${data_dir}/${listfile}"
                 info "名单${kleiid}已添加！"
             fi
         fi
@@ -704,12 +710,12 @@ Dellist(){
         grep -n "^" "${data_dir}/${listfile}"
         echo -e "\e[92m请输入你要移除的KLEIID${Red_font_prefix}[编号]${Font_color_suffix}，删除完毕请输入数字 0 \e[0m"
         read kleiid
-        if [[ "${kleiid}" == "0" ]]
+        if [[ "${kleiid}" -eq 0 ]]
         then
             info "移除完毕！"
             break
         else
-            sed -i "${kleid}d" "${data_dir}/${listfile}
+            sed -i "${kleid}d" "${data_dir}/${listfile}"
             info "名单已移除！"
         fi
     done
@@ -717,8 +723,8 @@ Dellist(){
 Cluster_manager(){
     cluster_str="删除"
     Choose_exit_cluster
-    rm -rf "${dst_base_dir}/${cluster}
-    info "存档 "${cluster}" 已删除！"
+    rm -rf "${dst_base_dir}/${cluster}"
+    info "存档【${cluster}】已删除！"
 }
 Auto_update(){
     Get_single_shard
@@ -730,7 +736,7 @@ Auto_update(){
             tmux attach-session -t Auto_update
             sleep 1
         else
-            tmux new-session -s Auto_update -d "bash "$HOME/dstserver.sh au"
+            tmux new-session -s Auto_update -d "bash $HOME/dstserver.sh au"
             info "自动更新已开启！即将跳转。。。退出请按Ctrl + B松开再按D!"
             sleep 1
             tmux attach-session -t Auto_update
@@ -749,9 +755,9 @@ Show_players(){
             tmux attach-session -t Show_players
             sleep 1
         else
-            tmux new-session -s Show_players -d "bash "$HOME/dstserver.sh sp"
+            tmux new-session -s Show_players -d "bash $HOME/dstserver.sh sp"
             tmux split-window -t Show_players
-            tmux send-keys -t Show_players:0 "bash "$HOME/dstserver.sh sa" C-m
+            tmux send-keys -t Show_players:0 "bash $HOME/dstserver.sh sa" C-m
             info "进程已开启。。。请再次执行命令进入!"
         fi
     else
@@ -763,7 +769,7 @@ Update_DST_Check(){
     info "正在检查游戏服务端是否有更新 。。。 请稍后 。。。"
     currentbuild=$(cat "${dst_server_dir}/version.txt")
     availablebuild=$(curl -s "${my_api_link}/" | sed 's/[ \t]*$//g' | tr -cd [0-9])
-    if [[ "${currentbuild}" != "${availablebuild}" && "${availablebuild}" != " ]]
+    if [[ "${currentbuild}" != "${availablebuild}" && "${availablebuild}" != "" ]]
     then
         dst_need_update=true
         dst_need_update_str="需要更新"
@@ -775,7 +781,7 @@ Update_DST_Check(){
 Force_update(){
     echo -e "\e[92m是否强制更新游戏服务端：1.是  2.否 ? \e[0m\c"
     read force
-    case "$force in
+    case $force in
         1)
         Get_server_status
         cur_serveropen=${serveropen}
@@ -822,14 +828,14 @@ Reboot_server(){
 exchangestatus(){
     if [ ! -f "${server_conf_file}" ]
     then
-        touch "${server_conf_file}
+        touch "${server_conf_file}"
     fi
-    if [ "$(grep "serveropen" -c "${server_conf_file}) -eq 0" ]
+    if [ $(grep "serveropen" -c "${server_conf_file}") -eq 0 ]
     then
-        echo "serveropen=$1" >> "${server_conf_file}
+        echo "serveropen=$1" >> "${server_conf_file}"
     else
-        str=$(grep "serveropen" "${server_conf_file})
-        sed -i "s/${str}/serveropen=$1/g" "${server_conf_file}
+        str=$(grep "serveropen" "${server_conf_file}")
+        sed -i "s/${str}/serveropen=$1/g" "${server_conf_file}"
     fi
 }
 Run_server(){
@@ -852,7 +858,7 @@ Run_server(){
 }
 Reboot_announce(){
     Get_shard_array
-    for shard in "${shardarray}
+    for shard in ${shardarray}
     do
         if tmux has-session -t DST_"${shard}" > /dev/null 2>&1
         then
@@ -868,8 +874,8 @@ Start_server(){
     echo -e "\e[92m是否新建存档: [y|n] (默认: y): \e[0m\c"
     read yn
     [[ -z "${yn}" ]] && yn="y"
-    new_cluster="
-    if [[ "${yn}" == [Yy]" ]]
+    unset new_cluster
+    if [[ "${yn}" == [Yy] ]]
     then
         echo -e "\e[92m请输入新建存档名称：（不要包含中文、符号和空格）\e[0m"
         read cluster
@@ -877,14 +883,14 @@ Start_server(){
         then
             tip "${cluster}存档已存在！是否删除已有存档：1.是  2.否？ "
             read ifdel
-            if [[ "$ifdel == "1" ]]
+            if [[ "$ifdel" -eq 1 ]]
             then
-                rm -rf "${dst_base_dir}/${cluster}
+                rm -rf "${dst_base_dir}/${cluster}"
             else
-                rm -rf "${dst_base_dir}/${cluster}/cluster.ini
+                rm -rf "${dst_base_dir}/${cluster}/cluster.ini"
             fi
         fi
-        mkdir -p "${dst_base_dir}/${cluster}
+        mkdir -p "${dst_base_dir}/${cluster}"
         Set_cluster
         Set_token
         new_cluster="true"
@@ -928,7 +934,7 @@ Shardconfig(){
     tip "只能有一个主世界！！！熔炉MOD房和挂机MOD房只能选主世界！！！"
     info "已创建${shardtype}[$sharddir]，这是一个：1. 主世界   2. 附从世界？ "
     read ismaster
-    if [ "${ismaster}" -eq 1" ]
+    if [ "${ismaster}" -eq 1 ]
     then
         shardmaster="true"
 		shardid=1
@@ -937,14 +943,14 @@ Shardconfig(){
 		# 非主世界采用随机数，防止冲突
 		shardid=$RANDOM
     fi
-    cat > "${dst_base_dir}/${cluster}/$sharddir/server.ini<<-EOF
+    cat > "${dst_base_dir}/${cluster}/$sharddir/server.ini"<<-EOF
 [NETWORK]
-server_port = "$[ 10997 + "$idnum" ]
+server_port = $((10997 + $idnum))
 
 
 [SHARD]
-is_master = "$shardmaster
-name = "${shardname}${idnum}
+is_master = $shardmaster
+name = ${shardname}${idnum}
 id = "$shardid
 
 
@@ -953,8 +959,8 @@ encode_user_path = true
 
 
 [STEAM]
-master_server_port = "$[ 27016 + "$idnum" ]
-authentication_port = "$[ 8766 + "$idnum" ]
+master_server_port = $((27016 + $idnum))
+authentication_port = $((8766 + $idnum))
 EOF
 }
 Getidnum(){
@@ -962,7 +968,7 @@ Getidnum(){
 }
 Createsharddir(){
     sharddir="${shardname}${idnum}"
-    mkdir -p "${dst_base_dir}/${cluster}/$sharddir
+    mkdir -p "${dst_base_dir}/${cluster}/$sharddir"
 }
 Addcaves(){
     shardtype="洞穴世界"
@@ -1010,34 +1016,34 @@ Import_cluster(){
 }
 Choose_exit_cluster(){
     echo -e "\e[92m已有存档：\e[0m"
-    ls -l "${dst_base_dir}" | awk '/^d/ {print "$NF}' | grep -v downloadmod > /tmp/dirlist.txt"
+    ls -l "${dst_base_dir}" | awk '/^d/ {print "$NF}' | grep -v downloadmod > "/tmp/dirlist.txt"
     index=1
-    for dirlist in "$(cat /tmp/dirlist.txt")
+    for dirlist in $(cat "/tmp/dirlist.txt")
     do
-        if [ "$(ls -l "${dst_base_dir}/${dirlist}" | grep -c ^d) -gt 0" ]
+        if [ $(ls -l "${dst_base_dir}/${dirlist}" | grep -c ^d) -gt 0 ]
         then
             if [ -f "${dst_base_dir}/${dirlist}/cluster.ini" ]
             then
-                cluster_name_str=$(cat "${dst_base_dir}/${dirlist}/cluster.ini | grep '^cluster_name =' | cut -d " " -f3)
+                cluster_name_str=$(cat "${dst_base_dir}/${dirlist}/cluster.ini" | grep '^cluster_name =' | cut -d " " -f3)
             fi
-            if [[ "$cluster_name_str == " ]]
+            if [[ "$cluster_name_str" == "" ]]
             then
                 cluster_name_str="不完整或已损坏的存档"
             fi
         else
             cluster_name_str="不完整或已损坏的存档"
         fi
-        echo "${index}. "${dirlist}：${cluster_name_str}"
+        echo "${index}. ${dirlist}：${cluster_name_str}"
         let index++
     done
     echo -e "\e[92m请输入你要${cluster_str}的存档${Red_font_prefix}[编号]${Font_color_suffix}：\e[0m\c"
     read listnum
-    cluster=$(cat /tmp/dirlist.txt" | head -n "${listnum}" | tail -n 1)
+    cluster=$(cat "/tmp/dirlist.txt" | head -n "${listnum}" | tail -n 1)
 }
 Close_server(){
     tip "正在关闭已开启的服务器（有的话） ..."
     unset nodone
-    for shard in "${shardarray}
+    for shard in ${shardarray}
     do
         if tmux has-session -t DST_"${shard}" > /dev/null 2>&1
         then
@@ -1048,9 +1054,9 @@ Close_server(){
             info "${shard}世界服务器未开启！"
         fi
     done
-    if [[ "$nodone == "true" ]]
+    if [[ "$nodone" == "true" ]]
     then
-        for shard in "${shardarray}
+        for shard in ${shardarray}
         do
             while (true)
             do
@@ -1061,7 +1067,7 @@ Close_server(){
                 fi
             done
         done
-        for shard in "${shardarray}
+        for shard in ${shardarray}
         do
             tmux kill-session -t DST_"${shard}" > /dev/null 2>&1
         done
@@ -1085,126 +1091,126 @@ Exit_show_players(){
 Set_cluster(){
     if [ -f "${dst_base_dir}/${cluster}/cluster.ini" ]
     then
-        rm -rf "${dst_base_dir}/${cluster}/cluster.ini
+        rm -rf "${dst_base_dir}/${cluster}/cluster.ini"
     fi
-    while (true)
-    do
-        clear
-        echo -e "\e[92m=============【存档槽：${cluster}】===============\e[0m"
-        index=1
-        cat "${dst_cluster_file}" | grep -v "script_ver" | while read line
-        do
-            ss=(${line})
-            if [ "${ss[4]}" != "readonly" ]
-            then
-                if [ "${ss[4]}" == "choose" ]
-                then
-                    for ((i=5;i<${#ss[*]};i++))
-                    do
-                        if [ "${ss[$i]}" == "${ss[1]}" ]
-                        then
-                            value=${ss[$i+1]}
-                        fi
-                    done
-                else
-                    # 处理替代空格的#号
-                    value=$(echo "${ss[1]}" | sed 's/#/ /g')
-                fi
-                if [ "${index}" -lt 10" ]
-                then
-                    echo -e "\e[33m[ "${index}] "${ss[2]}：${value}\e[0m"
-                else
-                    echo -e "\e[33m[${index}] "${ss[2]}：${value}\e[0m"
-                fi
-            fi
-            index=$[${index}" + 1]
-        done
-        echo -e "\e[92m===============================================\e[0m"
-        echo -e "\e[31m要开熔炉MOD房的要先在这里修改游戏模式为熔炉！！！\e[0m"
-        echo -e "\e[92m===============================================\e[0m"
-        cmd="
-        while (true)
-        do
-            if [[ "${cmd}" == " ]]
-            then
-                echo -e "\e[92m请选择你要更改的选项(修改完毕输入数字 0 确认修改并退出)：\e[0m\c"
-                read cmd
-            else
-                break
-            fi
-        done
-        case "${cmd}" in
-            0)
-            info "更改已保存！"
-               break
-               ;;
-            *)
-            changelist=($(sed -n "${cmd}p" "${dst_cluster_file}))
-            if [ "${changelist[4]}" = "choose" ]
-            then
-                echo -e "\e[92m请选择${changelist[2]}： \e[0m\c"
-                index=1
-                for ((i=5;i<${#changelist[*]};i=$i+2))
-                do
-                    echo -e "\e[92m${index}.${changelist[$[$i + 1]]}\e[0m\c"
-                    index=$[${index}" + 1]
-                done
-                echo -e "\e[92m: \e[0m\c"
-                read changelistindex
-                listnum=$[${changelistindex}" - 1]*2
-                changelist[1]=${changelist[$[$listnum + 5]]}
-            else
-                echo -e "\e[92m请输入${changelist[2]}：\e[0m\c"
-                read changestr
-                # 处理空格
-                changestr=$(echo "${changestr}" | sed 's/ /#/g')
-                changelist[1]=${changestr}
-            fi
-            changestr="${changelist[@]}"
-            sed -i "${cmd}c "${changestr}" "${dst_cluster_file}
-            ;;
-        esac
-    done
-    type=([STEAM] [GAMEPLAY] [NETWORK] [MISC] [SHARD])
-    for ((i=0;i<${#type[*]};i++))
-    do
-        echo "${type[i]}" >> "${dst_base_dir}/${cluster}/cluster.ini
-        cat "${dst_cluster_file}" | grep -v "script_ver" | while read lc
-        do
-            lcstr=($lc)
-            if [ "${lcstr[3]}" == "${type[i]}" ]
-            then
-                if [ "${lcstr[1]}" == "无" ]
-                then
-                    lcstr[1]="
-                fi
-                # 还原空格
-                value_str=$(echo "${lcstr[1]}" | sed 's/#/ /g')
-                echo "${lcstr[0]}" = "${value_str}" >> "${dst_base_dir}/${cluster}/cluster.ini
-            fi
-        done
-        echo " >> "${dst_base_dir}/${cluster}/cluster.ini
-    done
+    # while (true)
+    # do
+    #     clear
+    #     echo -e "\e[92m=============【存档槽：${cluster}】===============\e[0m"
+    #     index=1
+    #     cat "${dst_cluster_file}" | grep -v "script_ver" | while read line
+    #     do
+    #         ss=(${line})
+    #         if [ "${ss[4]}" != "readonly" ]
+    #         then
+    #             if [ "${ss[4]}" == "choose" ]
+    #             then
+    #                 for ((i=5;i<${#ss[*]};i++))
+    #                 do
+    #                     if [ "${ss[$i]}" == "${ss[1]}" ]
+    #                     then
+    #                         value=${ss[$i+1]}
+    #                     fi
+    #                 done
+    #             else
+    #                 # 处理替代空格的#号
+    #                 value=$(echo "${ss[1]}" | sed 's/#/ /g')
+    #             fi
+    #             if [ "${index}" -lt 10 ]
+    #             then
+    #                 echo -e "\e[33m[ ${index}] ${ss[2]}：${value}\e[0m"
+    #             else
+    #                 echo -e "\e[33m[${index}] ${ss[2]}：${value}\e[0m"
+    #             fi
+    #         fi
+    #         index=$((${index} + 1))
+    #     done
+    #     echo -e "\e[92m===============================================\e[0m"
+    #     echo -e "\e[31m要开熔炉MOD房的要先在这里修改游戏模式为熔炉！！！\e[0m"
+    #     echo -e "\e[92m===============================================\e[0m"
+    #     unset cmd
+    #     while (true)
+    #     do
+    #         if [[ "${cmd}" == "" ]]
+    #         then
+    #             echo -e "\e[92m请选择你要更改的选项(修改完毕输入数字 0 确认修改并退出)：\e[0m\c"
+    #             read cmd
+    #         else
+    #             break
+    #         fi
+    #     done
+    #     case "${cmd}" in
+    #         0)
+    #         info "更改已保存！"
+    #            break
+    #            ;;
+    #         *)
+    #         changelist=($(sed -n ${cmd}p "${dst_cluster_file}"))
+    #         if [ "${changelist[4]}" = "choose" ]
+    #         then
+    #             echo -e "\e[92m请选择${changelist[2]}： \e[0m\c"
+    #             index=1
+    #             for ((i=5;i<${#changelist[*]};i=$i+2))
+    #             do
+    #                 echo -e "\e[92m${index}.${changelist[$[$i + 1]]}\e[0m\c"
+    #                 index=$((${index} + 1))
+    #             done
+    #             echo -e "\e[92m: \e[0m\c"
+    #             read changelistindex
+    #             listnum=$(($((${changelistindex} - 1)) * 2))
+    #             changelist[1]=${changelist[$[$listnum + 5]]}
+    #         else
+    #             echo -e "\e[92m请输入${changelist[2]}：\e[0m\c"
+    #             read changestr
+    #             # 处理空格
+    #             changestr=$(echo "${changestr}" | sed 's/ /#/g')
+    #             changelist[1]=${changestr}
+    #         fi
+    #         changestr="${changelist[@]}"
+    #         sed -i ${cmd}c "${changestr}" ${dst_cluster_file}
+    #         ;;
+    #     esac
+    # done
+    #type=([STEAM] [GAMEPLAY] [NETWORK] [MISC] [SHARD])
+    # for (( i=0; i<${#type[*]}; i++ ))
+    # do
+    #     echo "${type[i]}" >> "${dst_base_dir}/${cluster}/cluster.ini"
+    #     cat "${dst_cluster_file}" | grep -v "script_ver" | while read lc
+    #     do
+    #         lcstr=($lc)
+    #         if [ "${lcstr[3]}" == "${type[i]}" ]
+    #         then
+    #             if [ "${lcstr[1]}" == "无" ]
+    #             then
+    #                 lcstr[1]=""
+    #             fi
+    #             # 还原空格
+    #             value_str=$(echo "${lcstr[1]}" | sed 's/#/ /g')
+    #             echo "${lcstr[0]} = ${value_str}" >> "${dst_base_dir}/${cluster}/cluster.ini"
+    #         fi
+    #     done
+    #     echo "" >> "${dst_base_dir}/${cluster}/cluster.ini"
+    # done
 }
 Set_token(){
     if [ -f "${dst_token_file}" ]
     then
-        default_token=$(cat "${dst_token_file})
+        default_token=$(cat "${dst_token_file}")
     else
         default_token="pds-g^KU_6yNrwFkC^9WDPAGhDM9eN6y2v8UUjEL3oDLdvIkt2AuDQB2mgaGE="
     fi
-    info "当前预设的服务器令牌：\n "${default_token}"
+    info "当前预设的服务器令牌：\n ${default_token}"
     echo -e "\e[92m是否更改？ 1.是  2.否 : \e[0m\c"
     read ch
-    if [ "$ch -eq 1" ]
+    if [ $ch -eq 1 ]
     then
         tip "请输入或粘贴你的令牌到此处："
         read mytoken
         mytoken=$(echo "${mytoken}" | sed 's/ //g')
-        echo "${mytoken}" > "${dst_token_file}
+        echo "${mytoken}" > "${dst_token_file}"
         info "已更改服务器默认令牌！"
     else
-        echo "${default_token}" >${dst_token_file}
+        echo "${default_token}" > ${dst_token_file}
     fi
     cat "${dst_token_file}" > "${dst_base_dir}/${cluster}/cluster_token.txt"
 }
@@ -1254,11 +1260,11 @@ Set_world(){
         read wc
         configure_file="${data_dir}/${shardname}leveldata.txt"
         data_file="${dst_base_dir}/${cluster}/${sharddir}/leveldataoverride.lua"
-        if [ "${wc}" -ne 2" ]
+        if [ "${wc}" -ne 2 ]
         then
             Set_world_config
         fi
-        Write_in "${shardname}
+        Write_in ${shardname}
     fi
 }
 Set_world_config(){
@@ -1281,9 +1287,9 @@ Set_world_config(){
             cat "${configure_file}" | grep -v "script_ver" | while read line
             do
                 ss=(${line})
-                if [ "${#ss[@]}" -gt 4" ]
+                if [ "${#ss[@]}" -gt 4 ]
                 then
-                    if [ "${index}" -gt 3" ]
+                    if [ "${index}" -gt 3 ]
                     then
                         printf "\n"
                         index=1
@@ -1297,23 +1303,23 @@ Set_world_config(){
                     done
                     if [ "${list[$j]}" == "${ss[2]}" ]
                     then
-                        if [ "${linenum}" -lt 10" ]
+                        if [ "${linenum}" -lt 10 ]
                         then
-                            printf "%-21s\t" "[ "${linenum}]${ss[3]}: "${value}"
+                            printf "%-21s\t" "[ ${linenum}]${ss[3]}: ${value}"
                         else
-                            printf "%-21s\t" "[${linenum}]${ss[3]}: "${value}"
+                            printf "%-21s\t" "[${linenum}]${ss[3]}: ${value}"
                         fi
-                        index=$[${index}" + 1]
+                        index=$((${index} + 1))
                     fi
                 fi
-                linenum=$[${linenum}" + 1]
+                linenum=$((${linenum} + 1))
             done
         done
         printf "\n"
-        cmd="
+        unset cmd
         while (true)
         do
-            if [[ "${cmd}" == " ]]
+            if [[ "${cmd}" == "" ]]
             then
                 echo -e "\e[92m请选择你要更改的选项(修改完毕输入数字 0 确认修改并退出)： \e[0m\c"
                 read cmd
@@ -1327,26 +1333,26 @@ Set_world_config(){
             break
             ;;
             *)
-            changelist=($(sed -n "${cmd}p" "${configure_file}))
+            changelist=($(sed -n "${cmd}p" "${configure_file}"))
                echo -e "\e[92m请选择${changelist[3]}： \e[0m\c"
                index=1
                for ((i=4;i<${#changelist[*]};i=$i+2))
                do
-                   echo -e "\e[92m${index}.${changelist[$[$i + 1]]}"   \e[0m\c"
-                   index=$[${index}" + 1]
+                   echo -e "\e[92m${index}.${changelist[$[$i + 1]]}   \e[0m\c"
+                   index=$[${index} + 1]
                done
                echo -e "\e[92m: \e[0m\c"
                read changelistindex
-               listnum=$[${changelistindex}" - 1]*2
+               listnum=$[${changelistindex} - 1]*2
                changelist[1]=${changelist[$[$listnum + 4]]}
                changestr="${changelist[@]}"
-               sed -i "${cmd}c "${changestr}" "${configure_file};;
+               sed -i ${cmd}c "${changestr}" "${configure_file}";;
         esac
     done
 }
 Write_in(){
     data_num=$[$(grep -n "^" "${configure_file}" | tail -n 1 | cut -d : -f1) - 1]
-    cat "${data_dir}/${1}start.lua" > "${data_file}
+    cat "${data_dir}/${1}start.lua" > "${data_file}"
     index=1
     cat "${configure_file}" | grep -v "script_ver" | while read line
     do
@@ -1364,13 +1370,13 @@ Write_in(){
         else
             str="[\"${ss[0]}\"]=\"${ss[1]}\"${char}"
         fi
-        echo "    "${str}" >> "${data_file}
+        echo "    ${str}" >> "${data_file}"
     done
-    cat "${data_dir}/${1}end.lua" >> "${data_file}
+    cat "${data_dir}/${1}end.lua" >> "${data_file}"
 }
 Default_mod(){
     Get_shard_array
-    for shard in "${shardarray}
+    for shard in ${shardarray}
     do
         if [ ! -f "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua" ]
         then
@@ -1387,9 +1393,9 @@ Setup_mod(){
     touch "${data_dir}/mods_setup.lua"
     Get_single_shard
     dir=$(cat "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua" | grep "workshop" | cut -f2 -d '"' | cut -d "-" -f2)
-    for moddir in "${dir}
+    for moddir in ${dir}
     do
-        if [[ "$(grep "${moddir}" -c "${data_dir}/mods_setup.lua") = 0" ]]
+        if [[ $(grep "${moddir}" -c "${data_dir}/mods_setup.lua") = 0 ]]
         then
             echo "ServerModSetup(\"${moddir}\")" >> "${data_dir}/mods_setup.lua"
         fi
@@ -1398,12 +1404,12 @@ Setup_mod(){
     info "添加启用的MODID到MOD更新配置文件！"
 }
 Start_shard(){
-    if [[ "$MOD_update == "true" ]]
+    if [[ "$MOD_update" == "true" ]]
     then
         Setup_mod
     fi
     cd "${dst_server_dir}/bin"
-    for shard in "${shardarray}
+    for shard in ${shardarray}
     do
         Save_log
         unset TMUX
@@ -1414,24 +1420,24 @@ Save_log(){
     cur_day=$(date "+%F")
     if [ ! -d "$log_save_dir/$cur_day" ]
     then
-        mkdir -p "$log_save_dir/$cur_day
+        mkdir -p "$log_save_dir/$cur_day"
     fi
     info "旧的日志已备份到【$log_save_dir】。"
     cur_time=$(date "+%T")
-    echo "$(date) >> "$log_save_dir/$cur_day/server_chat_log_backup_${cluster}_${shard}_${cur_time}.txt"
+    echo "$(date)" >> "$log_save_dir/$cur_day/server_chat_log_backup_${cluster}_${shard}_${cur_time}.txt"
     cp "$dst_base_dir/$cluster/$shard/server_chat_log.txt" "$log_save_dir/$cur_day/server_chat_log_backup_${cluster}_${shard}_${cur_time}.txt" >/dev/null 2>&1
-    echo "$(date) >> "$log_save_dir/$cur_day/server_log_backup_${cluster}_${shard}_${cur_time}.txt"
+    echo "$(date)" >> "$log_save_dir/$cur_day/server_log_backup_${cluster}_${shard}_${cur_time}.txt"
     cp  "$dst_base_dir/$cluster/$shard/server_log.txt" "$log_save_dir/$cur_day/server_log_backup_${cluster}_${shard}_${cur_time}.txt" >/dev/null 2>&1
 }
 Pid_kill(){
-    kill "$(ps -ef | grep -v grep | grep "$1 | awk '{print "$2}')
+    kill $(ps -ef | grep -v grep | grep $1 | awk '{print "$2}')
 }
 Start_check(){
     Get_shard_array
     rm "${ays_log_file}" >/dev/null 2>&1
-    touch "${ays_log_file}
+    touch "${ays_log_file}"
     shardnum=0
-    for shard in "$shardarray
+    for shard in $shardarray
     do
         unset TMUX
         tmux new-session -s DST_"${shard}"_log -d "bash "$HOME/dstserver.sh ay "$shard"
@@ -1439,21 +1445,21 @@ Start_check(){
     done
     ANALYSIS_SHARD=0
     any_log_index=1
-    any_old_line="
+    unset any_old_line
     while (true)
     do
-        if [ "$ANALYSIS_SHARD -lt "$shardnum" ]
+        if [ "$ANALYSIS_SHARD" -lt $shardnum ]
         then
             anyline=$(sed -n "${any_log_index}p "${ays_log_file})
-            if [[ "$anyline != " && "$anyline != "$any_old_line" ]]
+            if [[ "$anyline" != "" && "$anyline" != "$any_old_line" ]]
             then
                 any_log_index=$[$any_log_index + 1]
                 any_old_line=$anyline
-                if [ "$(echo "$anyline | grep -c ANALYSISLOGDONE) -gt 0" ]
+                if [ $(echo "$anyline" | grep -c ANALYSISLOGDONE) -gt 0 ]
                 then
                     ANALYSIS_SHARD=$[$ANALYSIS_SHARD +1]
                 else
-                    info "$anyline
+                    info "$anyline"
                 fi
             fi
         else
@@ -1464,56 +1470,56 @@ Start_check(){
     rm "${data_dir}/needupdatemodlist.txt" > /dev/null 2>&1
 }
 Analysis_log(){
-    log_file=${dst_base_dir}/${cluster}/$1/server_log.txt"
+    log_file="${dst_base_dir}/${cluster}/$1/server_log.txt"
     cp "${log_arr_str}" "${data_dir}/log_arr_str_$1.txt"
     if [ -f "$log_file" ]
     then
         RES="ok"
         log_index=1
-        old_line1="
+        unset old_line1
         retrytime=0
         while [ "$RES" = "ok" ]
         do
-            RES=`flock -x -n "$log_file -c "echo ok"`
-            line1=$(sed -n "${log_index}p "$log_file)
-            if [[ "$line1 != "$old_line1" ]]
+            RES=`flock -x -n "$log_file" -c "echo ok"`
+            line1="$(sed -n ${log_index}p "$log_file")"
+            if [[ "$line1" != "$old_line1" ]]
             then
                 log_index=$[$log_index + 1]
                 old_line1=$line1
             fi
             while read line
             do
-                if [[ "$line =~ '.*script_ver.*'" ]]
+                if [[ $line =~ '.*script_ver.*' ]]
                 then
                     break
                 else
-                    line_0=$(echo "$line | cut -d '@' -f1)
-                    line_1=$(echo "$line | cut -d '@' -f2)
-                    line_2=$(echo "$line | cut -d '@' -f3)
-                    if [[ "$line1 =~ "$line_1" ]]
+                    line_0=$(echo $line | cut -d '@' -f1)
+                    line_1=$(echo $line | cut -d '@' -f2)
+                    line_2=$(echo $line | cut -d '@' -f3)
+                    if [[ "$line1" =~ "$line_1" ]]
                     then
-                        case "$line_0 in
+                        case "$line_0" in
                             1)
-                            echo "$1:$line_2" >> "$ays_log_file
+                            echo "$1:$line_2" >> "$ays_log_file"
                             RES="done"
-                            echo "$1:ANALYSISLOGDONE" >> "$ays_log_file
+                            echo "$1:ANALYSISLOGDONE" >> "$ays_log_file"
                             break;;
                             2)
                             retrytime=$[$retrytime + 1]
-                            if [ "$retrytime -le 5" ]
+                            if [ "$retrytime" -le 5 ]
                             then
-                                echo "$1:连接失败！第$retrytime次连接重试！" >> "$ays_log_file
+                                echo "$1:连接失败！第$retrytime次连接重试！" >> "$ays_log_file"
                             else
-                                echo "$1:$line_2" >> "$ays_log_file
-                                num=$(grep "$line_2 -n "${data_dir}/log_arr_str_$1.txt" | cut -d ":" -f1)
+                                echo "$1:$line_2" >> "$ays_log_file"
+                                num=$(grep "$line_2" -n "${data_dir}/log_arr_str_$1.txt" | cut -d ":" -f1)
                                 sed -i "${num}d" "${data_dir}/log_arr_str_$1.txt"
                                 RES="done"
-                                echo "$1:ANALYSISLOGDONE" >> "$ays_log_file
+                                echo "$1:ANALYSISLOGDONE" >> "$ays_log_file"
                             fi
                             break;;
                             *)
-                            echo "$1:$line_2" >> "$ays_log_file
-                            num=$(grep "$line_2 -n "${data_dir}/log_arr_str_$1.txt" | cut -d ":" -f1)
+                            echo "$1:$line_2" >> "$ays_log_file"
+                            num=$(grep "$line_2" -n "${data_dir}/log_arr_str_$1.txt" | cut -d ":" -f1)
                             sed -i "${num}d" "${data_dir}/log_arr_str_$1.txt"
                             break;;
                         esac
@@ -1544,7 +1550,7 @@ First_run_check(){
 }
 # open swap
 Open_swap(){
-    if [ -f /swapfile" ]
+    if [ -f "/swapfile" ]
     then
         info "创建虚拟内存 ..."
         sudo dd if=/dev/zero of=/swapfile bs=1M count=2048
@@ -1555,7 +1561,7 @@ Open_swap(){
         echo "/swapfile swap swap defaults 0 0" >> /etc/fstab
         sudo chmod 0644 /etc/fstab
     fi
-    if [ "$(free -m | grep -i swap | tr -cd [0-9]) == "000" ]
+    if [ $(free -m | grep -i swap | tr -cd [0-9]) == "000" ]
     then
         sudo swapon /swapfile    
         info "虚拟内存已开启！"
@@ -1563,14 +1569,14 @@ Open_swap(){
 }
 # 创建文件夹
 Mkdstdir(){
-    mkdir -p "${HOME}/steamcmd
-    mkdir -p "${dst_server_dir}
-    mkdir -p "${DST_conf_basedir}/${DST_conf_dirname}
-    mkdir -p "${data_dir}
+    mkdir -p "${HOME}/steamcmd"
+    mkdir -p "${dst_server_dir}"
+    mkdir -p "${DST_conf_basedir}/${DST_conf_dirname}"
+    mkdir -p "${data_dir}"
 }
 # 检查当前系统信息
 Check_sys(){
-    if [[ -f /etc/redhat-release" ]]
+    if [[ -f "/etc/redhat-release" ]]
     then
         release="centos"
     elif cat /etc/issue | grep -q -E -i "debian"
@@ -1624,20 +1630,20 @@ Install_Dependency(){
 # Install steamcmd
 Install_Steamcmd(){
     wget "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz"
-    tar -xzvf steamcmd_linux.tar.gz -C "${HOME}/steamcmd
-    chmod +x "${HOME}/steamcmd/steamcmd.sh
+    tar -xzvf steamcmd_linux.tar.gz -C "${HOME}/steamcmd"
+    chmod +x "${HOME}/steamcmd/steamcmd.sh"
     rm steamcmd_linux.tar.gz
 }
 # Install DST Dedicated Server
 Install_Game(){
-    cd "${HOME}/steamcmd || exit 1
+    cd "${HOME}/steamcmd" || exit 1
     ./steamcmd.sh +login "anonymous" +force_install_dir "${dst_server_dir}" +app_update "343050" validate +quit
 }
 # 修复SteamCMD [S_API FAIL] SteamAPI_Init() failed;
 Fix_steamcmd(){
     info "修复Steamcmd可能存在的依赖问题 ..."
     mkdir -p "${HOME}/.steam/sdk32"
-    cp -v "${HOME}/steamcmd/linux32/steamclient.so "${HOME}/.steam/sdk32/steamclient.so"
+    cp -v "${HOME}/steamcmd/linux32/steamclient.so" "${HOME}/.steam/sdk32/steamclient.so"
     # fix lib for centos
     if [[ "${release}" == "centos" ]] && [ ! -f "${dst_server_dir}/bin/lib32/libcurl-gnutls.so.4" ]
     then
@@ -1649,19 +1655,19 @@ Fix_steamcmd(){
 # Show change log
 Show_changelog(){
     echo -e "\e[33m============================脚本更新说明====================================\e[0m"
-    wget "${update_link}/.dstscript/changelog.txt" -O /tmp/changelog.txt" > /dev/null 2>&1
-    datelog=$(cat /tmp/changelog.txt" | head -n 1)
-    cat /tmp/changelog.txt" | grep -A 20 "更新日志 "${datelog}"
+    wget "${update_link}/.dstscript/changelog.txt" -O "/tmp/changelog.txt" > /dev/null 2>&1
+    datelog=$(cat "/tmp/changelog.txt" | head -n 1)
+    cat "/tmp/changelog.txt" | grep -A 20 "更新日志 ${datelog}"
     echo -e "\e[33m============================================================================\e[0m"
     sleep 3
 }
 # 脚本更新
 Update_script(){
     info "正在检查脚本是否有更新 。。。 请稍后 。。。"
-    wget "${update_link}/.dstscript/filelist.txt" -O /tmp/filelist.txt" > /dev/null 2>&1
-    for file in "$(cat /tmp/filelist.txt" | cut -d ":" -f1)
+    wget "${update_link}/.dstscript/filelist.txt" -O "/tmp/filelist.txt" > /dev/null 2>&1
+    for file in $(cat "/tmp/filelist.txt" | cut -d ":" -f1)
     do
-        new_ver=$(cat /tmp/filelist.txt" | grep "${file}" | cut -d ":" -f2)
+        new_ver=$(cat "/tmp/filelist.txt" | grep "${file}" | cut -d ":" -f2)
         if [[ "${file}" != "dstserver.sh" ]]
         then
             truefile=".dstscript/${file}"
@@ -1677,10 +1683,10 @@ Update_script(){
         [[ -z "${new_ver}" ]] && new_ver=${cur_ver}
         if [[ "${new_ver}" != "${cur_ver}" ]]
         then
-            info "${file}" 发现新版本[ "${new_ver}" ]，更新中..."
+            info "${file} 发现新版本[ ${new_ver} ]，更新中..."
             wget "${update_link}/${truefile}" -O "${HOME}/${truefile}" > /dev/null 2>&1
-            chmod +x "${HOME}/dstserver.sh
-            info "${file}" 已更新为最新版本[ "${new_ver}" ] !"
+            chmod +x "${HOME}/dstserver.sh"
+            info "${file} 已更新为最新版本[ ${new_ver} ] !"
             if [[ "${file}" == "dstserver.sh" ]]
             then
                 need_exit="true"
@@ -1711,24 +1717,24 @@ Update_DST_MOD_Check(){
     rm "${data_dir}/needupdatemodlist.txt" > /dev/null 2>&1
     touch "${data_dir}/needupdatemodlist.txt"
     Get_single_shard
-    for modid in "$(grep '^  \["workshop-' "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua" | cut -d '"' -f2 | cut -d '-' -f2)
+    for modid in $(grep '^  \["workshop-' "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua" | cut -d '"' -f2 | cut -d '-' -f2)
     do
         mod_new_ver=$(curl -s "${my_api_link}/?type=mod&modid=${modid}" | sed 's/[ \t]*$//g')
         if [ -f "${dst_server_dir}/mods/workshop-${modid}/modinfo.lua" ]
         then
-            echo "fuc=\"getver\" > "${data_dir}/modinfo.lua"
+            echo "fuc = \"getver\"" > "${data_dir}/modinfo.lua"
             cat "${dst_server_dir}/mods/workshop-${modid}/modinfo.lua" >> "${data_dir}/modinfo.lua"
-            cd "${data_dir}
-            mod_cur_ver=$(lua modconf.lua")
-            echo "fuc=\"getname\" > "${data_dir}/modinfo.lua"
+            cd "${data_dir}"
+            mod_cur_ver=$(lua modconf.lua)
+            echo "fuc=\"getname\"" > "${data_dir}/modinfo.lua"
             cat "${dst_server_dir}/mods/workshop-${modid}/modinfo.lua" >> "${data_dir}/modinfo.lua"
-            cd "${data_dir}
-            cur_mod_name=$(lua modconf.lua")
+            cd "${data_dir}"
+            cur_mod_name=$(lua modconf.lua)
         else
             mod_cur_ver=000
             cur_mod_name="未知名称"
         fi
-        if [[ "${mod_new_ver}" != " && "${mod_cur_ver}" != " && "${mod_new_ver}" != "nil" && "${mod_new_ver}" != "${mod_cur_ver}" ]]
+        if [[ "${mod_new_ver}" != "" && "${mod_cur_ver}" != "" && "${mod_new_ver}" != "nil" && "${mod_new_ver}" != "${mod_cur_ver}" ]]
         then
             info "MOD 有更新(${modid}[${cur_mod_name}][${mod_cur_ver}" ==> "${mod_new_ver}])，即将更新 ..."
             MOD_update="true"
@@ -1741,7 +1747,7 @@ Update_DST_MOD_Check(){
 Status_keep(){
     Get_current_cluster
     Get_shard_array
-    for shard in "$shardarray
+    for shard in $shardarray
     do
         if ! tmux has-session -t DST_"${shard}" > /dev/null 2>&1
         then
@@ -1751,7 +1757,7 @@ Status_keep(){
             server_alive=true
         fi
     done
-    if [[ "$(grep "serveropen" "${server_conf_file}" | cut -d "=" -f2) == "true" &&  "${server_alive}" == "false" ]]
+    if [[ $(grep "serveropen" "${server_conf_file}" | cut -d "=" -f2) == "true" &&  "${server_alive}" == "false" ]]
     then
         tip "服务器异常退出，即将重启 ..."
         Reboot_server
@@ -1759,10 +1765,10 @@ Status_keep(){
 }
 Simple_server_status(){
     cluster="无"
-    server_on="
+    unset server_on
     Get_current_cluster
     Get_shard_array
-    for shard in "${shardarray}
+    for shard in ${shardarray}
     do
         if tmux has-session -t DST_"${shard}" > /dev/null 2>&1
         then
@@ -1776,12 +1782,12 @@ Simple_server_status(){
         auto_on="关闭"
     fi
     cluster_name="无"
-    if [[ "${server_on}" == " ]]
+    if [[ "${server_on}" == "" ]]
     then
         server_on="无"
     fi
-    [ -f "${dst_base_dir}/${cluster}/cluster.ini" ] && cluster_name=$(cat "${dst_base_dir}/${cluster}/cluster.ini | grep "^cluster_name" | cut -d "=" -f2)
-    echo -e "\e[33m存档: "${cluster}"   开启的世界：${server_on}"   名称: "${cluster_name}\e[0m"
+    [ -f "${dst_base_dir}/${cluster}/cluster.ini" ] && cluster_name=$(cat "${dst_base_dir}/${cluster}/cluster.ini" | grep "^cluster_name" | cut -d "=" -f2)
+    echo -e "\e[33m存档: ${cluster}   开启的世界：${server_on}   名称: ${cluster_name}\e[0m"
     echo -e "\e[33m自动更新维护：${auto_on}\e[0m"
 }
 # 清楚旧版本修改的hosts
@@ -1826,21 +1832,21 @@ Download_MOD(){
     info "正在安装/更新新添加的MOD(合集)，请稍候 。。。"
     if [ ! -d "${dst_base_dir}/downloadmod/Master" ]
     then
-        mkdir -p "${dst_base_dir}/downloadmod/Master
+        mkdir -p "${dst_base_dir}/downloadmod/Master"
     fi
     if tmux has-session -t DST_MODUPDATE > /dev/null 2>&1
     then
         tmux kill-session -t DST_MODUPDATE
     fi
     Del_need_update_mod_folder
-    cd "${dst_server_dir}/bin || exit 1
-    tmux new-session -s DST_MODUPDATE -d "${dst_bin_cmd}" -persistent_storage_root "${dst_conf_basedir}" -cluster downloadmod -shard Master"
+    cd "${dst_server_dir}/bin" || exit 1
+    tmux new-session -s DST_MODUPDATE -d "${dst_bin_cmd}" -persistent_storage_root "${dst_conf_basedir}" -cluster downloadmod -shard Master
     sleep 3
     while (true)
     do
         if tmux has-session -t DST_MODUPDATE > /dev/null 2>&1
         then
-            if [[ "$(grep "Your Server Will Not Start" -c "${dst_base_dir}/downloadmod/Master/server_log.txt") > 0" ]]
+            if [[ $(grep "Your Server Will Not Start" -c "${dst_base_dir}/downloadmod/Master/server_log.txt") -gt 0 ]]
             then
                 Update_DST_MOD_Check > /dev/null 2>&1
                 if [[ "${MOD_update}" == "true" ]]
@@ -1867,7 +1873,7 @@ Del_need_update_mod_folder(){
         do
             if [ -d "${dst_server_dir}/mods/workshop-${line}" ]
             then
-                rm -rf "${dst_server_dir}/mods/workshop-${line}
+                rm -rf "${dst_server_dir}/mods/workshop-${line}"
             fi
         done < "${data_dir}/needupdatemodlist.txt"
         info "旧版本MOD清除完毕！"
@@ -1898,7 +1904,7 @@ Send_md5_ip(){
         old_time=$(cat "${data_dir}/ipmd5.txt")
         cycle=$[ "${cur_time}" - "${old_time}" ]
         # 周期为七天
-        if [ "$cycle -gt 604800" ]
+        if [ $cycle -gt 604800 ]
         then
             Post_ipmd5
         fi
@@ -1911,7 +1917,7 @@ then
     dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
 fi
 ###
-if [[ "$1 == "au" ]]; then
+if [[ "$1" == "au" ]]; then
     while (true)
     do
         clear
@@ -1928,13 +1934,13 @@ if [[ "$1 == "au" ]]; then
         sleep 300
     done
 fi
-if [[ "$1 == "sp" ]]; then
+if [[ "$1" == "sp" ]]; then
     clear
     echo -e "\e[33m=====饥荒联机版独立服务器脚本当前玩家记录后台[Linux-Steam](${script_ver})=====\e[0m"
     Get_single_shard
     tail -f "${dst_base_dir}/${cluster}/${shard}/server_chat_log.txt" | cut -d " " -f2-100
 fi
-if [[ "$1 == "sa" ]]; then
+if [[ "$1" == "sa" ]]; then
     while (true)
     do
         clear
@@ -1947,9 +1953,9 @@ if [[ "$1 == "sa" ]]; then
         sleep 1
     done
 fi
-if [[ "$1 == "ay" ]]; then
+if [[ "$1" == "ay" ]]; then
     Get_current_cluster
-    Analysis_log "$2
+    Analysis_log "$2"
     exit
 fi
 # 移动根目录到隐藏目录
@@ -1960,11 +1966,11 @@ fi
 # 卸载重装
 if [ ! -d "${data_dir}" ]
 then
-    mkdir -p "${data_dir}
+    mkdir -p "${data_dir}"
 fi
 if [ ! -d "${data_dir}/playerhistory" ]
 then
-    mkdir -p "${data_dir}/playerhistory
+    mkdir -p "${data_dir}/playerhistory"
 fi
 # 迁移存档根目录到显性目录
 Move_base_dir(){
@@ -1975,13 +1981,13 @@ Move_base_dir(){
         tip "为方便小白找到存档根目录，根目录迁移至[${dst_conf_basedir}]，不再为隐藏目录"
         info "是否现在转移现有存档，为保证数据安全这将关闭正在运行的服务器：1.是   2.否？"
         read ismove
-        if [[ "$ismove == "1" ]]
+        if [[ "$ismove" == "1" ]]
         then
             Get_shard_array
             Close_server
             info "正在转移已有存档。。。请勿中断。。。"
-            mkdir -p "$HOME/Klei        
-            cp -r "$HOME/.klei/* "$HOME/Klei/ > /dev/null 2>&1
+            mkdir -p "$HOME/Klei"      
+            cp -r "$HOME/.klei/*" "$HOME/Klei/" > /dev/null 2>&1
             info "存档转移到[$HOME/Klei]。完毕！！！"
             touch "${data_dir}/Move_base_dir.txt"
             dst_conf_basedir="$HOME/Klei"
