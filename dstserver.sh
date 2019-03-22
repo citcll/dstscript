@@ -150,7 +150,7 @@ Get_single_shard(){
 }
 Get_current_cluster(){
     cluster="无"
-    [ -f "${server_conf_file}" ] && cluster=$(cat "${server_conf_file}" | grep "^cluster" | cut -d "=" -f2)
+    [ -f "${server_conf_file}" ] && cluster=$(grep "^cluster" "${server_conf_file}" | cut -d "=" -f2)
 }
 Get_server_status(){
     [ -f "${server_conf_file}" ] && serveropen=$(grep "serveropen" "${server_conf_file}" | cut -d "=" -f2)
@@ -283,7 +283,7 @@ Show_mod_cfg(){
     Get_data_from_file "${mod_cfg_dir}/${moddir}.cfg" "mod-configureable"
     c_able=$result
     c_line=$(grep "^" -n "${mod_cfg_dir}/${moddir}.cfg"| tail -n 1 | cut -d : -f1)
-    if [[ "$c_able" == "true" && "$c_line -gt 3" ]]
+    if [[ "$c_able" == "true" && "$c_line" -gt 3 ]]
     then
         Get_data_from_file "${mod_cfg_dir}/${moddir}.cfg" "mod-version"
         c_ver=$result
@@ -615,7 +615,7 @@ Delmodfromshard(){
                     down=$(grep -A 1 "${moddir}" "${data_dir}/modidlist.txt" | tail -1 |cut -d ":" -f1)
                 fi
                 upnum=${up}
-                downnum=$((${down}" - 1))
+                downnum=$((${down} - 1))
                 sed -i "${upnum},${downnum}d" "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua"
                 info "${shard}世界该Mod(${moddir})已停用！"
             else
@@ -1093,105 +1093,106 @@ Set_cluster(){
     then
         rm -rf "${dst_base_dir}/${cluster}/cluster.ini"
     fi
-    # while (true)
-    # do
-    #     clear
-    #     echo -e "\e[92m=============【存档槽：${cluster}】===============\e[0m"
-    #     index=1
-    #     cat "${dst_cluster_file}" | grep -v "script_ver" | while read line
-    #     do
-    #         ss=(${line})
-    #         if [ "${ss[4]}" != "readonly" ]
-    #         then
-    #             if [ "${ss[4]}" == "choose" ]
-    #             then
-    #                 for ((i=5;i<${#ss[*]};i++))
-    #                 do
-    #                     if [ "${ss[$i]}" == "${ss[1]}" ]
-    #                     then
-    #                         value=${ss[$i+1]}
-    #                     fi
-    #                 done
-    #             else
-    #                 # 处理替代空格的#号
-    #                 value=$(echo "${ss[1]}" | sed 's/#/ /g')
-    #             fi
-    #             if [ "${index}" -lt 10 ]
-    #             then
-    #                 echo -e "\e[33m[ ${index}] ${ss[2]}：${value}\e[0m"
-    #             else
-    #                 echo -e "\e[33m[${index}] ${ss[2]}：${value}\e[0m"
-    #             fi
-    #         fi
-    #         index=$((${index} + 1))
-    #     done
-    #     echo -e "\e[92m===============================================\e[0m"
-    #     echo -e "\e[31m要开熔炉MOD房的要先在这里修改游戏模式为熔炉！！！\e[0m"
-    #     echo -e "\e[92m===============================================\e[0m"
-    #     unset cmd
-    #     while (true)
-    #     do
-    #         if [[ "${cmd}" == "" ]]
-    #         then
-    #             echo -e "\e[92m请选择你要更改的选项(修改完毕输入数字 0 确认修改并退出)：\e[0m\c"
-    #             read cmd
-    #         else
-    #             break
-    #         fi
-    #     done
-    #     case "${cmd}" in
-    #         0)
-    #         info "更改已保存！"
-    #            break
-    #            ;;
-    #         *)
-    #         changelist=($(sed -n ${cmd}p "${dst_cluster_file}"))
-    #         if [ "${changelist[4]}" = "choose" ]
-    #         then
-    #             echo -e "\e[92m请选择${changelist[2]}： \e[0m\c"
-    #             index=1
-    #             for ((i=5;i<${#changelist[*]};i=$i+2))
-    #             do
-    #                 echo -e "\e[92m${index}.${changelist[$[$i + 1]]}\e[0m\c"
-    #                 index=$((${index} + 1))
-    #             done
-    #             echo -e "\e[92m: \e[0m\c"
-    #             read changelistindex
-    #             listnum=$(($((${changelistindex} - 1)) * 2))
-    #             changelist[1]=${changelist[$[$listnum + 5]]}
-    #         else
-    #             echo -e "\e[92m请输入${changelist[2]}：\e[0m\c"
-    #             read changestr
-    #             # 处理空格
-    #             changestr=$(echo "${changestr}" | sed 's/ /#/g')
-    #             changelist[1]=${changestr}
-    #         fi
-    #         changestr="${changelist[@]}"
-    #         sed -i ${cmd}c "${changestr}" ${dst_cluster_file}
-    #         ;;
-    #     esac
-    # done
-    #type=([STEAM] [GAMEPLAY] [NETWORK] [MISC] [SHARD])
-    # for (( i=0; i<${#type[*]}; i++ ))
-    # do
-    #     echo "${type[i]}" >> "${dst_base_dir}/${cluster}/cluster.ini"
-    #     cat "${dst_cluster_file}" | grep -v "script_ver" | while read lc
-    #     do
-    #         lcstr=($lc)
-    #         if [ "${lcstr[3]}" == "${type[i]}" ]
-    #         then
-    #             if [ "${lcstr[1]}" == "无" ]
-    #             then
-    #                 lcstr[1]=""
-    #             fi
-    #             # 还原空格
-    #             value_str=$(echo "${lcstr[1]}" | sed 's/#/ /g')
-    #             echo "${lcstr[0]} = ${value_str}" >> "${dst_base_dir}/${cluster}/cluster.ini"
-    #         fi
-    #     done
-    #     echo "" >> "${dst_base_dir}/${cluster}/cluster.ini"
-    # done
+    while (true)
+    do
+        clear
+        echo -e "\e[92m=============【存档槽：${cluster}】===============\e[0m"
+        index=1
+        cat "${dst_cluster_file}" | grep -v "script_ver" | while read line
+        do
+            ss=(${line})
+            if [ "${ss[4]}" != "readonly" ]
+            then
+                if [ "${ss[4]}" == "choose" ]
+                then
+                    for ((i=5;i<${#ss[*]};i++))
+                    do
+                        if [ "${ss[$i]}" == "${ss[1]}" ]
+                        then
+                            value=${ss[$i+1]}
+                        fi
+                    done
+                else
+                    # 处理替代空格的#号
+                    value=$(echo "${ss[1]}" | sed 's/#/ /g')
+                fi
+                if [ "${index}" -lt 10 ]
+                then
+                    echo -e "\e[33m[ ${index}] ${ss[2]}：${value}\e[0m"
+                else
+                    echo -e "\e[33m[${index}] ${ss[2]}：${value}\e[0m"
+                fi
+            fi
+            index=$((${index} + 1))
+        done
+        echo -e "\e[92m===============================================\e[0m"
+        echo -e "\e[31m要开熔炉MOD房的要先在这里修改游戏模式为熔炉！！！\e[0m"
+        echo -e "\e[92m===============================================\e[0m"
+        unset cmd
+        while (true)
+        do
+            if [[ "${cmd}" == "" ]]
+            then
+                echo -e "\e[92m请选择你要更改的选项(修改完毕输入数字 0 确认修改并退出)：\e[0m\c"
+                read cmd
+            else
+                break
+            fi
+        done
+        case "${cmd}" in
+            0)
+            info "更改已保存！"
+               break
+               ;;
+            *)
+            changelist=($(sed -n ${cmd}p "${dst_cluster_file}"))
+            if [ "${changelist[4]}" = "choose" ]
+            then
+                echo -e "\e[92m请选择${changelist[2]}： \e[0m\c"
+                index=1
+                for ((i=5;i<${#changelist[*]};i=$i+2))
+                do
+                    echo -e "\e[92m${index}.${changelist[$[$i + 1]]}\e[0m\c"
+                    index=$((${index} + 1))
+                done
+                echo -e "\e[92m: \e[0m\c"
+                read changelistindex
+                listnum=$(($((${changelistindex} - 1)) * 2))
+                changelist[1]=${changelist[$[$listnum + 5]]}
+            else
+                echo -e "\e[92m请输入${changelist[2]}：\e[0m\c"
+                read changestr
+                # 处理空格
+                changestr=$(echo "${changestr}" | sed 's/ /#/g')
+                changelist[1]=${changestr}
+            fi
+            changestr="${changelist[@]}"
+            sed -i ${cmd}c "${changestr}" ${dst_cluster_file}
+            ;;
+        esac
+    done
+    type=([STEAM] [GAMEPLAY] [NETWORK] [MISC] [SHARD])
+    for (( i=0; i<${#type[*]}; i++ ))
+    do
+        echo "${type[i]}" >> "${dst_base_dir}/${cluster}/cluster.ini"
+        cat "${dst_cluster_file}" | grep -v "script_ver" | while read lc
+        do
+            lcstr=($lc)
+            if [ "${lcstr[3]}" == "${type[i]}" ]
+            then
+                if [ "${lcstr[1]}" == "无" ]
+                then
+                    lcstr[1]=""
+                fi
+                # 还原空格
+                value_str=$(echo "${lcstr[1]}" | sed 's/#/ /g')
+                echo "${lcstr[0]} = ${value_str}" >> "${dst_base_dir}/${cluster}/cluster.ini"
+            fi
+        done
+        echo "" >> "${dst_base_dir}/${cluster}/cluster.ini"
+    done
 }
+
 Set_token(){
     if [ -f "${dst_token_file}" ]
     then
@@ -1361,9 +1362,9 @@ Write_in(){
         then
             char=","
         else
-            char="
+            char=""
         fi
-        index=$[${index}" + 1]
+        index=$[${index} + 1]
         if [[ "${ss[1]}" == "highlyrandom" ]]
         then
             str="${ss[0]}=\"highly random\"${char}"
@@ -1961,7 +1962,7 @@ fi
 # 移动根目录到隐藏目录
 if [ -d "${HOME}/dstscript" ]
 then
-    mv "${HOME}/dstscript "${HOME}/.dstscript
+    mv "${HOME}/dstscript" "${HOME}/.dstscript"
 fi
 # 卸载重装
 if [ ! -d "${data_dir}" ]
