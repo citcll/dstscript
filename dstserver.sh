@@ -162,7 +162,7 @@ MOD_manager(){
         if [ $( ls -l ${dst_base_dir}/${cluster} | grep -c ^d) -gt 0 ]
         then
             Default_mod
-            echo -e "\e[92m【存档：${cluster}】 你要 1.添加mod  2.删除mod  3.修改MOD配置\n                     4.重置MOD配置  5.安装MOD合集\n：\e[0m\c"
+            echo -e "\e[92m【存档：${cluster}】 你要 1.添加mod  2.删除mod  3.修改MOD配置\n                   4.重置MOD配置  5.安装MOD合集\n：\e[0m\c"
             read mc
             case ${mc} in
                 1)

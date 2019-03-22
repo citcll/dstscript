@@ -186,6 +186,8 @@ function createmodcfg()
     if configuration_options ~= nil and #configuration_options > 0 then
         f:write("mod-configureable = true\n")
         for i, j in pairs(configuration_options) do
+            if j.default == nil then
+                
             if j.default ~= nil then
                 local label = "nolabel"
                 if j.label ~= nil then
