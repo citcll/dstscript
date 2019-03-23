@@ -1,4 +1,4 @@
--- script_ver="1.3.7"
+-- script_ver="1.3.8"
 require "modinfo"
 
 -- Addon function
@@ -59,82 +59,6 @@ function list()
     f:close()
 end
 
-function writein()
-    local f = assert(io.open("modconfwrite.lua", 'w'))
-    if name ~= nil then
-        name = trim(name)
-        name = LuaRemove(name, "\n")
-    end
-    if configuration_options ~= nil and #configuration_options > 0 then
-        f:write('  ["', modid, '"]={    --[[', name, "]]\n")
-        f:write("    configuration_options={\n")
-        for i, j in pairs(configuration_options) do
-            if j.default ~= nil then
-                if type(j.default) == "string" then
-                    f:write('      ["', j.name, '"]="', j.default, '"')
-                else
-                    if type(j.default) == "table" then
-                        f:write('      ["', j.name, '"]= {\n')
-                        for m, n in pairs(j.default) do
-                            if type(n) == "table" then
-                                f:write('        {')
-                                for g, h in pairs(n) do
-                                    if type(h) == "string" then
-                                        f:write('"', h, '"')
-                                    else
-                                        f:write(tostring(h))
-                                    end
-                                    if g ~= #n then
-                                        f:write(", ")
-                                    end
-                                end
-                                if m ~= #j.default then
-                                    f:write("},\n")
-                                else
-                                    f:write("}\n")
-                                end
-                            end
-                        end
-                        f:write('      }')
-                    else
-                        f:write('      ["', j.name, '"]=', tostring(j.default))
-                    end
-                end
-                if i ~= #configuration_options then
-                    f:write(',')
-                end
-                if j.options ~= nil and #j.options > 0 then
-                    f:write("     --[[ ", j.label or j.name, ": ")
-                    for k, v in pairs(j.options) do
-                        if type(v.data) ~= "table" then
-                            local vd = v.data
-                            if type(v.data) ~= "string" then
-                                vd = tostring(vd)
-                            end    
-                            f:write(vd, "(", v.description, ") ")
-                        end
-                    end
-                    f:write("]]\n")
-                else
-                    f:write("     --[[ ", j.label or j.name, " ]]\n")
-                end
-            else
-                f:write('      ["', j.name, '"]=""')
-                if i ~= #configuration_options then
-                    f:write(',')
-                end
-                f:write("     --[[ ", j.label or j.name, " ]]\n")
-            end
-        end
-        f:write("    },\n")
-        f:write('    ["enabled"]=true\n')
-        f:write("  },\n")
-    else
-        f:write('  ["', modid, '"]={ ["enabled"]=true },    --[[', name, "]]\n")
-    end
-    f:close()
-end
-
 function getver()
     print(version)
 end
@@ -187,7 +111,10 @@ function createmodcfg()
         f:write("mod-configureable = true\n")
         for i, j in pairs(configuration_options) do
             if j.default == nil then
-                
+                if j.options ~= nil and #j.options > 0 then
+                    j.default = j.options[1].data
+                end
+            end
             if j.default ~= nil then
                 local label = "nolabel"
                 if j.label ~= nil then
@@ -207,8 +134,6 @@ function createmodcfg()
                 cfgname = LuaRemove(cfgname, "\n")
                 if type(j.default) == "table" then
                     f:write(cfgname .. " 表数据请直接修改modinfo.lua文件 table " .. label .. " " .. hover .. "\n")
-                -- elseif type(j.default) == "number" then
-                    -- f:write(cfgname .. " " .. tostring(j.default) .. " number " .. label .. " " .. hover .. "\n")
                 else
                     f:write(cfgname .. " " .. tostring(j.default) .. " " .. type(j.default) .. " " .. label .. " " .. hover .. " ")
                     if j.options ~= nil and #j.options > 0 then
@@ -256,8 +181,6 @@ elseif fuc == "getver" then
     getver()
 elseif fuc == "getname" then
     getname()
-elseif fuc == "writein" then
-    writein()
 elseif fuc == "createmodcfg" then
     createmodcfg()
 end
