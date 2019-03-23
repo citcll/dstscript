@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://blog.wqlin.com
 #===============================================================================
-script_ver="2.4.1.1"
+script_ver="2.4.1.2"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -46,8 +46,8 @@ Menu(){
         echo -e "\e[33m============欢迎使用饥荒联机版独立服务器脚本[Linux-Steam](${script_ver})============\e[0m"
         echo -e "\e[33m作者：Ariwori    下载更新及Bug反馈：${feedback_link}\e[0m"
         echo -e "\e[33m本脚本一切权利归作者所有。未经许可禁止使用本脚本进行任何的商业活动！\e[0m"
-        echo -e "\e[31m游戏服务端安装目录：${dst_server_dir} (Version: $(cat ${dst_server_dir}/version.txt))\e[33m【${dst_need_update_str}】\e[0m"
-        echo -e "\e[35m公告：$(cat "${data_dir}/announce.txt" | grep -v script_ver)\e[0m"
+        echo -e "\e[31m游戏服务端安装目录：${dst_server_dir} (Version: $(cat "${dst_server_dir}/version.txt"))\e[33m【${dst_need_update_str}】\e[0m"
+        echo -e "\e[35m公告：$(grep -v script_ver "${data_dir}/announce.txt")\e[0m"
         echo -e "\e[92m[ 1]启动服务器           [ 2]关闭服务器           [ 3]重启服务器\e[0m"
         echo -e "\e[92m[ 4]修改房间设置         [ 5]添加或移除MOD        [ 6]设置管理员和黑名单\e[0m"
         echo -e "\e[92m[ 7]游戏服务端控制台     [ 8]自动更新及异常维护   [ 9]退出本脚本\e[0m"
@@ -56,7 +56,7 @@ Menu(){
         Simple_server_status
         echo -e "\e[33m================================================================================\e[0m"
         echo -e "\e[92m[如需中断任何操作请直接按Ctrl+C]请输入命令代号：\e[0m\c"
-        read cmd
+        read -r cmd
         case ${cmd} in
             1)
             Start_server
@@ -106,7 +106,7 @@ Menu(){
 }
 Change_cluster(){
     Get_current_cluster
-    if [ -d $dst_base_dir/${cluster} ]
+    if [ -d "$dst_base_dir/${cluster}" ]
     then
         Set_cluster
     else
@@ -115,18 +115,18 @@ Change_cluster(){
 }
 Server_console(){
     Get_single_shard
-    if tmux has-session -t DST_${shard} > /dev/null 2>&1
+    if tmux has-session -t DST_"${shard}" > /dev/null 2>&1
     then
         info "即将跳转${shard}世界后台。。。退出请按Ctrl + B松开再按D，否则服务器将停止运行！！！"
         sleep 3
-        tmux attach-session -t DST_${shard}
+        tmux attach-session -t DST_"${shard}"
     else
         tip "${shard}世界未开启或已异常退出！！！"
     fi
 }
 Get_shard_array(){
     Get_current_cluster
-    [ $cluster != "无" ] && [ -d $dst_base_dir/${cluster} ] && shardarray=$(ls -l $dst_base_dir/${cluster} | grep ^d | awk '{print $9}')
+    [ "$cluster" != "无" ] && [ -d "$dst_base_dir/${cluster}" ] && shardarray=$(ls -l "$dst_base_dir/${cluster}" | grep ^d | awk '{print $9}')
 }
 Get_single_shard(){
     Get_current_cluster
@@ -134,9 +134,9 @@ Get_single_shard(){
     for shard in ${shardarray}
     do
         shardm=$shard
-        if [ -f ${dst_base_dir}/${cluster}/${shardm}/server.ini ]
+        if [ -f "${dst_base_dir}/${cluster}/${shardm}/server.ini" ]
         then
-            if [ $(grep 'is_master = true' -c ${dst_base_dir}/${cluster}/${shardm}/server.ini) -gt 0 ] 
+            if [ "$(grep 'is_master = true' -c ${dst_base_dir}/${cluster}/${shardm}/server.ini)" -gt 0 ] 
             then
                 shardm=$shard
                 break
@@ -180,7 +180,7 @@ MOD_manager(){
                 Install_mod_collection
                 ;;
                 *)
-                break;;
+                return;;
             esac
             Removelastcomma
         else
@@ -323,9 +323,9 @@ Show_mod_cfg(){
                 fi
                 if [ ${index} -lt 10 ]
                 then
-                    echo -e "\e[33m[ ${index}] $label：${Red_font_prefix}${value}${Font_color_suffix}\n    简介==>$hover\e[0m"
+                    echo -e "\e[33m[ ${index}] $label：${Red_font_prefix}${value}${Font_color_suffix}\n     简介==>$hover\e[0m"
                 else
-                    echo -e "\e[33m[${index}] $label：${Red_font_prefix}${value}${Font_color_suffix}\n    简介==>$hover\e[0m"
+                    echo -e "\e[33m[${index}] $label：${Red_font_prefix}${value}${Font_color_suffix}\n     简介==>$hover\e[0m"
                 fi
                 index=$[${index} + 1]
             done
@@ -722,7 +722,7 @@ Cluster_manager(){
 }
 Auto_update(){
     Get_single_shard
-    if tmux has-session -t DST_${shard} > /dev/null 2>&1
+    if tmux has-session -t DST_"${shard}" > /dev/null 2>&1
     then       
         if tmux has-session -t Auto_update > /dev/null 2>&1
         then
@@ -741,7 +741,7 @@ Auto_update(){
 }
 Show_players(){
     Get_single_shard
-    if tmux has-session -t DST_${shard} > /dev/null 2>&1
+    if tmux has-session -t DST_"${shard}" > /dev/null 2>&1
     then
         if tmux has-session -t Show_players > /dev/null 2>&1
         then
@@ -854,9 +854,9 @@ Reboot_announce(){
     Get_shard_array
     for shard in ${shardarray}
     do
-        if tmux has-session -t DST_${shard} > /dev/null 2>&1
+        if tmux has-session -t DST_"${shard}" > /dev/null 2>&1
         then
-            tmux send-keys -t DST_${shard} "c_announce(\"${shard}世界服务器因改动或更新需要重启，预计耗时三分钟，给你带来的不便还请谅解！\")" C-m
+            tmux send-keys -t DST_"${shard}" "c_announce(\"${shard}世界服务器因改动或更新需要重启，预计耗时三分钟，给你带来的不便还请谅解！\")" C-m
         fi
         sleep 5
     done
@@ -1039,9 +1039,9 @@ Close_server(){
     unset nodone
     for shard in ${shardarray}
     do
-        if tmux has-session -t DST_${shard} > /dev/null 2>&1
+        if tmux has-session -t DST_"${shard}" > /dev/null 2>&1
         then
-            tmux send-keys -t DST_${shard} "c_shutdown(true)" C-m
+            tmux send-keys -t DST_"${shard}" "c_shutdown(true)" C-m
             exchangestatus false
             nodone="true"
         else
@@ -1054,7 +1054,7 @@ Close_server(){
         do
             while (true)
             do
-                if ! tmux has-session -t DST_${shard} > /dev/null 2>&1
+                if ! tmux has-session -t DST_"${shard}" > /dev/null 2>&1
                 then
                     info "${shard}世界服务器已关闭！"
                     break
@@ -1063,7 +1063,7 @@ Close_server(){
         done
         for shard in ${shardarray}
         do
-            tmux kill-session -t DST_${shard} > /dev/null 2>&1
+            tmux kill-session -t DST_"${shard}" > /dev/null 2>&1
         done
     fi
     Exit_show_players
@@ -1407,7 +1407,7 @@ Start_shard(){
     do
         Save_log
         unset TMUX
-        tmux new-session -s DST_${shard} -d "${dst_bin_cmd} -persistent_storage_root ${dst_conf_basedir} -cluster ${cluster} -shard ${shard}"
+        tmux new-session -s DST_"${shard}" -d "${dst_bin_cmd} -persistent_storage_root ${dst_conf_basedir} -cluster ${cluster} -shard ${shard}"
     done
 }
 Save_log(){
@@ -1434,7 +1434,7 @@ Start_check(){
     for shard in $shardarray
     do
         unset TMUX
-        tmux new-session -s DST_${shard}_log -d "bash $HOME/dstserver.sh ay $shard"
+        tmux new-session -s DST_"${shard}"_log -d "bash $HOME/dstserver.sh ay $shard"
         shardnum=$[$shardnum + 1]
     done
     ANALYSIS_SHARD=0
@@ -1544,15 +1544,22 @@ First_run_check(){
 }
 # open swap
 Open_swap(){
-    info "创建并开启虚拟内存 ..."
-    sudo dd if=/dev/zero of=/swapfile bs=1M count=2048
-    sudo mkswap /swapfile
-    sudo chmod 0600 /swapfile
-    sudo swapon /swapfile
-    sudo chmod 0666 /etc/fstab
-    echo "/swapfile swap swap defaults 0 0" >> /etc/fstab
-    sudo chmod 0644 /etc/fstab
-    info "虚拟内存已开启！"
+    if [ -f /swapfile ]
+    then
+        info "创建虚拟内存 ..."
+        sudo dd if=/dev/zero of=/swapfile bs=1M count=2048
+        sudo mkswap /swapfile
+        sudo chmod 0600 /swapfile
+        # 开机自启
+        sudo chmod 0666 /etc/fstab
+        echo "/swapfile swap swap defaults 0 0" >> /etc/fstab
+        sudo chmod 0644 /etc/fstab
+    fi
+    if [ $(free -m | grep -i swap | tr -cd [0-9]) == "000" ]
+    then
+        sudo swapon /swapfile    
+        info "虚拟内存已开启！"
+    fi
 }
 # 创建文件夹
 Mkdstdir(){
@@ -1736,7 +1743,7 @@ Status_keep(){
     Get_shard_array
     for shard in $shardarray
     do
-        if ! tmux has-session -t DST_${shard} > /dev/null 2>&1
+        if ! tmux has-session -t DST_"${shard}" > /dev/null 2>&1
         then
             server_alive=false
             break
@@ -1757,7 +1764,7 @@ Simple_server_status(){
     Get_shard_array
     for shard in ${shardarray}
     do
-        if tmux has-session -t DST_${shard} > /dev/null 2>&1
+        if tmux has-session -t DST_"${shard}" > /dev/null 2>&1
         then
             server_on="${server_on}${shard}"
         fi
@@ -1935,7 +1942,7 @@ if [[ $1 == "sa" ]]; then
         Get_single_shard
         echo -e "\e[92m请输入你要发送的公告内容，按下回车键发送：\e[0m"
         read an
-        tmux send-keys -t DST_${shard} "c_announce(\"$an\")" C-m
+        tmux send-keys -t DST_"${shard}" "c_announce(\"$an\")" C-m
         info "公告已发送！"
         sleep 1
     done
