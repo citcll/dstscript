@@ -1977,31 +1977,32 @@ fi
 Move_base_dir(){
     if [ -d "$HOME/.klei" ]
     then
-    if [ ! -f "${data_dir}/Move_base_dir.txt" ]
-    then
-        tip "为方便小白找到存档根目录，根目录迁移至[${dst_conf_basedir}]，不再为隐藏目录"
-        info "是否现在转移现有存档，为保证数据安全这将关闭正在运行的服务器：1.是   2.否？"
-        read ismove
-        if [[ "$ismove" == "1" ]]
+        if [ ! -f "${data_dir}/Move_base_dir.txt" ]
         then
-            Get_shard_array
-            Close_server
-            info "正在转移已有存档。。。请勿中断。。。"
-            mkdir -p "$HOME/Klei"      
-            cp -r "$HOME/.klei/*" "$HOME/Klei/" > /dev/null 2>&1
-            info "存档转移到[$HOME/Klei]。完毕！！！"
-            touch "${data_dir}/Move_base_dir.txt"
-            dst_conf_basedir="$HOME/Klei"
-            dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
-        else
-            dst_conf_basedir="$HOME/.klei"
-            dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
-            tip "你选择了否，根目录未改变，下次运行脚本仍会提醒！！！"
+            tip "为方便小白找到存档根目录，根目录迁移至[${dst_conf_basedir}]，不再为隐藏目录"
+            info "是否现在转移现有存档，为保证数据安全这将关闭正在运行的服务器：1.是   2.否？"
+            read ismove
+            if [[ "$ismove" == "1" ]]
+            then
+                Get_shard_array
+                Close_server
+                info "正在转移已有存档。。。请勿中断。。。"
+                mkdir -p "$HOME/Klei"      
+                cp -r "$HOME/.klei/*" "$HOME/Klei/" > /dev/null 2>&1
+                info "存档转移到[$HOME/Klei]。完毕！！！"
+                touch "${data_dir}/Move_base_dir.txt"
+                dst_conf_basedir="$HOME/Klei"
+                dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
+            else
+                dst_conf_basedir="$HOME/.klei"
+                dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
+                tip "你选择了否，根目录未改变，下次运行脚本仍会提醒！！！"
+            fi
+            sleep 1
         fi
-        sleep 1
-    fi
     else
         dst_conf_basedir="$HOME/Klei"
+        dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
     fi
 }
 # Run from here
