@@ -952,7 +952,7 @@ server_port = $((10997 + $idnum))
 [SHARD]
 is_master = $shardmaster
 name = ${shardname}${idnum}
-id = "$shardid
+id = $shardid
 
 
 [ACCOUNT]
