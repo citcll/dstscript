@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://blog.wqlin.com
 #===============================================================================
-script_ver="2.4.2"
+script_ver="2.4.2.1"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -219,7 +219,7 @@ Install_mod_collection(){
         fi
         cp "$data_dir/modcollectionlist.txt" "${dst_server_dir}/mods/dedicated_server_mods_setup.lua"
         cd "${dst_server_dir}/bin" || exit 1
-        tmux new-session -s DST_MODUPDATE -d "${dst_bin_cmd}" -persistent_storage_root "${dst_conf_basedir}" -cluster downloadmod -shard Master
+        tmux new-session -s DST_MODUPDATE -d "${dst_bin_cmd} -persistent_storage_root ${dst_conf_basedir} -cluster downloadmod -shard Master"
         sleep 3
         while (true)
         do
@@ -1352,7 +1352,7 @@ Set_world_config(){
                listnum=$[${changelistindex} - 1]*2
                changelist[1]=${changelist[$[$listnum + 4]]}
                changestr="${changelist[@]}"
-               sed -i ${cmd}c "${changestr}" "${configure_file}";;
+               sed -i "${cmd}c ${changestr}" "${configure_file}";;
         esac
     done
 }
@@ -1419,7 +1419,7 @@ Start_shard(){
     do
         Save_log
         unset TMUX
-        tmux new-session -s DST_"${shard}" -d "${dst_bin_cmd}" -persistent_storage_root "${dst_conf_basedir}" -cluster "${cluster}" -shard "${shard}"
+        tmux new-session -s DST_${shard} -d "${dst_bin_cmd} -persistent_storage_root ${dst_conf_basedir} -cluster ${cluster} -shard ${shard}"
     done
 }
 Save_log(){
@@ -1838,7 +1838,7 @@ Download_MOD(){
     fi
     Del_need_update_mod_folder
     cd "${dst_server_dir}/bin" || exit 1
-    tmux new-session -s DST_MODUPDATE -d "${dst_bin_cmd}" -persistent_storage_root "${dst_conf_basedir}" -cluster downloadmod -shard Master
+    tmux new-session -s DST_MODUPDATE -d "${dst_bin_cmd} -persistent_storage_root ${dst_conf_basedir} -cluster downloadmod -shard Master"
     sleep 3
     while (true)
     do
