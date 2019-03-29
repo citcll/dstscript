@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://blog.wqlin.com
 #===============================================================================
-script_ver="2.4.2.4"
+script_ver="2.4.3"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -22,6 +22,7 @@ my_api_link="https://api.wqlin.com/dst"
 update_link="${my_api_link}/dstscript"
 log_save_dir="${dst_conf_basedir}/LogBackup"
 mod_cfg_dir="${data_dir}/modconfigure"
+cluster_backup_dir="${dst_conf_basedir}/ClusterBackup"
 # 屏幕输出
 Green_font_prefix="\033[32m"
 Red_font_prefix="\033[31m"
@@ -49,10 +50,10 @@ Menu(){
         echo -e "\e[31m游戏服务端安装目录：${dst_server_dir} (Version: $(cat "${dst_server_dir}/version.txt"))\e[33m【${dst_need_update_str}】\e[0m"
         echo -e "\e[35m公告：$(grep -v script_ver "${data_dir}/announce.txt")\e[0m"
         echo -e "\e[92m[ 1]启动服务器           [ 2]关闭服务器           [ 3]重启服务器\e[0m"
-        echo -e "\e[92m[ 4]修改房间设置         [ 5]MOD管理及配置        [ 6]设置管理员和黑名单\e[0m"
-        echo -e "\e[92m[ 7]游戏服务端控制台     [ 8]自动更新及异常维护   [ 9]退出本脚本\e[0m"
-        echo -e "\e[92m[10]删除存档             [11]更新游戏服务端       [12]更新MOD\e[0m"
-        echo -e "\e[92m[13]当前玩家记录\e[0m"
+        echo -e "\e[92m[ 4]修改房间设置         [ 5]MOD管理及配置        [ 6]特殊名单管理\e[0m"
+        echo -e "\e[92m[ 7]游戏服务端控制台     [ 8]附加功能设置         [ 9]退出本脚本\e[0m"
+        echo -e "\e[92m[10]存档管理             [11]更新游戏服务端       [12]更新MOD\e[0m"
+        echo -e "\e[92m[13]当前玩家记录         [14]查看附加进程\e[0m"
         Simple_server_status
         echo -e "\e[33m==============================================================================\e[0m"
         echo -e "\e[92m[如需中断任何操作请直接按Ctrl+C]请输入命令代号：\e[0m\c"
@@ -81,7 +82,7 @@ Menu(){
             Server_console
             ;;
             8)
-            Auto_update
+            Extend_function_setting
             ;;
             9)
             exit
@@ -98,11 +99,22 @@ Menu(){
             13)
             Show_players
             ;;
+            14)
+            Get_in_EFS
+            ;;
             *)
             error "输入有误！！！"
             ;;
         esac
     done
+}
+Get_in_EFS(){
+    if tmux has-session -t Auto_update > /dev/null 2>&1
+    then       
+        tmux attach -t Auto_update
+    else
+        tip "附加功能进程未开启或已异常退出！"
+    fi
 }
 Change_cluster(){
     Get_current_cluster
@@ -126,7 +138,7 @@ Server_console(){
 }
 Get_shard_array(){
     Get_current_cluster
-    [ "$cluster" != "无" ] && [ -d "$dst_base_dir/${cluster}" ] && shardarray=$(ls -l "$dst_base_dir/${cluster}" | grep ^d | awk '{print $9}')
+    [[ $cluster != "无" ]] && [ -d "$dst_base_dir/${cluster}" ] && shardarray=$(ls -l "$dst_base_dir/${cluster}" | grep ^d | awk '{print $9}')
 }
 Get_single_shard(){
     Get_current_cluster
@@ -733,18 +745,77 @@ Dellist(){
         fi
     done
 }
+Restore_cluster(){
+    #ss="$(ls$cluster_backup_dir/$cur_day/cluster_backup_${cluster}_${cur_time}.tar.gz"
+    if [ $(ls $cluster_backup_dir | grep -c ^) -gt 0 ]
+    then
+        echo -e "\e[92m 请选择日期：\c"
+        dindex=1
+        for ddate in $(ls $cluster_backup_dir)
+        do
+            echo -e "$dindex.$ddate   \c"
+            dindex=$(($dindex +1))
+        done
+        echo -e "\e[0m\c"
+        read dddate
+        ddddate=$(ls $cluster_backup_dir | head -n $dddate | tail -n 1)
+        if [ $(ls $cluster_backup_dir/$ddddate | grep -c ^) -gt 0 ]
+        then
+            ls -rc $cluster_backup_dir/$ddddate | grep -n ^
+            echo -e "\e[92m 请选择要恢复的存档：\e[0m\c"
+            read clustersnum
+            clustersname=$(ls -rc $cluster_backup_dir/$ddddate | head -n $clustersnum | tail -n 1)
+            mycluster=$(echo $clustersname | cut -d "_" -f3)
+            Get_current_cluster
+            Get_server_status
+            if [[ "$mycluster" == "$cluster" && "$serveropen" == "true" ]]
+            then
+                error "存档【$mycluster】正在运行，请关闭后再恢复！！"
+            else
+                tar -xzPf $cluster_backup_dir/$ddddate/$clustersname
+                info "存档【$mycluster】已恢复！"
+            fi
+        else
+            error "日期【$ddddate】没有任何备份！"
+        fi
+    else
+        error "当前没有任何备份！"
+    fi
+}
 Cluster_manager(){
+    while (true)
+    do
+        echo -e "\e[92m你要：1.删除存档  2.恢复存档   3.返回主菜单? \e[0m\c"
+        read clusterst
+        case $clusterst in
+            1)
+            Del_cluster
+            ;;
+            2)
+            Restore_cluster
+            ;;
+            3)
+            break
+            ;;
+            *)
+            error "输入有误！！！"
+            ;;
+        esac
+    done
+}
+Del_cluster(){
     cluster_str="删除"
     Choose_exit_cluster
     if [ ! -z $cluster ]
     then
         mycluster=$cluster
         Get_current_cluster
-        if [[ $mycluster != $cluster ]]
+        Get_server_status
+        if [[ "$mycluster" == "$cluster" && "$serveropen" == "true" ]]
         then
-            rm -rf "${dst_base_dir}/${mycluster}" && info "存档【${mycluster}】已删除！"
-        else
             error "存档【$mycluster】正在运行，请关闭后再删除！！"
+        else
+            rm -rf "${dst_base_dir}/${mycluster}" && info "存档【${mycluster}】已删除！"
         fi
     fi
 }
@@ -752,19 +823,12 @@ Auto_update(){
     Get_single_shard
     if tmux has-session -t DST_"${shard}" > /dev/null 2>&1
     then       
-        if tmux has-session -t Auto_update > /dev/null 2>&1
-        then
-            info "自动更新进程已在运行，即将跳转。。。退出请按Ctrl + B松开再按D！"
-            tmux attach-session -t Auto_update
-            sleep 1
-        else
-            tmux new-session -s Auto_update -d "bash $HOME/dstserver.sh au"
-            info "自动更新已开启！即将跳转。。。退出请按Ctrl + B松开再按D!"
-            sleep 1
-            tmux attach-session -t Auto_update
-        fi
+        tmux kill-session -t Auto_update > /dev/null 2>&1
+        sleep 1
+        tmux new-session -s Auto_update -d "bash $HOME/dstserver.sh au"
+        info "附加功能已开启！"
     else
-        tip "${shard}世界未开启或已异常退出！无法启用自动更新！"
+        tip "${shard}世界未开启或已异常退出！无法启用附加功能！"
     fi
 }
 Show_players(){
@@ -848,17 +912,29 @@ Reboot_server(){
     Close_server
     Run_server
 }
-exchangestatus(){
+exchangesetting(){
     if [ ! -f "${server_conf_file}" ]
     then
         touch "${server_conf_file}"
     fi
-    if [ $(grep "serveropen" -c "${server_conf_file}") -eq 0 ]
+    if [ $(grep $1 -c "${server_conf_file}") -gt 0 ]
     then
-        echo "serveropen=$1" >> "${server_conf_file}"
+        linen=$(grep $1 -n "${server_conf_file}" | cut -d ":" -f1)
+        sed -i ${linen}d "${server_conf_file}"
+        echo "$1=$2" >> "${server_conf_file}"
     else
-        str=$(grep "serveropen" "${server_conf_file}")
-        sed -i "s/${str}/serveropen=$1/g" "${server_conf_file}"
+        echo "$1=$2" >> "${server_conf_file}"
+    fi
+}
+getsetting(){
+    if [ ! -f "${server_conf_file}" ]
+    then
+        touch "${server_conf_file}"
+    fi
+    unset result
+    if [ $(grep $1 -c "${server_conf_file}") -gt 0 ]
+    then
+        result=$(grep ^$1 "${server_conf_file}" | head -n 1 | cut -d "=" -f2)
     fi
 }
 Run_server(){
@@ -866,7 +942,7 @@ Run_server(){
     if [ -d "$dst_base_dir/${cluster}" ]
     then
         Get_shard_array
-        exchangestatus true
+        exchangesetting serveropen true
         Default_mod
         Set_list
         Update_DST_MOD_Check
@@ -875,6 +951,7 @@ Run_server(){
         info "服务器开启中。。。请稍候。。。"
         sleep 5
         Start_check
+        Auto_update
     else
         error "存档【${cluster}】已被删除或损坏！服务器无法开启！"
     fi
@@ -922,8 +999,7 @@ Start_server(){
         Choose_exit_cluster
         [ -z $cluster ] && exit 0
     fi
-    echo "cluster=${cluster}" > "${server_conf_file}"
-    echo "shardarray=${shardarray}" >> "${server_conf_file}"
+    exchangesetting "cluster" "${cluster}"
     if [[ "${new_cluster}" == "true" ]]
     then
         Addshard
@@ -1076,7 +1152,7 @@ Close_server(){
         if tmux has-session -t DST_"${shard}" > /dev/null 2>&1
         then
             tmux send-keys -t DST_"${shard}" "c_shutdown(true)" C-m
-            exchangestatus false
+            exchangesetting serveropen false
             nodone="true"
         else
             info "${shard}世界服务器未开启！"
@@ -1107,7 +1183,7 @@ Exit_auto_update(){
     then
         tmux kill-session -t Auto_update > /dev/null 2>&1
     fi
-    info "自动更新进程已停止运行 ..."
+    info "附加功能进程已停止运行 ..."
 }
 Exit_show_players(){
     if tmux has-session -t Show_players > /dev/null 2>&1
@@ -1438,6 +1514,7 @@ Start_shard(){
     then
         Setup_mod
     fi
+    Backup_cluster
     cd "${dst_server_dir}/bin"
     for shard in ${shardarray}
     do
@@ -1447,17 +1524,67 @@ Start_shard(){
     done
 }
 Save_log(){
-    cur_day=$(date "+%F")
-    if [ ! -d "$log_save_dir/$cur_day" ]
+    Clean_old_log
+    if [ -f "$dst_base_dir/$cluster/$shard/server_chat_log.txt" ]
     then
-        mkdir -p "$log_save_dir/$cur_day"
+        cur_day=$(date "+%F")
+        if [ ! -d "$log_save_dir/$cur_day" ]
+        then
+            mkdir -p "$log_save_dir/$cur_day"
+        fi
+        cur_time=$(date "+%H%M%S")
+        echo "$(date)" >> "$log_save_dir/$cur_day/server_chat_log_backup_${cluster}_${shard}_${cur_time}.txt"
+        cp "$dst_base_dir/$cluster/$shard/server_chat_log.txt" "$log_save_dir/$cur_day/server_chat_log_backup_${cluster}_${shard}_${cur_time}.txt"
+        echo "$(date)" >> "$log_save_dir/$cur_day/server_log_backup_${cluster}_${shard}_${cur_time}.txt"
+        cp  "$dst_base_dir/$cluster/$shard/server_log.txt" "$log_save_dir/$cur_day/server_log_backup_${cluster}_${shard}_${cur_time}.txt"
+        info "【${shard}】旧的日志已备份到【$log_save_dir/$cur_day】【保留一周内的日志备份】。"
     fi
-    info "【${shard}】旧的日志已备份到【$log_save_dir】。"
-    cur_time=$(date "+%T")
-    echo "$(date)" >> "$log_save_dir/$cur_day/server_chat_log_backup_${cluster}_${shard}_${cur_time}.txt"
-    cp "$dst_base_dir/$cluster/$shard/server_chat_log.txt" "$log_save_dir/$cur_day/server_chat_log_backup_${cluster}_${shard}_${cur_time}.txt" >/dev/null 2>&1
-    echo "$(date)" >> "$log_save_dir/$cur_day/server_log_backup_${cluster}_${shard}_${cur_time}.txt"
-    cp  "$dst_base_dir/$cluster/$shard/server_log.txt" "$log_save_dir/$cur_day/server_log_backup_${cluster}_${shard}_${cur_time}.txt" >/dev/null 2>&1
+}
+Clean_old_log(){
+    # 保留一周的日志
+    all=$(ls $log_save_dir | grep -c ^)
+    if [ $all -gt 6 ]
+    then
+        info "清理旧的备份日志 ..."
+        del=$(($all - 7))
+        for dir in $(ls $log_save_dir | sort | head -n $del)
+        do
+            rm -rf $log_save_dir/$dir
+        done
+    fi
+}
+Backup_cluster(){
+    Clean_old_cluster
+    Get_current_cluster
+    Get_single_shard
+    if [ -d "$dst_base_dir/$cluster/$shard/save" ]
+    then
+        cur_day=$(date "+%F")
+        if [ ! -d "$cluster_backup_dir/$cur_day" ]
+        then
+            mkdir -p "$cluster_backup_dir/$cur_day"
+        fi
+        cur_time=$(date "+%H%M%S")
+        tar -zcPf "$cluster_backup_dir/$cur_day/cluster_backup_${cluster}_${cur_time}.tar.gz" "$dst_base_dir/$cluster"
+        info "【${shard}】旧的存档已备份到【$log_save_dir/$cur_day】【保留三天内的存档备份】。"
+    fi
+}
+Clean_old_cluster(){
+    # 保留三天的存档备份
+    if [ ! -d "$cluster_backup_dir" ]
+    then
+        mkdir -p "$cluster_backup_dir"
+    fi
+    all=$(ls $cluster_backup_dir | grep -c ^)
+    if [ $all -gt 2 ]
+    then
+        info "清理旧的存档备份 ..."
+        del=$(($all - 2))
+        for dir in $(ls $cluster_backup_dir | sort | head -n $del)
+        do
+            rm -rf $cluster_backup_dir/$dir
+        done
+    fi
 }
 Pid_kill(){
     kill $(ps -ef | grep -v grep | grep $1 | awk '{print $2}')
@@ -1726,7 +1853,7 @@ Update_script(){
     if [[ "${need_exit}" == "true" ]]
     then
         tmux kill-session -t Auto_update > /dev/null 2>&1
-        tip "因脚本已更新，自动更新进程已退出，如需要请重新开启！"
+        tip "因脚本已更新，附加功能进程已退出，如需要请重新开启！"
         exit 0
     fi
 }
@@ -1777,7 +1904,8 @@ Status_keep(){
             server_alive="true"
         fi
     done
-    if [[ $(grep "serveropen" "${server_conf_file}" | cut -d "=" -f2) == "true" &&  "${server_alive}" == "false" ]]
+    getsetting "serveropen"
+    if [[ $result == "true" &&  "${server_alive}" == "false" ]]
     then
         tip "服务器异常退出，即将重启 ..."
         Reboot_server
@@ -1808,7 +1936,7 @@ Simple_server_status(){
     fi
     [ -f "${dst_base_dir}/${cluster}/cluster.ini" ] && cluster_name=$(cat "${dst_base_dir}/${cluster}/cluster.ini" | grep "^cluster_name" | cut -d "=" -f2)
     echo -e "\e[33m存档: ${cluster}   开启的世界：${server_on}   名称: ${cluster_name}\e[0m"
-    echo -e "\e[33m自动更新维护：${auto_on}\e[0m"
+    echo -e "\e[33m附加功能进程：${auto_on}\e[0m"
 }
 # 清楚旧版本修改的hosts
 Fix_Net_hosts(){
@@ -2009,23 +2137,160 @@ Copyright(){
         fi
     fi
 }
+Extend_function_setting(){
+    while (true)
+    do
+        clear
+        unset parm
+        echo -e "\e[33m=====饥荒联机版独立服务器脚本拓展功能设置[Linux-Steam](${script_ver})=====\e[0m"
+        echo -e "\e[92m    0. 保存设置并返回主菜单\e[0m"
+        echo -e "\e[92m    1. 周期性检查游戏是否有更新，需要更新时重启更新\e[0m"
+        echo -e "\e[92m    2. 周期性检查启用的MOD是否有更新，需要更新时重启更新\e[0m"
+        echo -e "\e[92m    3. 周期性检查游戏进程是否意外退出，退出自动重启\e[0m"
+        echo -e "\e[92m    4. 周期性备份当前开启的存档\e[0m"
+        echo -e "\e[35m涉及时间的设置单位均为分钟，只能输入整数\e[0m"
+        echo -e "\e[33m=====================================================================\e[0m"
+        echo -e "\e[92m请输入命令代号：\e[0m\c"
+        read efs
+        case $efs in
+            0)
+            Auto_update
+            break
+            ;;
+            1)
+            parm="gameupdate"
+            ;;
+            2)
+            parm="modupdate"
+            ;;
+            3)
+            parm="keepalive"
+            ;;
+            4)
+            parm="backupcluster"
+            ;;
+            *)
+            error "输入有误！！！"
+            ;;
+        esac
+        efs_menu
+    done
+}
+efs_menu(){
+    while (true)
+    do
+        echo -e "\e[92m请选择设置项： 0.返回上一级  1.是否开启   2.时间周期  ：\e[0m\c"
+        read sss
+        case $sss in
+            0)
+            break
+            ;;
+            1)
+            echo -e "\e[92m请选择： 1.开启   2.关闭  ：\e[0m\c"
+            read isopen
+            case $isopen in
+                1)
+                st="true"
+                exchangesetting "$parm" "$st"
+                ;;
+                *)
+                st="false"
+                exchangesetting "$parm" "$st"
+                ;;
+            esac
+            ;;
+            2)
+            echo -e "\e[92m请输入时间间隔[分钟、整数]：\e[0m\c"
+            read dtime
+            [[ $dtime == "" ]] && dtime=30
+            exchangesetting "${parm}time" "$dtime"
+            ;;
+            *)
+            error "输入有误！！！"
+            ;;
+        esac
+    done
+}
+checktime(){
+    cur_time=$(date +%s)
+    getsetting "${1}time"
+    [[ $result == "" ]] && result=30
+    period=$(($result * 60))
+    inittime=`eval echo '$'"init_$1_time"`
+    speadtime=$(($cur_time - $inittime))
+    if [ $speadtime -gt $period ]
+    then
+        return 0
+    else
+        return 1
+    fi
+}
 Copyright
 Move_base_dir
 ###
 if [[ "$1" == "au" ]]; then
+    init_gameupdate_time=$(date +%s)
+    init_modupdate_time=$(date +%s)
+    init_keepalive_time=$(date +%s)
+    init_backupcluster_time=$(date +%s)
     while (true)
     do
         clear
-        echo -e "\e[33m=====饥荒联机版独立服务器脚本自动更新及异常维护进程[Linux-Steam](${script_ver})=====\e[0m"
+        echo -e "\e[33m=====饥荒联机版独立服务器脚本附加功能进程[Linux-Steam](${script_ver})=====\e[0m"
         info "$(date) [退出请按Ctrl + B松开再按D]"
-        Update_DST
-        Update_DST_MOD_Check
-        if [[ "${MOD_update}" == "true" ]]
+        getsetting "gameupdate"
+        if [[ "$result" == "true" ]]
         then
-            Reboot_server
+            if checktime "gameupdate"
+            then
+                Update_DST
+                init_gameupdate_time=$(date +%s)
+            fi
+            info "游戏自动更新已开启！检查周期 $result 分钟"
+        else
+            tip "游戏自动更新未开启！"
         fi
-        Status_keep
-        info "每五分钟进行一次更新检测。。。"
+        getsetting "modupdate"
+        if [[ "$result" == "true" ]]
+        then
+            if checktime "modupdate"
+            then
+                Update_DST_MOD_Check
+                if [[ "${MOD_update}" == "true" ]]
+                then
+                    Reboot_server
+                fi
+                init_modupdate_time=$(date +%s)
+            fi
+            info "MOD自动更新已开启！检查周期 $result 分钟"
+        else
+            tip "MOD自动更新未开启！"
+        fi
+        getsetting "keepalive"
+        if [[ "$result" == "true" ]]
+        then
+            if checktime "keepalive"
+            then
+                Status_keep
+                init_keepalive_time=$(date +%s)
+            fi
+            info "闪退自动重启已开启！检查周期 $result 分钟"
+        else
+            tip "闪退自动重启未开启！"
+        fi
+        getsetting "backupcluster"
+        if [[ "$result" == "true" ]]
+        then
+            if checktime "backupcluster"
+            then
+                Backup_cluster
+                init_backupcluster_time=$(date +%s)
+            fi
+            info "存档自动备份已开启！检查周期 $result 分钟"
+        else
+            tip "存档自动备份未开启！"
+        fi
+        info "每五分钟进行一次大循环。。。"
         sleep 300
     done
 fi
