@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://blog.wqlin.com
 #===============================================================================
-script_ver="2.4.2.3"
+script_ver="2.4.2.4"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -162,26 +162,33 @@ MOD_manager(){
         if [ $( ls -l "${dst_base_dir}/${cluster}" | grep -c ^d) -gt 0 ]
         then
             Default_mod
-            echo -e "\e[92m【存档：${cluster}】 你要 1.添加mod  2.删除mod  3.修改MOD配置\n                    4.重置MOD配置  5.安装MOD合集\n：\e[0m\c"
-            read mc
-            case "${mc}" in
-                1)
-                Listallmod
-                Addmod;;
-                2)
-                Listusedmod
-                Delmod;;
-                3)               
-                Mod_Cfg;;
-                4)
-                Clear_mod_cfg
-                ;;
-                5)
-                Install_mod_collection
-                ;;
-                *)
-                return;;
-            esac
+            while (true)
+            do
+                echo -e "\e[92m【存档：${cluster}】 你要 1.添加mod  2.删除mod  3.修改MOD配置\n                    4.重置MOD配置  5.安装MOD合集  6.返回主菜单\n：\e[0m\c"
+                read mc
+                case "${mc}" in
+                    1)
+                    Listallmod
+                    Addmod;;
+                    2)
+                    Listusedmod
+                    Delmod;;
+                    3)               
+                    Mod_Cfg;;
+                    4)
+                    Clear_mod_cfg
+                    ;;
+                    5)
+                    Install_mod_collection
+                    ;;
+                    6)
+                    break
+                    ;;
+                    *)
+                    error "输入有误！！！"
+                    ;;
+                esac
+            done
             Removelastcomma
         else
             error "当前存档【${cluster}】已被删除或已损坏！"
@@ -197,7 +204,7 @@ Install_mod_collection(){
     while (true)
     do
         read clid
-        if [ "$clid" -eq 0 ]
+        if [ $clid -eq 0 ]
         then
             info "合集添加完毕！即将安装 ..."
             break
@@ -225,7 +232,7 @@ Install_mod_collection(){
         do
             if tmux has-session -t DST_MODUPDATE > /dev/null 2>&1
             then
-                if [[ $(grep "Your Server Will Not Start" -c "${dst_base_dir}/downloadmod/Master/server_log.txt") -gt 0 ]]
+                if [ $(grep "Your Server Will Not Start" -c "${dst_base_dir}/downloadmod/Master/server_log.txt") -gt 0 ]
                 then              
                     info "安装进程已执行完毕，请到添加MOD中查看是否安装成功！"
                     tmux kill-session -t DST_MODUPDATE
@@ -250,7 +257,7 @@ Mod_Cfg(){
         Listusedmod
         info "请从以上列表选择你要配置的MOD${Red_font_prefix}[编号]${Font_color_suffix},完毕请输数字 0 ！"
         read modid
-        if [[ "${modid}" -eq 0 ]]
+        if [[ "${modid}" == "0" ]]
         then
             info "MOD配置完毕！"
             break
@@ -540,10 +547,9 @@ Addmod(){
             Addmodfunc
         fi
     done
+    clear
     info "默认参数配置已写入配置文件，可手动修改，也可通过脚本修改："
     info "${dst_base_dir}/${cluster}/***/modoverrides.lua"
-    sleep 3
-    clear
 }
 Addmodtoshard(){
     Get_shard_array
@@ -573,7 +579,7 @@ Addmodtoshard(){
     done
 }
 Truemodid(){
-    if [ "${modid}" -lt 10000 ]
+    if [ ${modid} -lt 10000 ]
     then
         moddir=$(sed -n ${modid}p "${data_dir}/modconflist.lua" | cut -d ':' -f3)
     else
@@ -594,7 +600,7 @@ Delmodfromshard(){
     do
         if [ -f "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua" ]
         then
-            if [[ $(grep "${moddir}" -c "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua") -gt 0 ]]
+            if [ $(grep "${moddir}" -c "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua") -gt 0 ]
             then
                 grep -n "^  \[" "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua" > "${data_dir}/modidlist.txt"
                 lastmodlinenum=$(cat "${data_dir}/modidlist.txt" | tail -n 1 | cut -d ":" -f1)
@@ -633,7 +639,7 @@ Delmod(){
     while (true)
     do
         read modid
-        if [[ "${modid}" -eq 0 ]]
+        if [[ "${modid}" == "0" ]]
         then
             info "MOD删除完毕！"
             break
@@ -644,47 +650,63 @@ Delmod(){
     done
 }
 List_manager(){
-    echo -e "\e[92m你要设置：1.管理员  2.黑名单  3.白名单 ? \e[0m\c"
-    read list
-    case "${list}" in
-        1)
-        listfile="alist.txt"
-        listname="管理员"
-        ;;
-        2)
-        listfile="blist.txt"
-        listname="黑名单"
-        ;;
-        3)
-        listfile="wlist.txt"
-        listname="白名单"
-        ;;
-        *)
-        error "输入有误，请输入数字[1-3]"
-        ;;
-    esac
-    echo -e "\e[92m你要：1.添加${listname}" 2.移除${listname}" ? \e[0m\c"
-    read addordel
-    case "${addordel}" in
-        1)
-        Addlist
-        ;;
-        2)
-        Dellist
-        ;;
-    esac
+    tip "添加的名单设置在重启后生效，且在每一个存档都会生效！"
+    while (true)
+    do
+        echo -e "\e[92m你要设置：1.管理员  2.黑名单  3.白名单 4.返回主菜单? \e[0m\c"
+        read list
+        case "${list}" in
+            1)
+            listfile="alist.txt"
+            listname="管理员"
+            ;;
+            2)
+            listfile="blist.txt"
+            listname="黑名单"
+            ;;
+            3)
+            listfile="wlist.txt"
+            listname="白名单"
+            ;;
+            4)
+            break
+            ;;
+            *)
+            error "输入有误，请输入数字[1-3]"
+            ;;
+        esac
+        while (true)
+        do
+            echo -e "\e[92m你要：1.添加${listname} 2.移除${listname} 3.返回上一级菜单? \e[0m\c"
+            read addordel
+            case "${addordel}" in
+                1)
+                Addlist
+                ;;
+                2)
+                Dellist
+                ;;
+                3)
+                break
+                ;;
+                *)
+                error "输入有误！"
+                ;;
+            esac
+        done
+    done
 }
 Addlist(){
     echo -e "\e[92m请输入你要添加的KLEIID（KU_XXXXXXX）：(添加完毕请输入数字 0 )\e[0m"
     while (true)
     do
         read kleiid
-        if [[ "${kleiid}" -eq 0 ]]
+        if [[ "${kleiid}" == "0" ]]
         then
             info "添加完毕！"
             break
         else
-            if [[ $(grep "${kleiid}" -c "${data_dir}/${listfile}") -gt 0 ]]
+            if [ $(grep "${kleiid}" -c "${data_dir}/${listfile}") -gt 0 ]
             then
                 info "名单${kleiid}已经存在！"
             else
@@ -701,7 +723,7 @@ Dellist(){
         grep -n "^" "${data_dir}/${listfile}"
         echo -e "\e[92m请输入你要移除的KLEIID${Red_font_prefix}[编号]${Font_color_suffix}，删除完毕请输入数字 0 \e[0m"
         read kleiid
-        if [[ "${kleiid}" -eq 0 ]]
+        if [[ "${kleiid}" == "0" ]]
         then
             info "移除完毕！"
             break
@@ -1102,6 +1124,7 @@ Set_cluster(){
     while (true)
     do
         clear
+        tip "存档设置修改后需要重启服务器方能生效！！！"
         echo -e "\e[92m=============【存档槽：${cluster}】===============\e[0m"
         index=1
         cat "${dst_cluster_file}" | grep -v "script_ver" | while read line
@@ -1122,7 +1145,7 @@ Set_cluster(){
                     # 处理替代空格的#号
                     value=$(echo "${ss[1]}" | sed 's/#/ /g')
                 fi
-                if [ "${index}" -lt 10 ]
+                if [ ${index} -lt 10 ]
                 then
                     echo -e "\e[33m[ ${index}] ${ss[2]}：${value}\e[0m"
                 else
@@ -1310,7 +1333,7 @@ Set_world_config(){
                     done
                     if [ "${list[$j]}" == "${ss[2]}" ]
                     then
-                        if [ "${linenum}" -lt 10 ]
+                        if [ ${linenum} -lt 10 ]
                         then
                             printf "%-21s\t" "[ ${linenum}]${ss[3]}: ${value}"
                         else
@@ -1402,7 +1425,7 @@ Setup_mod(){
     dir=$(cat "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua" | grep "workshop" | cut -f2 -d '"' | cut -d "-" -f2)
     for moddir in ${dir}
     do
-        if [[ $(grep "${moddir}" -c "${data_dir}/mods_setup.lua") = 0 ]]
+        if [ $(grep "${moddir}" -c "${data_dir}/mods_setup.lua") -eq 0 ]
         then
             echo "ServerModSetup(\"${moddir}\")" >> "${data_dir}/mods_setup.lua"
         fi
@@ -1490,11 +1513,9 @@ Analysis_log(){
         do
             while read line
             do
-                echo $line
                 line_0=$(echo $line | cut -d '@' -f1)
                 line_1=$(echo $line | cut -d '@' -f2)
                 line_2=$(echo $line | cut -d '@' -f3)
-                echo "$line_0 $line_1 $line_2"
                 if [ $(grep "$line_1" -c $log_file) -gt 0 ]
                 then
                     case "$line_0" in
@@ -1517,7 +1538,7 @@ Analysis_log(){
                         fi
                         break;;
                         *)
-                        echo "$1:$line_2" >> "$ays_log_file"
+                        printf_and_save_log "$1" "$line_2" "$ays_log_file"
                         num=$(grep "$line_2" -n "${data_dir}/log_arr_str_$1.txt" | cut -d ":" -f1)
                         sed -i "${num}d" "${data_dir}/log_arr_str_$1.txt"
                         break;;
@@ -1845,7 +1866,7 @@ Download_MOD(){
     do
         if tmux has-session -t DST_MODUPDATE > /dev/null 2>&1
         then
-            if [[ $(grep "Your Server Will Not Start" -c "${dst_base_dir}/downloadmod/Master/server_log.txt") -gt 0 ]]
+            if [ $(grep "Your Server Will Not Start" -c "${dst_base_dir}/downloadmod/Master/server_log.txt") -gt 0 ]
             then
                 Update_DST_MOD_Check > /dev/null 2>&1
                 if [[ "${MOD_update}" == "true" ]]
