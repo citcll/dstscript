@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://blog.wqlin.com
 #===============================================================================
-script_ver="2.4.2.1"
+script_ver="2.4.2.2"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -771,10 +771,10 @@ Update_DST_Check(){
     availablebuild=$(curl -s "${my_api_link}/" | sed 's/[ \t]*$//g' | tr -cd [0-9])
     if [[ "${currentbuild}" != "${availablebuild}" && "${availablebuild}" != "" ]]
     then
-        dst_need_update=true
+        dst_need_update="true"
         dst_need_update_str="需要更新"
     else
-        dst_need_update=false
+        dst_need_update="false"
         dst_need_update_str="无需更新"
     fi
 }
@@ -803,6 +803,7 @@ Update_DST(){
     Get_server_status
     cur_serveropen=${serveropen}
     Update_DST_Check
+    cur_dst_need_update=${dst_need_update}
     if [[ "${dst_need_update}" == "true" ]]
     then
         info "更新可用(${currentbuild}===>${availablebuild})！即将执行更新..."
@@ -813,7 +814,7 @@ Update_DST(){
     else
         tip "无可用更新！当前版本（${availablebuild}）"
     fi
-    if [[ "${cur_serveropen}" == "true" && "${dst_need_update}" == "true" ]]
+    if [[ "${cur_serveropen}" == "true" && "${cur_dst_need_update}" == "true" ]]
     then
         Run_server
     fi
@@ -1729,7 +1730,7 @@ Update_DST_MOD_Check(){
             cd "${data_dir}"
             cur_mod_name=$(lua modconf.lua)
         else
-            mod_cur_ver=000
+            mod_cur_ver="000"
             cur_mod_name="未知名称"
         fi
         if [[ "${mod_new_ver}" != "" && "${mod_cur_ver}" != "" && "${mod_new_ver}" != "nil" && "${mod_new_ver}" != "${mod_cur_ver}" ]]
@@ -1749,10 +1750,10 @@ Status_keep(){
     do
         if ! tmux has-session -t DST_"${shard}" > /dev/null 2>&1
         then
-            server_alive=false
+            server_alive="false"
             break
         else
-            server_alive=true
+            server_alive="true"
         fi
     done
     if [[ $(grep "serveropen" "${server_conf_file}" | cut -d "=" -f2) == "true" &&  "${server_alive}" == "false" ]]
