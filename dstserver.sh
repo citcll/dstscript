@@ -720,9 +720,9 @@ Cluster_manager(){
         Get_current_cluster
         if [[ $mycluster != $cluster ]]
         then
-            rm -rf "${dst_base_dir}/${cluster}" && info "存档【${cluster}】已删除！"
+            rm -rf "${dst_base_dir}/${mycluster}" && info "存档【${mycluster}】已删除！"
         else
-            error "存档【$cluster】正在运行，请关闭后再删除！！"
+            error "存档【$mycluster】正在运行，请关闭后再删除！！"
         fi
     fi
 }
