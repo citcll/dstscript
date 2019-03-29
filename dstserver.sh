@@ -164,7 +164,7 @@ MOD_manager(){
             Default_mod
             while (true)
             do
-                echo -e "\e[92m【存档：${cluster}】 你要 1.添加mod  2.删除mod  3.修改MOD配置\n                    4.重置MOD配置  5.安装MOD合集  6.返回主菜单\n：\e[0m\c"
+                echo -e "\e[92m【存档：${cluster}】 你要\n1.添加mod       2.删除mod      3.修改MOD配置 \n4.重置MOD配置   5.安装MOD合集  6.返回主菜单\n：\e[0m\c"
                 read mc
                 case "${mc}" in
                     1)
