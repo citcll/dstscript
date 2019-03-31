@@ -1537,7 +1537,8 @@ Save_log(){
         cp "$dst_base_dir/$cluster/$shard/server_chat_log.txt" "$log_save_dir/$cur_day/server_chat_log_backup_${cluster}_${shard}_${cur_time}.txt"
         echo "$(date)" >> "$log_save_dir/$cur_day/server_log_backup_${cluster}_${shard}_${cur_time}.txt"
         cp  "$dst_base_dir/$cluster/$shard/server_log.txt" "$log_save_dir/$cur_day/server_log_backup_${cluster}_${shard}_${cur_time}.txt"
-        info "【${shard}】旧的日志已备份到【$log_save_dir/$cur_day】【保留一周内的日志备份】。"
+        info "【${shard}】旧的日志已备份到【$log_save_dir/$cur_day】"
+        info "【保留一周内的日志备份】。"
     fi
 }
 Clean_old_log(){
@@ -1566,7 +1567,8 @@ Backup_cluster(){
         fi
         cur_time=$(date "+%H%M%S")
         tar -zcPf "$cluster_backup_dir/$cur_day/cluster_backup_${cluster}_${cur_time}.tar.gz" "$dst_base_dir/$cluster"
-        info "【${shard}】旧的存档已备份到【$log_save_dir/$cur_day】【保留三天内的存档备份】。"
+        info "【${shard}】旧的存档已备份到【$log_save_dir/$cur_day】"
+        info "【保留三天内的存档备份】。"
     fi
 }
 Clean_old_cluster(){
