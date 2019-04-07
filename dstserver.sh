@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://blog.wqlin.com
 #===============================================================================
-script_ver="2.4.3"
+script_ver="2.4.3.1"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -917,9 +917,9 @@ exchangesetting(){
     then
         touch "${server_conf_file}"
     fi
-    if [ $(grep $1 -c "${server_conf_file}") -gt 0 ]
+    if [ $(grep "^$1=" -c "${server_conf_file}") -gt 0 ]
     then
-        linen=$(grep $1 -n "${server_conf_file}" | cut -d ":" -f1)
+        linen=$(grep "^$1=" -n "${server_conf_file}" | cut -d ":" -f1)
         sed -i ${linen}d "${server_conf_file}"
         echo "$1=$2" >> "${server_conf_file}"
     else
