@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://blog.wqlin.com
 #===============================================================================
-script_ver="2.4.4"
+script_ver="pause"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -1515,16 +1515,17 @@ Start_shard(){
         Setup_mod
     fi
     Backup_cluster
+    Save_log
     cd "${dst_server_dir}/bin"
     for shard in ${shardarray}
     do
-        Save_log
         unset TMUX
         tmux new-session -s DST_${shard} -d "${dst_bin_cmd} -persistent_storage_root ${dst_conf_basedir} -cluster ${cluster} -shard ${shard}"
     done
 }
 Save_log(){
     Clean_old_log
+    Get_single_shard
     if [ -f "$dst_base_dir/$cluster/$shard/server_chat_log.txt" ]
     then
         cur_day=$(date "+%F")
@@ -1567,7 +1568,7 @@ Backup_cluster(){
         fi
         cur_time=$(date "+%H%M%S")
         tar -zcPf "$cluster_backup_dir/$cur_day/cluster_backup_${cluster}_${cur_time}.tar.gz" "$dst_base_dir/$cluster"
-        info "【${shard}】旧的存档已备份到【$log_save_dir/$cur_day】"
+        info "【${shard}】旧的存档已备份到【$cluster_backup_dir/$cur_day】"
         info "【保留三天内的存档备份】。"
     fi
 }
@@ -1653,21 +1654,22 @@ Analysis_log(){
                         RES="done"
                         printf_and_save_log $1 "ANALYSISLOGDONE" "$ays_log_file"
                         break;;
-                        2)
-                        retrytime=$[$retrytime + 1]
-                        if [ $retrytime -le 5 ]
-                        then
-                            printf_and_save_log $1 "连接失败！第$retrytime次连接重试！" "$ays_log_file"
-                            sleep 5
-                        else
-                            printf_and_save_log "$1" "$line_2" "$ays_log_file"
-                            num=$(grep "$line_2" -n "${data_dir}/log_arr_str_$1.txt" | cut -d ":" -f1)
-                            sed -i "${num}d" "${data_dir}/log_arr_str_$1.txt"
-                            RES="done"
-                            printf_and_save_log $1 "ANALYSISLOGDONE" "$ays_log_file"
-                        fi
-                        break;;
                         *)
+                        if [ $(grep ".*Connection to master failed. Waiting to reconnect.*" -c $log_file) -gt 0 ]
+                        then
+                            retrytime=$[$retrytime + 1]
+                            if [ $retrytime -le 5 ]
+                            then
+                                printf_and_save_log $1 "连接失败！第$retrytime次连接重试！" "$ays_log_file"
+                                sleep 10
+                            fi
+                        fi
+                        # printf_and_save_log "$1" "$line_2" "$ays_log_file"
+                        # num=$(grep "$line_2" -n "${data_dir}/log_arr_str_$1.txt" | cut -d ":" -f1)
+                        # sed -i "${num}d" "${data_dir}/log_arr_str_$1.txt"
+                        # RES="done"
+                        # printf_and_save_log $1 "ANALYSISLOGDONE" "$ays_log_file"
+                        # break;;
                         # if [ $(echo $line_2 | grep -c "开始下载或更新MOD") -gt 0 ]
                         # then
                         #     modnum=$(grep "DownloadMods(.*)$" $log_file | sed "s/.*DownloadMods(\([0-9]*\)).*/\1/g")
