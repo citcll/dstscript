@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://blog.wqlin.com
 #===============================================================================
-script_ver="2.4.3.3"
+script_ver="2.4.3.4"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -1667,6 +1667,11 @@ Analysis_log(){
                         fi
                         break;;
                         *)
+                        if [[ "开始下载或更新MOD并加载MOD配置。。。" == $line_2 ]]
+                        then
+                            modnum=$(grep "DownloadMods(.*)$" $log_file | sed "s/.*DownloadMods(\([0-9]*\)).*/\1/g")
+                            line_2="$line_2【MOD：$modnum 个。MOD多的话这里耗时多。】"
+                        fi
                         printf_and_save_log "$1" "$line_2" "$ays_log_file"
                         num=$(grep "$line_2" -n "${data_dir}/log_arr_str_$1.txt" | cut -d ":" -f1)
                         sed -i "${num}d" "${data_dir}/log_arr_str_$1.txt"
@@ -1998,7 +2003,8 @@ Download_MOD(){
         then
             if [ $(grep "Your Server Will Not Start" -c "${dst_base_dir}/downloadmod/Master/server_log.txt") -gt 0 ]
             then
-                Update_DST_MOD_Check > /dev/null 2>&1
+                # 执行完检查
+                Update_DST_MOD_Check
                 if [[ "${MOD_update}" == "true" ]]
                 then
                     tip "因网络或不明原因MOD更新失败！请本地上传更新或重试！"
@@ -2145,12 +2151,12 @@ Extend_function_setting(){
         clear
         unset parm
         echo -e "\e[33m=====饥荒联机版独立服务器脚本拓展功能设置[Linux-Steam](${script_ver})=====\e[0m"
-        echo -e "\e[92m    0. 保存设置并返回主菜单\e[0m"
+        echo -e "\e[92m    0. 保存设置重启拓展功能进程并返回主菜单\e[0m"
         echo -e "\e[92m    1. 周期性检查游戏是否有更新，需要更新时重启更新\e[0m"
         echo -e "\e[92m    2. 周期性检查启用的MOD是否有更新，需要更新时重启更新\e[0m"
         echo -e "\e[92m    3. 周期性检查游戏进程是否意外退出，退出自动重启\e[0m"
         echo -e "\e[92m    4. 周期性备份当前开启的存档\e[0m"
-        echo -e "\e[35m涉及时间的设置单位均为分钟，只能输入整数\e[0m"
+        echo -e "\e[35m涉及时间的设置单位均为分钟，只能输入整数，尽量不要小于五分钟。\e[0m"
         echo -e "\e[33m=====================================================================\e[0m"
         echo -e "\e[92m请输入命令代号：\e[0m\c"
         read efs
