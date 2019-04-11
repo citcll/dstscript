@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://blog.wqlin.com
 #===============================================================================
-script_ver="2.4.3.4"
+script_ver="2.4.3.5"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -1655,7 +1655,7 @@ Analysis_log(){
                         break;;
                         2)
                         retrytime=$[$retrytime + 1]
-                        if [ $retrytime -le 5 ]
+                        if [ $retrytime -le 10 ]
                         then
                             printf_and_save_log $1 "连接失败！第$retrytime次连接重试！" "$ays_log_file"
                         else
@@ -1667,11 +1667,11 @@ Analysis_log(){
                         fi
                         break;;
                         *)
-                        if [[ "开始下载或更新MOD并加载MOD配置。。。" == $line_2 ]]
-                        then
-                            modnum=$(grep "DownloadMods(.*)$" $log_file | sed "s/.*DownloadMods(\([0-9]*\)).*/\1/g")
-                            line_2="$line_2【MOD：$modnum 个。MOD多的话这里耗时多。】"
-                        fi
+                        # if [ $(echo $line_2 | grep -c "开始下载或更新MOD") -gt 0 ]
+                        # then
+                        #     modnum=$(grep "DownloadMods(.*)$" $log_file | sed "s/.*DownloadMods(\([0-9]*\)).*/\1/g")
+                        #     line_2="$line_2【MOD：$modnum 个。MOD多的话这里耗时多。】"
+                        # fi
                         printf_and_save_log "$1" "$line_2" "$ays_log_file"
                         num=$(grep "$line_2" -n "${data_dir}/log_arr_str_$1.txt" | cut -d ":" -f1)
                         sed -i "${num}d" "${data_dir}/log_arr_str_$1.txt"
