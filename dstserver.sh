@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://blog.wqlin.com
 #===============================================================================
-script_ver="2.4.3.2"
+script_ver="2.4.3.3"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -854,7 +854,7 @@ Update_DST_Check(){
     # data from klei forums
     info "正在检查游戏服务端是否有更新 。。。 请稍后 。。。"
     currentbuild=$(cat "${dst_server_dir}/version.txt")
-    availablebuild=$(curl -s "${my_api_link}/" | grep -o "[^ ]\+\+[ ]\+*" | tr -cd [0-9])
+    availablebuild=$(curl -s "${my_api_link}/" | grep -o "[^ ]\+\+[^ ]\+*" | tr -cd [0-9])
     if [[ "${currentbuild}" != "${availablebuild}" && "${availablebuild}" != "" ]]
     then
         dst_need_update="true"
@@ -1868,7 +1868,7 @@ Update_DST_MOD_Check(){
     Get_single_shard
     for modid in $(grep '^  \["workshop-' "${dst_base_dir}/${cluster}/${shard}/modoverrides.lua" | cut -d '"' -f2 | cut -d '-' -f2)
     do
-        mod_new_ver=$(curl -s "${my_api_link}/?type=mod&modid=${modid}" | grep -o "[^ ]\+\+[ ]\+*")
+        mod_new_ver=$(curl -s "${my_api_link}/?type=mod&modid=${modid}" | grep -o "[^ ]\+\+[^ ]\+*")
         if [ -f "${dst_server_dir}/mods/workshop-${modid}/modinfo.lua" ]
         then
             echo "fuc = \"getver\"" > "${data_dir}/modinfo.lua"
