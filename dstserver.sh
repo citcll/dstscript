@@ -5,7 +5,7 @@
 #    Author: Ariwori
 #    Blog: https://blog.wqlin.com
 #===============================================================================
-script_ver="2.4.3.5"
+script_ver="2.4.4"
 dst_conf_dirname="DoNotStarveTogether"
 dst_conf_basedir="${HOME}/Klei"
 dst_base_dir="${dst_conf_basedir}/${dst_conf_dirname}"
@@ -1655,9 +1655,10 @@ Analysis_log(){
                         break;;
                         2)
                         retrytime=$[$retrytime + 1]
-                        if [ $retrytime -le 10 ]
+                        if [ $retrytime -le 5 ]
                         then
                             printf_and_save_log $1 "连接失败！第$retrytime次连接重试！" "$ays_log_file"
+                            sleep 5
                         else
                             printf_and_save_log "$1" "$line_2" "$ays_log_file"
                             num=$(grep "$line_2" -n "${data_dir}/log_arr_str_$1.txt" | cut -d ":" -f1)
