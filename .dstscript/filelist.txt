@@ -10,5 +10,5 @@ Cavesend.lua:1.1.9
 lavaarena.lua:1.0.6
 updatelib.txt:1.0.6
 announce.txt:1.1.0
-logarr.txt:1.0.9
+logarr.txt:1.1.0
 aog.lua:1.0.6
